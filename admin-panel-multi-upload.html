@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - BachatList</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .content { padding: 30px; }
+        .login-screen {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .login-screen input {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 300px;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102,126,234,0.4); }
+        .btn-success {
+            background: #43e97b;
+            color: white;
+            margin-top: 20px;
+        }
+        .btn-success:hover { background: #2dd865; }
+        .btn-secondary {
+            background: #718096;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        .btn-secondary:hover { background: #4a5568; }
+        .btn-danger {
+            background: #f56565;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .btn-danger:hover { background: #e53e3e; }
+        .deal-section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f7fafc;
+        }
+        .deal-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 22px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .deal-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+        }
+        .deal-item h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .multi-upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f7fafc;
+            margin-bottom: 15px;
+        }
+        .multi-upload-area:hover {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+        .multi-upload-area.dragover {
+            border-color: #667eea;
+            background: #e6f2ff;
+            transform: scale(1.02);
+        }
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .upload-text {
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+        .upload-hint {
+            font-size: 12px;
+            color: #718096;
+        }
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .image-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+            background: white;
+        }
+        .image-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+        .image-item-controls {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+        }
+        .image-item-controls button {
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .image-item-controls button:hover {
+            background: rgba(0,0,0,0.9);
+            transform: scale(1.1);
+        }
+        .image-item-info {
+            padding: 8px;
+            background: #f7fafc;
+            font-size: 11px;
+            color: #718096;
+            text-align: center;
+        }
+        .primary-badge {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: #43e97b;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .hidden { display: none; }
+        .error { color: #f5576c; margin-top: 10px; }
+        .success { 
+            background: #43e97b; 
+            color: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin: 20px 0;
+            text-align: center;
+        }
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            flex: 1;
+            min-width: 150px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 5px;
+        }
+        .section-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tab:hover {
+            border-color: #667eea;
+        }
+        .tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 BachatList Admin Panel</h1>
+            <p>Manage your website content with multiple image uploads</p>
+        </div>
+        
+        <div class="content">
+            <!-- Login Screen -->
+            <div id="loginScreen" class="login-screen">
+                <h2>Enter Password</h2>
+                <input type="password" id="passwordInput" placeholder="Password" onkeypress="if(event.key==='Enter') login()">
+                <br>
+                <button class="btn btn-primary" onclick="login()">Login</button>
+                <div id="loginError" class="error hidden"></div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="adminPanel" class="hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalImages">0</div>
+                            <div class="stat-label">Total Images</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalDeals">3</div>
+                            <div class="stat-label">Total Deals</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="dataSize">0 KB</div>
+                            <div class="stat-label">Data Size</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="logout()" style="padding: 8px 20px; font-size: 14px;">Logout</button>
+                </div>
+
+                <div id="successMsg" class="success hidden"></div>
+
+                <!-- Section Tabs -->
+                <div class="section-tabs">
+                    <div class="tab active" onclick="switchTab('trending')">🔥 Trending Deals</div>
+                    <div class="tab" onclick="switchTab('reviews')">⭐ Product Reviews</div>
+                    <div class="tab" onclick="switchTab('categories')">📂 Categories</div>
+                </div>
+
+                <!-- Trending Deals Section -->
+                <div id="trending-content" class="tab-content active">
+                    <div class="deal-section">
+                        <h2>🔥 Trending Deals</h2>
+                        
+                        <!-- Deal 1 -->
+                        <div class="deal-item">
+                            <h3>Deal 1 - Premium Wireless Earbuds</h3>
+                            
+                            <div class="form-group">
+                                <label>📸 Multiple Images (Click or Drag)</label>
+                                <div class="multi-upload-area" id="upload-area-deal-1" onclick="document.getElementById('file-input-deal-1').click()">
+                                    <input type="file" id="file-input-deal-1" accept="image/*" multiple style="display: none;" onchange="handleMultipleImages(event, 'deal-1')">
+                                    <div class="upload-icon">📤</div>
+                                    <div class="upload-text">Upload Multiple Images</div>
+                                    <div class="upload-hint">Max 5MB per image • JPG, PNG, WebP • Select multiple files</div>
+                                </div>
+                                <div id="gallery-deal-1" class="image-gallery"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>📝 Title</label>
+                                <input type="text" id="title-deal-1" placeholder="Premium Wireless Earbuds with ANC">
+                            </div>
+
+                            <div class="form-group">
+                                <label>📄 Description</label>
+                                <textarea id="desc-deal-1" placeholder="Active noise cancellation, 30hr battery life, premium sound quality"></textarea>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                                <div class="form-group">
+                                    <label>💰 Current Price</label>
+                                    <input type="text" id="price-deal-1" placeholder="₹2,499">
+                                </div>
+                                <div class="form-group">
+                                    <label>🏷️ Original Price</label>
+                                    <input type="text" id="original-price-deal-1" placeholder="₹6,999">
+                                </div>
+                                <div class="form-group">
+                                    <label>⭐ Rating</label>
+                                    <input type="text" id="rating-deal-1" placeholder="4.5/5">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>🔗 Amazon Link</label>
+                                <input type="text" id="link-deal-1" placeholder="https://amazon.in/...">
+                            </div>
+                        </div>
+
+                        <!-- Deal 2 -->
+                        <div class="deal-item">
+                            <h3>Deal 2 - Fitness Smart Watch</h3>
+                            
+                            <div class="form-group">
+                                <label>📸 Multiple Images (Click or Drag)</label>
+                                <div class="multi-upload-area" id="upload-area-deal-2" onclick="document.getElementById('file-input-deal-2').click()">
+                                    <input type="file" id="file-input-deal-2" accept="image/*" multiple style="display: none;" onchange="handleMultipleImages(event, 'deal-2')">
+                                    <div class="upload-icon">📤</div>
+                                    <div class="upload-text">Upload Multiple Images</div>
+                                    <div class="upload-hint">Max 5MB per image • JPG, PNG, WebP • Select multiple files</div>
+                                </div>
+                                <div id="gallery-deal-2" class="image-gallery"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>📝 Title</label>
+                                <input type="text" id="title-deal-2" placeholder="Fitness Smart Watch - Health Tracker">
+                            </div>
+
+                            <div class="form-group">
+                                <label>📄 Description</label>
+                                <textarea id="desc-deal-2" placeholder="Heart rate monitor, sleep tracking, 15-day battery, IP68 waterproof"></textarea>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                                <div class="form-group">
+                                    <label>💰 Current Price</label>
+                                    <input type="text" id="price-deal-2" placeholder="₹1,999">
+                                </div>
+                                <div class="form-group">
+                                    <label>🏷️ Original Price</label>
+                                    <input type="text" id="original-price-deal-2" placeholder="₹6,999">
+                                </div>
+                                <div class="form-group">
+                                    <label>⭐ Rating</label>
+                                    <input type="text" id="rating-deal-2" placeholder="4.7/5">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>🔗 Amazon Link</label>
+                                <input type="text" id="link-deal-2" placeholder="https://amazon.in/...">
+                            </div>
+                        </div>
+
+                        <!-- Deal 3 -->
+                        <div class="deal-item">
+                            <h3>Deal 3 - Fast Charging Power Bank</h3>
+                            
+                            <div class="form-group">
+                                <label>📸 Multiple Images (Click or Drag)</label>
+                                <div class="multi-upload-area" id="upload-area-deal-3" onclick="document.getElementById('file-input-deal-3').click()">
+                                    <input type="file" id="file-input-deal-3" accept="image/*" multiple style="display: none;" onchange="handleMultipleImages(event, 'deal-3')">
+                                    <div class="upload-icon">📤</div>
+                                    <div class="upload-text">Upload Multiple Images</div>
+                                    <div class="upload-hint">Max 5MB per image • JPG, PNG, WebP • Select multiple files</div>
+                                </div>
+                                <div id="gallery-deal-3" class="image-gallery"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>📝 Title</label>
+                                <input type="text" id="title-deal-3" placeholder="20000mAh Fast Charging Power Bank">
+                            </div>
+
+                            <div class="form-group">
+                                <label>📄 Description</label>
+                                <textarea id="desc-deal-3" placeholder="20W fast charging, dual USB ports, LED display, compact design"></textarea>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                                <div class="form-group">
+                                    <label>💰 Current Price</label>
+                                    <input type="text" id="price-deal-3" placeholder="₹899">
+                                </div>
+                                <div class="form-group">
+                                    <label>🏷️ Original Price</label>
+                                    <input type="text" id="original-price-deal-3" placeholder="₹1,999">
+                                </div>
+                                <div class="form-group">
+                                    <label>⭐ Rating</label>
+                                    <input type="text" id="rating-deal-3" placeholder="4.3/5">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>🔗 Amazon Link</label>
+                                <input type="text" id="link-deal-3" placeholder="https://amazon.in/...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div id="reviews-content" class="tab-content">
+                    <div class="deal-section">
+                        <h2>⭐ Product Reviews</h2>
+                        
+                        <div class="deal-item">
+                            <h3>Review 1 - Best Budget Laptops</h3>
+                            
+                            <div class="form-group">
+                                <label>📸 Multiple Images</label>
+                                <div class="multi-upload-area" id="upload-area-review-1" onclick="document.getElementById('file-input-review-1').click()">
+                                    <input type="file" id="file-input-review-1" accept="image/*" multiple style="display: none;" onchange="handleMultipleImages(event, 'review-1')">
+                                    <div class="upload-icon">📤</div>
+                                    <div class="upload-text">Upload Review Images</div>
+                                    <div class="upload-hint">Max 5MB per image • JPG, PNG, WebP</div>
+                                </div>
+                                <div id="gallery-review-1" class="image-gallery"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>📝 Title</label>
+                                <input type="text" id="title-review-1" placeholder="Best Budget Laptops Under ₹40,000">
+                            </div>
+
+                            <div class="form-group">
+                                <label>📄 Description</label>
+                                <textarea id="desc-review-1" placeholder="Comprehensive comparison of top budget laptops..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>🔗 Review Link</label>
+                                <input type="text" id="link-review-1" placeholder="review-1.html">
+                            </div>
+                        </div>
+
+                        <div class="deal-item">
+                            <h3>Review 2 - Top Wireless Headphones</h3>
+                            
+                            <div class="form-group">
+                                <label>📸 Multiple Images</label>
+                                <div class="multi-upload-area" id="upload-area-review-2" onclick="document.getElementById('file-input-review-2').click()">
+                                    <input type="file" id="file-input-review-2" accept="image/*" multiple style="display: none;" onchange="handleMultipleImages(event, 'review-2')">
+                                    <div class="upload-icon">📤</div>
+                                    <div class="upload-text">Upload Review Images</div>
+                                    <div class="upload-hint">Max 5MB per image • JPG, PNG, WebP</div>
+                                </div>
+                                <div id="gallery-review-2" class="image-gallery"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>📝 Title</label>
+                                <input type="text" id="title-review-2" placeholder="Top 10 Wireless Headphones 2024">
+                            </div>
+
+                            <div class="form-group">
+                                <label>📄 Description</label>
+                                <textarea id="desc-review-2" placeholder="Tested and reviewed the best wireless headphones..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>🔗 Review Link</label>
+                                <input type="text" id="link-review-2" placeholder="review-2.html">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories Section -->
+                <div id="categories-content" class="tab-content">
+                    <div class="deal-section">
+                        <h2>📂 Category Images</h2>
+                        
+                        <div class="deal-item">
+                            <h3>Category Images</h3>
+                            
+                            <div class="form-group">
+                                <label>📸 Upload Category Banners</label>
+                                <div class="multi-upload-area" id="upload-area-category" onclick="document.getElementById('file-input-category').click()">
+                                    <input type="file" id="file-input-category" accept="image/*" multiple style="display: none;" onchange="handleMultipleImages(event, 'category')">
+                                    <div class="upload-icon">📤</div>
+                                    <div class="upload-text">Upload Category Images</div>
+                                    <div class="upload-hint">Electronics, Fashion, Home, Beauty, Books, Sports</div>
+                                </div>
+                                <div id="gallery-category" class="image-gallery"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-success" onclick="saveData()" style="width: 100%; font-size: 18px; padding: 15px;">
+                    💾 Save & Download JSON
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PASSWORD_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
+        let contentData = { deals: {}, reviews: {}, categories: {} };
+        let imageStorage = {};
+        const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', function() {
+            const session = localStorage.getItem('adminSession');
+            if (session) {
+                const sessionData = JSON.parse(session);
+                const now = new Date().getTime();
+                if (now - sessionData.time < 3600000) {
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    loadData();
+                    return;
+                } else {
+                    localStorage.removeItem('adminSession');
+                }
+            }
+
+            // Setup drag and drop for all upload areas
+            setupAllDragAndDrop();
+        });
+
+        function setupAllDragAndDrop() {
+            const uploadAreas = document.querySelectorAll('.multi-upload-area');
+            uploadAreas.forEach(area => {
+                const areaId = area.id.replace('upload-area-', '');
+                
+                area.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    area.classList.add('dragover');
+                });
+                
+                area.addEventListener('dragleave', () => {
+                    area.classList.remove('dragover');
+                });
+                
+                area.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    area.classList.remove('dragover');
+                    
+                    const files = Array.from(e.dataTransfer.files);
+                    processMultipleFiles(files, areaId);
+                });
+            });
+        }
+
+        function handleMultipleImages(event, sectionId) {
+            const files = Array.from(event.target.files);
+            processMultipleFiles(files, sectionId);
+        }
+
+        function processMultipleFiles(files, sectionId) {
+            const imageFiles = files.filter(file => file.type.startsWith('image/'));
+            
+            if (imageFiles.length === 0) {
+                alert('Please select image files');
+                return;
+            }
+
+            imageFiles.forEach(file => {
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`${file.name} is too large. Max size is 5MB`);
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    addImageToGallery(e.target.result, sectionId, file.name);
+                    updateStats();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function addImageToGallery(base64Data, sectionId, fileName) {
+            if (!imageStorage[sectionId]) {
+                imageStorage[sectionId] = [];
+            }
+
+            const imageId = `${sectionId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const isPrimary = imageStorage[sectionId].length === 0;
+
+            imageStorage[sectionId].push({
+                id: imageId,
+                data: base64Data,
+                fileName: fileName,
+                isPrimary: isPrimary
+            });
+
+            renderGallery(sectionId);
+        }
+
+        function renderGallery(sectionId) {
+            const gallery = document.getElementById(`gallery-${sectionId}`);
+            if (!gallery) return;
+
+            const images = imageStorage[sectionId] || [];
+            
+            gallery.innerHTML = images.map((img, index) => `
+                <div class="image-item" id="${img.id}">
+                    ${img.isPrimary ? '<div class="primary-badge">PRIMARY</div>' : ''}
+                    <img src="${img.data}" alt="${img.fileName}">
+                    <div class="image-item-controls">
+                        ${!img.isPrimary ? `<button onclick="setPrimary('${sectionId}', '${img.id}')" title="Set as primary">⭐</button>` : ''}
+                        <button onclick="removeImage('${sectionId}', '${img.id}')" title="Remove">❌</button>
+                    </div>
+                    <div class="image-item-info">${img.fileName.substring(0, 20)}</div>
+                </div>
+            `).join('');
+        }
+
+        function setPrimary(sectionId, imageId) {
+            const images = imageStorage[sectionId];
+            images.forEach(img => img.isPrimary = (img.id === imageId));
+            renderGallery(sectionId);
+        }
+
+        function removeImage(sectionId, imageId) {
+            const images = imageStorage[sectionId];
+            const index = images.findIndex(img => img.id === imageId);
+            
+            if (index !== -1) {
+                const wasPrimary = images[index].isPrimary;
+                images.splice(index, 1);
+                
+                // Set first image as primary if we removed the primary image
+                if (wasPrimary && images.length > 0) {
+                    images[0].isPrimary = true;
+                }
+                
+                renderGallery(sectionId);
+                updateStats();
+            }
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(`${tabName}-content`).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function updateStats() {
+            let totalImages = 0;
+            Object.values(imageStorage).forEach(images => {
+                totalImages += images.length;
+            });
+            
+            document.getElementById('totalImages').textContent = totalImages;
+            
+            const dataSize = new Blob([JSON.stringify(imageStorage)]).size;
+            const sizeInKB = (dataSize / 1024).toFixed(2);
+            const sizeInMB = (dataSize / (1024 * 1024)).toFixed(2);
+            
+            document.getElementById('dataSize').textContent = 
+                dataSize > 1024 * 1024 ? `${sizeInMB} MB` : `${sizeInKB} KB`;
+        }
+
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function login() {
+            const passwordInput = document.getElementById('passwordInput');
+            const password = passwordInput.value;
+            
+            if (!password) {
+                document.getElementById('loginError').textContent = 'Please enter a password!';
+                document.getElementById('loginError').classList.remove('hidden');
+                return;
+            }
+
+            const hashedPassword = await hashPassword(password);
+            
+            if (hashedPassword === PASSWORD_HASH) {
+                const sessionData = { time: new Date().getTime() };
+                localStorage.setItem('adminSession', JSON.stringify(sessionData));
+                
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                passwordInput.value = '';
+                loadData();
+            } else {
+                document.getElementById('loginError').textContent = 'Incorrect password!';
+                document.getElementById('loginError').classList.remove('hidden');
+                passwordInput.value = '';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('adminSession');
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        function loadData() {
+            fetch('content-data.json')
+                .then(response => response.json())
+                .then(data => {
+                    contentData = data;
+                    imageStorage = data.images || {};
+                    
+                    // Render all galleries
+                    Object.keys(imageStorage).forEach(sectionId => {
+                        renderGallery(sectionId);
+                    });
+                    
+                    // Load form fields
+                    ['deal-1', 'deal-2', 'deal-3'].forEach(id => {
+                        const deal = contentData.deals?.[id] || {};
+                        if (document.getElementById(`title-${id}`)) {
+                            document.getElementById(`title-${id}`).value = deal.title || '';
+                            document.getElementById(`desc-${id}`).value = deal.description || '';
+                            document.getElementById(`price-${id}`).value = deal.price || '';
+                            document.getElementById(`original-price-${id}`).value = deal.originalPrice || '';
+                            document.getElementById(`rating-${id}`).value = deal.rating || '';
+                            document.getElementById(`link-${id}`).value = deal.link || '';
+                        }
+                    });
+
+                    ['review-1', 'review-2'].forEach(id => {
+                        const review = contentData.reviews?.[id] || {};
+                        if (document.getElementById(`title-${id}`)) {
+                            document.getElementById(`title-${id}`).value = review.title || '';
+                            document.getElementById(`desc-${id}`).value = review.description || '';
+                            document.getElementById(`link-${id}`).value = review.link || '';
+                        }
+                    });
+                    
+                    updateStats();
+                })
+                .catch(error => {
+                    console.log('Starting with empty data');
+                    updateStats();
+                });
+        }
+
+        function saveData() {
+            // Save deals
+            ['deal-1', 'deal-2', 'deal-3'].forEach(id => {
+                if (!contentData.deals) contentData.deals = {};
+                contentData.deals[id] = {
+                    title: document.getElementById(`title-${id}`)?.value || '',
+                    description: document.getElementById(`desc-${id}`)?.value || '',
+                    price: document.getElementById(`price-${id}`)?.value || '',
+                    originalPrice: document.getElementById(`original-price-${id}`)?.value || '',
+                    rating: document.getElementById(`rating-${id}`)?.value || '',
+                    link: document.getElementById(`link-${id}`)?.value || ''
+                };
+            });
+
+            // Save reviews
+            ['review-1', 'review-2'].forEach(id => {
+                if (!contentData.reviews) contentData.reviews = {};
+                contentData.reviews[id] = {
+                    title: document.getElementById(`title-${id}`)?.value || '',
+                    description: document.getElementById(`desc-${id}`)?.value || '',
+                    link: document.getElementById(`link-${id}`)?.value || ''
+                };
+            });
+
+            // Save images
+            contentData.images = imageStorage;
+
+            // Download JSON
+            const jsonStr = JSON.stringify(contentData, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'content-data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+
+            const successMsg = document.getElementById('successMsg');
+            successMsg.textContent = '✅ Data saved successfully! JSON file downloaded.';
+            successMsg.classList.remove('hidden');
+            setTimeout(() => successMsg.classList.add('hidden'), 5000);
+        }
+    </script>
+</body>
+</html>
