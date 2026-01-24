@@ -14,6 +14,10 @@
     "deal-desc-2": "Heart rate monitor, sleep tracking, 15-day battery, IP68 waterproof",
     "deal-desc-3": "20W fast charging, dual USB ports, LED display, compact design"
   },
-  "prices": {},
+  "prices": {
+    "price-1": "₹2,499",
+    "price-2": "₹1,999",
+    "price-3": "₹899"
+  },
   "customContent": {}
 }

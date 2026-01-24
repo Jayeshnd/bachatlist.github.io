@@ -10,13 +10,26 @@
 <body>
     <nav class="navbar">
         <div class="container">
-            <a href="index.html" class="logo"><span class="logo-icon">💰</span>Bachat<span class="logo-accent">List</span></a>
-            <ul class="nav-links">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">💰</span>
+                Bachat<span class="logo-accent">List</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
                 <li><a href="index.html">Home</a></li>
-                <li><a href="deals.html">Deals</a></li>
+                <li><a href="deals.html">Today's Deals</a></li>
+                <li><a href="reviews.html">Reviews</a></li>
+                <li><a href="categories.html">Categories</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
+            <div class="nav-right">
+                <button class="search-btn" onclick="toggleSearch()">🔍</button>
+                <div class="menu-toggle" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
         </div>
     </nav>
     <div style="margin-top: 100px; padding: 80px 24px;">
@@ -47,6 +60,50 @@
     </div>
     <footer class="footer">
         <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <span class="logo-icon">💰</span>
+                        Bachat<span class="logo-accent">List</span>
+                    </div>
+                    <p>India's most trusted platform for finding the best deals, honest product reviews, and smart shopping tips. Save more on every purchase!</p>
+                    <div class="social-links">
+                        <a href="#" title="Facebook">📘</a>
+                        <a href="#" title="Twitter">🐦</a>
+                        <a href="#" title="Instagram">📷</a>
+                        <a href="#" title="YouTube">📺</a>
+                        <a href="#" title="Telegram">✈️</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="deals.html">Today's Deals</a></li>
+                        <li><a href="reviews.html">Product Reviews</a></li>
+                        <li><a href="categories.html">Categories</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Top Categories</h4>
+                    <ul>
+                        <li><a href="categories.html">Electronics</a></li>
+                        <li><a href="categories.html">Fashion</a></li>
+                        <li><a href="categories.html">Home & Kitchen</a></li>
+                        <li><a href="categories.html">Beauty</a></li>
+                        <li><a href="categories.html">Books</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="disclaimer.html">Affiliate Disclosure</a></li>
+                    </ul>
+                </div>
+            </div>
             <div class="footer-bottom">
                 <p>&copy; 2024 BachatList.com. All rights reserved.</p>
             </div>

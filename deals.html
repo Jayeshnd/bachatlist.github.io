@@ -11,10 +11,10 @@
 <body>
     <nav class="navbar">
         <div class="container">
-            <div class="logo">
+            <a href="index.html" class="logo">
                 <span class="logo-icon">💰</span>
                 Bachat<span class="logo-accent">List</span>
-            </div>
+            </a>
             <ul class="nav-links" id="navLinks">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="deals.html" class="active">Today's Deals</a></li>
@@ -23,6 +23,14 @@
                 <li><a href="about.html">About</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
+            <div class="nav-right">
+                <button class="search-btn" onclick="toggleSearch()">🔍</button>
+                <div class="menu-toggle" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -42,21 +50,21 @@
         </div>
 
         <div class="deals-grid" id="allDealsGrid">
-            <article class="deal-card hot-deal">
+            <article class="deal-card hot-deal" id="deal-1">
                 <div class="deal-badge">🔥 Hot Deal</div>
                 <div class="deal-image">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g1)' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='28' fill='white' font-weight='bold'%3EWireless Earbuds%3C/text%3E%3C/svg%3E" alt="Wireless Earbuds">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g1)' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='28' fill='white' font-weight='bold'%3EWireless Earbuds%3C/text%3E%3C/svg%3E" alt="Wireless Earbuds" id="deal-image-1">
                     <div class="deal-discount">65% OFF</div>
                 </div>
                 <div class="deal-content">
-                    <h3>Premium Wireless Earbuds with ANC</h3>
+                    <h3 id="deal-title-1">Premium Wireless Earbuds with ANC</h3>
                     <div class="deal-rating">
                         <span class="stars">⭐⭐⭐⭐⭐</span>
                         <span class="rating-text">4.5/5 (2,345 reviews)</span>
                     </div>
-                    <p class="deal-desc">Active noise cancellation, 30hr battery life, premium sound quality</p>
+                    <p class="deal-desc" id="deal-desc-1">Active noise cancellation, 30hr battery life, premium sound quality</p>
                     <div class="deal-price">
-                        <span class="current-price">₹2,499</span>
+                        <span class="current-price" id="price-1">₹2,499</span>
                         <span class="original-price">₹6,999</span>
                         <span class="savings">Save ₹4,500</span>
                     </div>
@@ -67,21 +75,21 @@
                 </div>
             </article>
 
-            <article class="deal-card">
+            <article class="deal-card" id="deal-2">
                 <div class="deal-badge">⚡ Lightning Deal</div>
                 <div class="deal-image">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23f093fb'/%3E%3Cstop offset='100%25' style='stop-color:%23f5576c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g2)' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='28' fill='white' font-weight='bold'%3ESmart Watch%3C/text%3E%3C/svg%3E" alt="Smart Watch">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23f093fb'/%3E%3Cstop offset='100%25' style='stop-color:%23f5576c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g2)' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='28' fill='white' font-weight='bold'%3ESmart Watch%3C/text%3E%3C/svg%3E" alt="Smart Watch" id="deal-image-2">
                     <div class="deal-discount">70% OFF</div>
                 </div>
                 <div class="deal-content">
-                    <h3>Fitness Smart Watch - Health Tracker</h3>
+                    <h3 id="deal-title-2">Fitness Smart Watch - Health Tracker</h3>
                     <div class="deal-rating">
                         <span class="stars">⭐⭐⭐⭐⭐</span>
                         <span class="rating-text">4.7/5 (5,890 reviews)</span>
                     </div>
-                    <p class="deal-desc">Heart rate monitor, sleep tracking, 15-day battery, IP68 waterproof</p>
+                    <p class="deal-desc" id="deal-desc-2">Heart rate monitor, sleep tracking, 15-day battery, IP68 waterproof</p>
                     <div class="deal-price">
-                        <span class="current-price">₹1,999</span>
+                        <span class="current-price" id="price-2">₹1,999</span>
                         <span class="original-price">₹6,999</span>
                         <span class="savings">Save ₹5,000</span>
                     </div>
@@ -92,21 +100,21 @@
                 </div>
             </article>
 
-            <article class="deal-card">
+            <article class="deal-card" id="deal-3">
                 <div class="deal-badge">💎 Best Value</div>
                 <div class="deal-image">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g3' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234facfe'/%3E%3Cstop offset='100%25' style='stop-color:%2300f2fe'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g3)' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='28' fill='white' font-weight='bold'%3EPower Bank%3C/text%3E%3C/svg%3E" alt="Power Bank">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g3' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234facfe'/%3E%3Cstop offset='100%25' style='stop-color:%2300f2fe'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g3)' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='28' fill='white' font-weight='bold'%3EPower Bank%3C/text%3E%3C/svg%3E" alt="Power Bank" id="deal-image-3">
                     <div class="deal-discount">55% OFF</div>
                 </div>
                 <div class="deal-content">
-                    <h3>20000mAh Fast Charging Power Bank</h3>
+                    <h3 id="deal-title-3">20000mAh Fast Charging Power Bank</h3>
                     <div class="deal-rating">
                         <span class="stars">⭐⭐⭐⭐</span>
                         <span class="rating-text">4.3/5 (8,234 reviews)</span>
                     </div>
-                    <p class="deal-desc">20W fast charging, dual USB ports, LED display, compact design</p>
+                    <p class="deal-desc" id="deal-desc-3">20W fast charging, dual USB ports, LED display, compact design</p>
                     <div class="deal-price">
-                        <span class="current-price">₹899</span>
+                        <span class="current-price" id="price-3">₹899</span>
                         <span class="original-price">₹1,999</span>
                         <span class="savings">Save ₹1,100</span>
                     </div>
@@ -188,14 +196,32 @@
                         Bachat<span class="logo-accent">List</span>
                     </div>
                     <p>India's most trusted platform for finding the best deals, honest product reviews, and smart shopping tips. Save more on every purchase!</p>
+                    <div class="social-links">
+                        <a href="#" title="Facebook">📘</a>
+                        <a href="#" title="Twitter">🐦</a>
+                        <a href="#" title="Instagram">📷</a>
+                        <a href="#" title="YouTube">📺</a>
+                        <a href="#" title="Telegram">✈️</a>
+                    </div>
                 </div>
                 <div class="footer-col">
                     <h4>Quick Links</h4>
                     <ul>
-                        <li><a href="index.html">Home</a></li>
                         <li><a href="deals.html">Today's Deals</a></li>
                         <li><a href="reviews.html">Product Reviews</a></li>
                         <li><a href="categories.html">Categories</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Top Categories</h4>
+                    <ul>
+                        <li><a href="categories.html">Electronics</a></li>
+                        <li><a href="categories.html">Fashion</a></li>
+                        <li><a href="categories.html">Home & Kitchen</a></li>
+                        <li><a href="categories.html">Beauty</a></li>
+                        <li><a href="categories.html">Books</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -208,7 +234,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 BachatList.com - All Rights Reserved.</p>
+                <p>&copy; 2024 BachatList.com - All Rights Reserved. As an Amazon Associate, we earn from qualifying purchases.</p>
             </div>
         </div>
     </footer>
