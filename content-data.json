@@ -1,0 +1,20 @@
+{
+  "images": {
+    "image-1": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23667eea' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='white'%3EWireless Earbuds%3C/text%3E%3C/svg%3E",
+    "image-2": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23f093fb' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='white'%3ESmart Watch%3C/text%3E%3C/svg%3E",
+    "image-3": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%2343e97b' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='white'%3EPhone Cases%3C/text%3E%3C/svg%3E",
+    "review-image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='500'%3E%3Crect fill='%234a5899' width='900' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='32' fill='white'%3EProduct Image%3C/text%3E%3C/svg%3E"
+  },
+  "titles": {
+    "title-1": "Best Wireless Earbuds for 2024",
+    "title-2": "Ultimate Smart Watch Guide",
+    "title-3": "Premium Phone Cases Collection",
+    "product-title": "Premium Tech Product Review"
+  },
+  "descriptions": {
+    "desc-1": "Discover the top-rated wireless earbuds with exceptional sound quality, comfort, and battery life. Perfect for music lovers and professionals.",
+    "desc-2": "Compare the latest smart watches with fitness tracking, health monitoring, and premium features for an active lifestyle.",
+    "desc-3": "Protect your device in style with our curated selection of durable, stylish phone cases for all major brands."
+  },
+  "reviewContent": {}
+}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechGear Reviews - Best Product Recommendations</title>
+    <meta name="description" content="Discover the best tech products, gadgets, and gear with honest reviews and recommendations. Find the perfect products for your needs.">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Work+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">TechGear<span>Reviews</span></div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="reviews.html">Reviews</a></li>
+                <li><a href="categories.html">Categories</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="menu-toggle">☰</div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Discover the Best<br><span>Tech Products</span></h1>
+            <p class="hero-subtitle">Honest reviews and recommendations to help you make the right choice</p>
+            <a href="reviews.html" class="cta-button">Explore Reviews</a>
+        </div>
+        <div class="hero-pattern"></div>
+    </header>
+
+    <section class="featured-section">
+        <div class="container">
+            <h2 class="section-title">Featured Reviews</h2>
+            <div class="featured-grid">
+                <article class="featured-card" data-category="electronics">
+                    <div class="card-image">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23667eea' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='white'%3EWireless Earbuds%3C/text%3E%3C/svg%3E" alt="Best Wireless Earbuds 2024" id="image-1">
+                    </div>
+                    <div class="card-content">
+                        <span class="category-badge">Electronics</span>
+                        <h3 id="title-1">Best Wireless Earbuds for 2024</h3>
+                        <p id="desc-1">Discover the top-rated wireless earbuds with exceptional sound quality, comfort, and battery life. Perfect for music lovers and professionals.</p>
+                        <a href="review-wireless-earbuds.html" class="read-more">Read Full Review →</a>
+                    </div>
+                </article>
+
+                <article class="featured-card" data-category="gadgets">
+                    <div class="card-image">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23f093fb' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='white'%3ESmart Watch%3C/text%3E%3C/svg%3E" alt="Smart Watches Review" id="image-2">
+                    </div>
+                    <div class="card-content">
+                        <span class="category-badge">Gadgets</span>
+                        <h3 id="title-2">Ultimate Smart Watch Guide</h3>
+                        <p id="desc-2">Compare the latest smart watches with fitness tracking, health monitoring, and premium features for an active lifestyle.</p>
+                        <a href="review-smart-watch.html" class="read-more">Read Full Review →</a>
+                    </div>
+                </article>
+
+                <article class="featured-card" data-category="accessories">
+                    <div class="card-image">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%2343e97b' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='white'%3EPhone Cases%3C/text%3E%3C/svg%3E" alt="Premium Phone Cases" id="image-3">
+                    </div>
+                    <div class="card-content">
+                        <span class="category-badge">Accessories</span>
+                        <h3 id="title-3">Premium Phone Cases Collection</h3>
+                        <p id="desc-3">Protect your device in style with our curated selection of durable, stylish phone cases for all major brands.</p>
+                        <a href="review-phone-cases.html" class="read-more">Read Full Review →</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="categories-preview">
+        <div class="container">
+            <h2 class="section-title">Browse by Category</h2>
+            <div class="category-grid">
+                <a href="category-laptops.html" class="category-card">
+                    <span class="category-icon">💻</span>
+                    <h3>Laptops</h3>
+                    <p>15+ Reviews</p>
+                </a>
+                <a href="category-smartphones.html" class="category-card">
+                    <span class="category-icon">📱</span>
+                    <h3>Smartphones</h3>
+                    <p>20+ Reviews</p>
+                </a>
+                <a href="category-audio.html" class="category-card">
+                    <span class="category-icon">🎧</span>
+                    <h3>Audio</h3>
+                    <p>12+ Reviews</p>
+                </a>
+                <a href="category-cameras.html" class="category-card">
+                    <span class="category-icon">📷</span>
+                    <h3>Cameras</h3>
+                    <p>8+ Reviews</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2>Stay Updated</h2>
+                <p>Get the latest reviews and tech recommendations delivered to your inbox</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>TechGear Reviews</h4>
+                    <p>Your trusted source for honest product reviews and recommendations.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="reviews.html">All Reviews</a></li>
+                        <li><a href="categories.html">Categories</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="disclaimer.html">Affiliate Disclosure</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Follow Us</h4>
+                    <div class="social-links">
+                        <a href="#">Twitter</a>
+                        <a href="#">Facebook</a>
+                        <a href="#">Instagram</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 TechGear Reviews. All rights reserved. As an Amazon Associate, we earn from qualifying purchases.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
