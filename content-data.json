@@ -1,20 +1,19 @@
 {
-  "images": {
-    "image-1": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23667eea' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='white'%3EWireless Earbuds%3C/text%3E%3C/svg%3E",
-    "image-2": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23f093fb' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='white'%3ESmart Watch%3C/text%3E%3C/svg%3E",
-    "image-3": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%2343e97b' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='white'%3EPhone Cases%3C/text%3E%3C/svg%3E",
-    "review-image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='500'%3E%3Crect fill='%234a5899' width='900' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='32' fill='white'%3EProduct Image%3C/text%3E%3C/svg%3E"
+  "dealImages": {
+    "deal-image-1": "https://example.com/wireless-earbuds.jpg",
+    "deal-image-2": "https://example.com/smart-watch.jpg",
+    "deal-image-3": "https://example.com/power-bank.jpg"
   },
-  "titles": {
-    "title-1": "Best Wireless Earbuds for 2024",
-    "title-2": "Ultimate Smart Watch Guide",
-    "title-3": "Premium Phone Cases Collection",
-    "product-title": "Premium Tech Product Review"
+  "dealTitles": {
+    "deal-title-1": "Premium Wireless Earbuds with ANC",
+    "deal-title-2": "Fitness Smart Watch - Health Tracker",
+    "deal-title-3": "20000mAh Fast Charging Power Bank"
   },
-  "descriptions": {
-    "desc-1": "Discover the top-rated wireless earbuds with exceptional sound quality, comfort, and battery life. Perfect for music lovers and professionals.",
-    "desc-2": "Compare the latest smart watches with fitness tracking, health monitoring, and premium features for an active lifestyle.",
-    "desc-3": "Protect your device in style with our curated selection of durable, stylish phone cases for all major brands."
+  "dealDescriptions": {
+    "deal-desc-1": "Active noise cancellation, 30hr battery life, premium sound quality",
+    "deal-desc-2": "Heart rate monitor, sleep tracking, 15-day battery, IP68 waterproof",
+    "deal-desc-3": "20W fast charging, dual USB ports, LED display, compact design"
   },
-  "reviewContent": {}
+  "prices": {},
+  "customContent": {}
 }

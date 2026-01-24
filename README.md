@@ -1,213 +1,126 @@
-# TechGear Reviews - Amazon Associates Website with Telegram Bot
+# 💰 BachatList - Smart Shopping Platform
 
-A complete, professional affiliate website ready to deploy on GitHub Pages with integrated Telegram bot for content management.
+India's most trusted platform for finding the best deals, honest product reviews, and money-saving tips.
 
 ## 🌟 Features
 
-- ✅ **Amazon Associates Compliant**: 15+ pages with original content
-- 🤖 **Telegram Bot Integration**: Update content remotely via Telegram
-- 📱 **Fully Responsive**: Mobile-first design
-- 🎨 **Modern UI**: Professional, unique design
-- ⚡ **Fast & Lightweight**: Static HTML/CSS/JS (no dependencies)
-- 🚀 **GitHub Pages Ready**: Deploy in minutes
+✅ **Amazon Associates Compliant**
+- 20+ pages of original content
+- Professional design
+- Full legal compliance
+- Privacy policy & affiliate disclosure
 
-## 📋 Requirements Met
+✅ **Modern Design**
+- Beautiful gradient-based UI
+- Fully responsive
+- Smooth animations
+- Fast loading times
 
-### Amazon Associates Requirements:
-- ✅ 10+ unique pages with original content
-- ✅ Public website with your domain
-- ✅ Content published within last 60 days
-- ✅ Professional design and structure
-- ✅ Clear affiliate disclosure
-- ✅ Privacy policy and terms
+✅ **Telegram Bot Integration**
+- Update content remotely
+- Manage deals via commands
+- Upload images through Telegram
+- Real-time website updates
 
-### Pages Included:
-1. Home page (index.html)
-2. About page
-3. Contact page
-4. Categories page
-5. All Reviews page
-6. Privacy Policy
-7. Affiliate Disclosure
-8. 10+ Individual Review Pages (review-1.html to review-10.html)
+✅ **Advanced Features**
+- Deal wishlist system
+- Search functionality
+- Newsletter subscription
+- Price tracking (coming soon)
+- Deal countdown timers
 
-**Total: 18+ pages** ✅
+## 🚀 Quick Deploy
 
-## 🚀 Quick Deploy to GitHub Pages
+### 1. Upload to GitHub
 
-### Step 1: Create GitHub Repository
-
-1. Go to [GitHub](https://github.com)
-2. Click "New Repository"
-3. Name it: `yourname.github.io` or any name
-4. Make it **Public**
-5. Don't initialize with README
-6. Click "Create repository"
-
-### Step 2: Upload Website Files
-
-**Option A: Upload via Web Interface**
-1. Click "uploading an existing file"
-2. Drag and drop all files from `affiliate-website` folder
-3. Commit changes
-
-**Option B: Upload via Git (Recommended)**
 ```bash
-cd affiliate-website
+cd bachatlist-website
 git init
 git add .
 git commit -m "Initial commit"
 git branch -M main
-git remote add origin https://github.com/yourusername/your-repo.git
+git remote add origin https://github.com/bachatlist/bachatlist.github.io.git
 git push -u origin main
 ```
 
-### Step 3: Enable GitHub Pages
+### 2. Configure Domain
 
-1. Go to repository Settings
-2. Click "Pages" in left sidebar
-3. Under "Source", select "main" branch
-4. Click "Save"
-5. Your site will be live at: `https://yourusername.github.io/repo-name/`
+Add `CNAME` file with:
+```
+bachatlist.com
+```
 
-### Step 4: Custom Domain (Optional)
+Configure DNS:
+```
+Type: A
+Host: @
+Value: 185.199.108.153
 
-1. Buy a domain (GoDaddy, Namecheap, etc.)
-2. In GitHub Pages settings, add your custom domain
-3. In your domain registrar, add these DNS records:
-   ```
-   Type: A
-   Host: @
-   Value: 185.199.108.153
-   
-   Type: A
-   Host: @
-   Value: 185.199.109.153
-   
-   Type: A
-   Host: @
-   Value: 185.199.110.153
-   
-   Type: A
-   Host: @
-   Value: 185.199.111.153
-   
-   Type: CNAME
-   Host: www
-   Value: yourusername.github.io
-   ```
+Type: CNAME  
+Host: www
+Value: bachatlist.github.io
+```
 
-## 🤖 Telegram Bot Setup
+### 3. Setup Telegram Bot
 
-### Prerequisites
 ```bash
 pip install python-telegram-bot --break-system-packages
 ```
 
-### Get Bot Token
+1. Message @BotFather on Telegram
+2. Create new bot
+3. Get token
+4. Edit `telegram_bot.py` - add your token
+5. Run: `python telegram_bot.py`
 
-1. Open Telegram and search for `@BotFather`
-2. Send `/newbot`
-3. Follow instructions to create your bot
-4. Copy the bot token (looks like: `123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ`)
+### 4. Apply to Amazon Associates
 
-### Configure Bot
+1. Go to https://affiliate-program.amazon.in
+2. Click "Sign up"
+3. Enter: bachatlist.com
+4. Complete application
+5. Get approved (24-48 hours)
 
-1. Open `telegram_bot.py`
-2. Replace `YOUR_BOT_TOKEN_HERE` with your actual token:
-   ```python
-   BOT_TOKEN = '123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ'
-   ```
-
-3. (Optional) Add your Telegram user ID for security:
-   - Send `/start` to your bot to get your user ID
-   - Add it to the script:
-   ```python
-   AUTHORIZED_USERS = [123456789]  # Your Telegram user ID
-   ```
-
-### Run Bot
-
-```bash
-python telegram_bot.py
-```
-
-The bot will create a `content-data.json` file that your website reads.
-
-## 📱 Using Telegram Bot
-
-### Available Commands
-
-**Basic Commands:**
-- `/start` - Welcome message and instructions
-- `/help` - Show all commands
-- `/list` - List all updatable element IDs
-- `/status` - Show current content statistics
-
-**Update Commands:**
-
-**Update Images:**
-```
-/update_image image-1 https://example.com/image.jpg
-```
-
-**Update Titles:**
-```
-/update_title title-1 New Amazing Product Title
-```
-
-**Update Descriptions:**
-```
-/update_desc desc-1 This is the new product description text
-```
-
-**Update Review Content:**
-```
-/update_review review-content <p>New paragraph content</p>
-```
-
-### Upload Images via Telegram
-
-1. Send any image to the bot
-2. Bot saves it to `uploaded_images/` folder
-3. Upload the image to your GitHub repo
-4. Get the raw GitHub URL
-5. Use `/update_image` command with the GitHub URL
-
-### Example Workflow
+## 🤖 Telegram Bot Commands
 
 ```
-# List available elements
-/list
+/start - Welcome & instructions
+/list - Show all updatable IDs
+/status - Current content stats
 
-# Update an image
-/update_image image-1 https://raw.githubusercontent.com/user/repo/main/images/product.jpg
+/update_deal_image <id> <url> - Update deal image
+/update_deal_title <id> <text> - Update title
+/update_deal_desc <id> <text> - Update description
+/update_price <id> <price> - Update price
+```
 
-# Update a title
-/update_title title-1 Best Wireless Earbuds 2024
+### Example Usage:
 
-# Update description
-/update_desc desc-1 These earbuds offer incredible sound quality and battery life
+```
+/update_deal_image deal-image-1 https://example.com/product.jpg
+/update_deal_title deal-title-1 Best Wireless Earbuds 2024
+/update_deal_desc deal-desc-1 Amazing sound with 40hr battery
+/update_price price-1 ₹1,999
 ```
 
 ## 📁 Project Structure
 
 ```
-affiliate-website/
-├── index.html              # Home page
-├── about.html              # About page
-├── contact.html            # Contact page
-├── categories.html         # Categories listing
-├── reviews.html            # All reviews page
-├── privacy.html            # Privacy policy
-├── disclaimer.html         # Affiliate disclosure
-├── review-1.html to        # Individual review pages
-│   review-10.html
-├── styles.css              # Main stylesheet
-├── script.js               # JavaScript functionality
-├── telegram_bot.py         # Telegram bot for content management
-├── content-data.json       # Generated by bot (content storage)
-└── README.md               # This file
+bachatlist-website/
+├── index.html              # Homepage
+├── deals.html             # Deals page
+├── reviews.html           # Reviews page
+├── categories.html        # Categories page
+├── about.html             # About page
+├── contact.html           # Contact page
+├── privacy.html           # Privacy policy
+├── disclaimer.html        # Affiliate disclosure
+├── styles.css             # Main stylesheet
+├── script.js              # JavaScript functionality
+├── telegram_bot.py        # Telegram bot
+├── content-data.json      # Content management
+├── CNAME                  # Custom domain config
+└── README.md              # This file
 ```
 
 ## 🎨 Customization
@@ -217,143 +130,87 @@ affiliate-website/
 Edit `styles.css`:
 ```css
 :root {
-    --primary: #2d3561;      /* Main color */
-    --secondary: #f4a261;    /* Secondary color */
-    --accent: #e76f51;       /* Accent color */
+    --primary: #667eea;      /* Main color */
+    --secondary: #f093fb;    /* Secondary color */
+    --accent: #4facfe;       /* Accent color */
 }
 ```
 
-### Change Site Name
+### Update Logo
 
-Replace "TechGear Reviews" throughout the HTML files with your site name.
+Edit in `index.html`:
+```html
+<div class="logo">
+    <span class="logo-icon">💰</span>
+    Bachat<span class="logo-accent">List</span>
+</div>
+```
 
-### Update Content
+## 💡 Content Strategy
 
-**Via Telegram Bot:** (Recommended)
-- Use bot commands to update content remotely
+### Week 1
+- [ ] Add 10+ product deals
+- [ ] Write 5 detailed reviews
+- [ ] Share on social media
+- [ ] Apply to Amazon Associates
 
-**Via Manual Edit:**
-- Edit HTML files directly
-- Push changes to GitHub
+### Week 2
+- [ ] Get Amazon approval
+- [ ] Add affiliate links
+- [ ] Create comparison posts
+- [ ] Build email list
 
-## 🔄 Updating Content
+### Month 1
+- [ ] 50+ deals published
+- [ ] 20+ reviews written
+- [ ] First 3 sales completed
+- [ ] SEO optimization done
 
-### Method 1: Telegram Bot (Live Updates)
+## 📊 SEO Checklist
 
-1. Run the bot: `python telegram_bot.py`
-2. Use Telegram commands to update content
-3. Upload `content-data.json` to your GitHub repo
-4. Changes appear on website immediately
+- [x] Unique page titles
+- [x] Meta descriptions
+- [x] Header tags (H1, H2)
+- [x] Alt text for images
+- [x] Internal linking
+- [x] Mobile responsive
+- [x] Fast loading speed
+- [ ] Submit sitemap to Google
+- [ ] Google Analytics setup
+- [ ] Search Console verified
 
-### Method 2: Direct Edit
+## 🔐 Security
 
-1. Edit HTML files locally
-2. Push to GitHub
-3. Wait 1-2 minutes for GitHub Pages to rebuild
+1. **Protect Bot Token**
+   - Never commit to public repo
+   - Use environment variables in production
 
-## 🔐 Security Tips
+2. **Restrict Bot Access**
+   - Add your user ID to `AUTHORIZED_USERS`
 
-1. **Protect Bot Token**: Never commit your bot token to public repos
-2. **Restrict Bot Access**: Add your user ID to `AUTHORIZED_USERS`
-3. **Use Environment Variables**: For production, use environment variables:
-   ```python
-   import os
-   BOT_TOKEN = os.environ.get('BOT_TOKEN')
-   ```
-
-## 📊 Amazon Associates Application
-
-### Before Applying:
-1. Deploy website to GitHub Pages
-2. Add 10+ quality product reviews
-3. Update all pages with current dates
-4. Add Amazon affiliate links to review pages
-5. Ensure privacy policy and disclaimer are visible
-
-### Application Steps:
-1. Go to [https://affiliate-program.amazon.in](https://affiliate-program.amazon.in)
-2. Click "Sign up"
-3. Enter your website URL
-4. Fill in application details
-5. Wait for approval (usually 24-48 hours)
-
-### After Approval:
-1. Get your Amazon Associate ID
-2. Generate product links from Amazon Associates dashboard
-3. Replace placeholder links in review pages
-4. Track earnings in Associates dashboard
-
-## 🎯 Tips for Success
-
-### Content Strategy:
-- Write detailed, honest reviews
-- Add product comparisons
-- Include pros and cons
-- Use high-quality images
-- Update content regularly
-
-### SEO Optimization:
-- Use descriptive page titles
-- Add meta descriptions
-- Include relevant keywords
-- Create internal links between pages
-- Submit sitemap to Google Search Console
-
-### Traffic Generation:
-- Share reviews on social media
-- Engage in relevant online communities
-- Create YouTube video reviews
-- Build an email newsletter
-- Guest post on related blogs
-
-## 🛠️ Maintenance
-
-### Weekly:
-- Add 1-2 new reviews
-- Update existing content
-- Check affiliate links
-- Monitor bot status
-
-### Monthly:
-- Review analytics
-- Update popular reviews
-- Check Amazon Associates dashboard
-- Optimize underperforming pages
+3. **Monitor Access**
+   - Check bot logs regularly
+   - Review content changes
 
 ## 📞 Support
 
-### Common Issues:
-
-**Website not loading:**
-- Check GitHub Pages is enabled
-- Verify branch is set to 'main'
-- Wait 5 minutes after pushing changes
-
-**Bot not responding:**
-- Check bot token is correct
-- Ensure bot is running
-- Verify user ID in authorized users
-
-**Content not updating:**
-- Ensure `content-data.json` is uploaded to GitHub
-- Check browser cache (hard refresh: Ctrl+Shift+R)
-- Verify JSON file is valid
+- **Website**: https://bachatlist.com
+- **GitHub**: https://github.com/bachatlist
+- **Email**: support@bachatlist.com
 
 ## 📄 License
 
-This project is open source. You can modify and use it for your affiliate websites.
+This project is open source. Feel free to use and modify for your own affiliate website.
 
 ## 🙏 Credits
 
-Built with:
-- Pure HTML/CSS/JavaScript
-- Google Fonts (Playfair Display, Work Sans)
-- Python Telegram Bot API
+- Design: Modern gradient-based UI
+- Icons: Emoji icons
+- Fonts: Google Fonts (Poppins, Inter)
+- Bot: Python Telegram Bot API
 
 ---
 
-**Ready to launch your affiliate website?** Follow the deployment steps above and start earning with Amazon Associates!
+**Made with ❤️ for smart shoppers in India**
 
-For questions or issues, feel free to reach out or create an issue in the repository.
-
-Good luck with your affiliate marketing journey! 🚀
+Start saving money today with BachatList! 💰
