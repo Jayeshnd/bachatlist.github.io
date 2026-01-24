@@ -125,9 +125,13 @@
 
             <!-- Admin Panel -->
             <div id="adminPanel" class="hidden">
+                <div style="text-align: right; margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="logout()" style="padding: 8px 20px; font-size: 14px;">Logout</button>
+                </div>
                 <div id="successMsg" class="success hidden"></div>
                 
-                <div class="deal-section"                    <h2>📸 Deal Images</h2>
+                <div class="deal-section">
+                    <h2>📸 Deal Images</h2>
                     <div class="form-group">
                         <label>Deal Image 1 URL</label>
                         <input type="text" id="deal-image-1" placeholder="https://example.com/image.jpg">
@@ -146,7 +150,7 @@
                     <h2>📝 Deal Titles</h2>
                     <div class="form-group">
                         <label>Deal Title 1</label>
-                        <input type="text" id="deal-title-1" plalder="Product Title">
+                        <input type="text" id="deal-title-1" placeholder="Product Title">
                     </div>
                     <div class="form-group">
                         <label>Deal Title 2</label>
@@ -166,7 +170,8 @@
                     </div>
                     <div class="form-group">
                         <label>Deal Description 2</label>
-                        <textarea id="deal-desc-2" placeholder="Product description"></textarea>                   </div>
+                        <textarea id="deal-desc-2" placeholder="Product description"></textarea>
+                    </div>
                     <div class="form-group">
                         <label>Deal Description 3</label>
                         <textarea id="deal-desc-3" placeholder="Product description"></textarea>
@@ -181,15 +186,15 @@
                     </div>
                     <div class="form-group">
                         <label>Price 2</label>
-                        <input type="text" id="price-2" placehr="₹1,999">
+                        <input type="text" id="price-2" placeholder="₹1,999">
                     </div>
                     <div class="form-group">
                         <label>Price 3</label>
-                      <input type="text" id="price-3" placeholder="₹899">
+                        <input type="text" id="price-3" placeholder="₹899">
                     </div>
                 </div>
 
-                <button class="btn btn-ccess" onclick="saveData()" style="width: 100%; font-size: 18px; padding: 15px;">
+                <button class="btn btn-success" onclick="saveData()" style="width: 100%; font-size: 18px; padding: 15px;">
                     💾 Save & Download JSON
                 </button>
             </div>
@@ -197,19 +202,137 @@
     </div>
 
     <script>
-        const PASSWORD = 'admin'; // Change this password
+        // Password hash (SHA-256 of 'admin')
+        // To change password: hash your new password at https://emn178.github.io/online-tools/sha256.html
+        // Replace the hash below with your new hash
+        const PASSWORD_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'; // Default: 'admin'
         let contentData = {};
+        let loginAttempts = 0;
+        const MAX_ATTEMPTS = 5;
+        const LOCKOUT_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
 
-        function login() {
-            const password = document.getElementById('passwordInput').value;
-            if (password === PASSWORD) {
+        // Check if user is already logged in (session)
+        window.addEventListener('DOMContentLoaded', function() {
+            const session = localStorage.getItem('adminSession');
+            if (session) {
+                const sessionData = JSON.parse(session);
+                const now = new Date().getTime();
+                // Session valid for 1 hour
+                if (now - sessionData.time < 3600000) {
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    loadData();
+                    return;
+                } else {
+                    localStorage.removeItem('adminSession');
+                }
+            }
+            
+            // Check for lockout
+            const lockout = localStorage.getItem('adminLockout');
+            if (lockout) {
+                const lockoutTime = parseInt(lockout);
+                const now = new Date().getTime();
+                if (now < lockoutTime) {
+                    const remaining = Math.ceil((lockoutTime - now) / 1000 / 60);
+                    document.getElementById('loginError').textContent = `Too many failed attempts! Please wait ${remaining} minutes.`;
+                    document.getElementById('loginError').classList.remove('hidden');
+                    document.getElementById('passwordInput').disabled = true;
+                    document.querySelector('.btn-primary').disabled = true;
+                } else {
+                    localStorage.removeItem('adminLockout');
+                    localStorage.removeItem('loginAttempts');
+                }
+            }
+        });
+
+        // Hash function (SHA-256)
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        async function login() {
+            const passwordInput = document.getElementById('passwordInput');
+            const password = passwordInput.value;
+            
+            if (!password) {
+                document.getElementById('loginError').textContent = 'Please enter a password!';
+                document.getElementById('loginError').classList.remove('hidden');
+                return;
+            }
+
+            // Check lockout
+            const lockout = localStorage.getItem('adminLockout');
+            if (lockout) {
+                const lockoutTime = parseInt(lockout);
+                const now = new Date().getTime();
+                if (now < lockoutTime) {
+                    const remaining = Math.ceil((lockoutTime - now) / 1000 / 60);
+                    document.getElementById('loginError').textContent = `Too many failed attempts! Please wait ${remaining} minutes.`;
+                    document.getElementById('loginError').classList.remove('hidden');
+                    return;
+                } else {
+                    localStorage.removeItem('adminLockout');
+                    loginAttempts = 0;
+                }
+            }
+
+            // Hash the input password and compare
+            const hashedPassword = await hashPassword(password);
+            
+            if (hashedPassword === PASSWORD_HASH) {
+                // Successful login
+                loginAttempts = 0;
+                localStorage.removeItem('loginAttempts');
+                localStorage.removeItem('adminLockout');
+                
+                // Create session
+                const sessionData = {
+                    time: new Date().getTime(),
+                    hash: hashedPassword.substring(0, 10) // Store partial hash for verification
+                };
+                localStorage.setItem('adminSession', JSON.stringify(sessionData));
+                
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('adminPanel').classList.remove('hidden');
+                document.getElementById('loginError').classList.add('hidden');
+                passwordInput.value = '';
                 loadData();
             } else {
-                document.getElementById('loginError').textContent = 'Incorrect password!
+                // Failed login
+                loginAttempts = parseInt(localStorage.getItem('loginAttempts') || '0') + 1;
+                localStorage.setItem('loginAttempts', loginAttempts.toString());
+                
+                const remaining = MAX_ATTEMPTS - loginAttempts;
+                
+                if (loginAttempts >= MAX_ATTEMPTS) {
+                    // Lockout
+                    const lockoutTime = new Date().getTime() + LOCKOUT_TIME;
+                    localStorage.setItem('adminLockout', lockoutTime.toString());
+                    document.getElementById('loginError').textContent = `Too many failed attempts! Account locked for 5 minutes.`;
+                    passwordInput.disabled = true;
+                    document.querySelector('.btn-primary').disabled = true;
+                } else {
+                    document.getElementById('loginError').textContent = `Incorrect password! ${remaining} attempt(s) remaining.`;
+                }
                 document.getElementById('loginError').classList.remove('hidden');
+                passwordInput.value = '';
             }
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('adminSession');
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('passwordInput').disabled = false;
+            document.querySelector('.btn-primary').disabled = false;
+            document.getElementById('passwordInput').focus();
         }
 
         async function loadData() {
@@ -217,52 +340,73 @@
                 const response = await fetch('content-data.json');
                 contentData = await response.json();
                 
+                // Initialize structure if missing
+                if (!contentData.dealImages) contentData.dealImages = {};
+                if (!contentData.dealTitles) contentData.dealTitles = {};
+                if (!contentData.dealDescriptions) contentData.dealDescriptions = {};
+                if (!contentData.prices) contentData.prices = {};
+                
                 // Populate form fields
                 Object.keys(contentData.dealImages).forEach(id => {
                     const input = document.getElementById(id);
-                    if (input) input.value = contentData.dealImages[id];
+                    if (input) input.value = contentData.dealImages[id] || '';
                 });
                 
                 Object.keys(contentData.dealTitles).forEach(id => {
                     const input = document.getElementById(id);
-                    if (input) input.value = contentData.dealTitles[id];
+                    if (input) input.value = contentData.dealTitles[id] || '';
                 });
                 
                 Object.keys(contentData.dealDescriptions).forEach(id => {
                     const input = document.getElementById(id);
-                    if (input) input.value = contentData.dealDescriptions[id];
+                    if (input) input.value = contentData.dealDescriptions[id] || '';
                 });
                 
                 Object.keys(contentData.prices).forEach(id => {
                     const input = document.getElementById(id);
-                    if (input) input.value = contentData.prices[id];
+                    if (input) input.value = contentData.prices[id] || '';
                 });
             } catch (error) {
                 console.error('Error loading data:', error);
+                // Initialize with default structure
+                contentData = {
+                    dealImages: { "deal-image-1": "", "deal-image-2": "", "deal-image-3": "" },
+                    dealTitles: { "deal-title-1": "", "deal-title-2": "", "deal-title-3": "" },
+                    dealDescriptions: { "deal-desc-1": "", "deal-desc-2": "", "deal-desc-3": "" },
+                    prices: { "price-1": "", "price-2": "", "price-3": "" },
+                    customContent: {}
+                };
                 alert('Could not load content-data.json. Starting with empty data.');
             }
         }
 
         function saveData() {
-            // Update contentData object
-            Object.keys(contentData.dealImages).forEach(id => {
+            // Ensure contentData structure exists
+            if (!contentData.dealImages) contentData.dealImages = {};
+            if (!contentData.dealTitles) contentData.dealTitles = {};
+            if (!contentData.dealDescriptions) contentData.dealDescriptions = {};
+            if (!contentData.prices) contentData.prices = {};
+            if (!contentData.customContent) contentData.customContent = {};
+            
+            // Update contentData object from form fields
+            ['deal-image-1', 'deal-image-2', 'deal-image-3'].forEach(id => {
                 const input = document.getElementById(id);
-                if (input) contentData.dealImages[id] = input.value;
+                if (input) contentData.dealImages[id] = input.value || '';
             });
             
-            Object.keys(contentData.dealTitles).forEach(id => {
+            ['deal-title-1', 'deal-title-2', 'deal-title-3'].forEach(id => {
                 const input = document.getElementById(id);
-                if (input) contentData.dealTitles[id] = input.value;
+                if (input) contentData.dealTitles[id] = input.value || '';
             });
             
-            Object.keys(contentData.dealDescriptions).forEach(id => {
+            ['deal-desc-1', 'deal-desc-2', 'deal-desc-3'].forEach(id => {
                 const input = document.getElementById(id);
-                if (input) contentData.dealDescriptions[id] = input.value;
+                if (input) contentData.dealDescriptions[id] = input.value || '';
             });
             
-            Object.keys(contentData.prices).forEach(id => {
+            ['price-1', 'price-2', 'price-3'].forEach(id => {
                 const input = document.getElementById(id);
-                if (input) contentData.prices[id] = input.value;
+                if (input) contentData.prices[id] = input.value || '';
             });
 
             // Download JSON file
