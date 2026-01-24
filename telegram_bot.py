@@ -5,7 +5,7 @@ Manage your website content directly from Telegram!
 Setup:
 1. pip install python-telegram-bot --break-system-packages
 2. Create bot with @BotFather
-3. Replace YOUR_BOT_TOKEN_HERE with your token
+3. Setup your .env file with your token
 4. Run: python telegram_bot.py
 5. Upload content-data.json to GitHub after updates
 
@@ -21,13 +21,17 @@ Commands:
 
 import json
 import os
+from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
+# Load environment variables
+load_dotenv()
+
 # Configuration
-BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE'  # Get from @BotFather
+BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 DATA_FILE = 'content-data.json'
-AUTHORIZED_USERS = []  # Add your Telegram user ID for security
+AUTHORIZED_USERS = [int(id) for id in os.getenv('AUTHORIZED_USER_IDS', '').split(',') if id]
 
 # Initialize content structure
 def init_content_data():

@@ -72,22 +72,20 @@ git push -u origin main
 
 ### Configure Bot
 
-1. Open `telegram_bot.py` in a text editor
-2. Find this line:
-   ```python
-   BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE'
+1. **Create a `.env` file** in the same folder as `telegram_bot.py`.
+2. Add your token to the file like this:
+   ```env
+   TELEGRAM_BOT_TOKEN=123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ
+   AUTHORIZED_USER_IDS=YOUR_TELEGRAM_ID
    ```
-3. Replace with your token:
-   ```python
-   BOT_TOKEN = '123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ'
-   ```
-4. Save the file
+3. (Optional) Add your Telegram User ID to `AUTHORIZED_USER_IDS` for security. You can find your ID by sending `/start` to the bot.
+4. Save the file.
 
 ### Run Bot
 
 ```bash
-# Install required package
-pip install python-telegram-bot --break-system-packages
+# Install required packages
+pip install python-telegram-bot python-dotenv --break-system-packages
 
 # Run the bot
 python telegram_bot.py

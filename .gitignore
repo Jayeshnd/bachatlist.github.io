@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+uploaded_images/
+.replit
+replit.md
+node_modules/
+.DS_Store
