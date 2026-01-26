@@ -26,6 +26,26 @@ async function getHomePageData() {
 export default async function HomePage() {
   const { categories, deals } = await getHomePageData();
 
+  // Fallback demo data if database is empty
+  const demoCategories = categories.length > 0 ? categories : [
+    { id: "1", icon: "📱", name: "Electronics", slug: "electronics", dealCount: 0, description: "Tech & gadgets" },
+    { id: "2", icon: "👗", name: "Fashion", slug: "fashion", dealCount: 0, description: "Clothing & accessories" },
+    { id: "3", icon: "🏠", name: "Home", slug: "home", dealCount: 0, description: "Home & garden" },
+  ];
+
+  const demoDeals = deals.length > 0 ? deals : [
+    {
+      id: "1",
+      title: "Sample Deal 1",
+      description: "This is a sample deal",
+      discount: 30,
+      originalPrice: "999",
+      productUrl: "#",
+      affiliateUrl: null,
+      category: { name: "Electronics", slug: "electronics" },
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -80,7 +100,7 @@ export default async function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <h2 className="text-3xl font-bold text-gray-900 mb-8">Browse by Category</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map((category) => (
+          {demoCategories.map((category: any) => (
             <Link
               key={category.id}
               href={`/category/${category.slug}`}
@@ -107,13 +127,13 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        {deals.length === 0 ? (
+        {demoDeals.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-600 text-lg">No deals available yet</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {deals.map((deal) => (
+            {demoDeals.map((deal: any) => (
               <a
                 key={deal.id}
                 href={deal.affiliateUrl || deal.productUrl}
@@ -142,7 +162,7 @@ export default async function HomePage() {
                       </span>
                       {deal.originalPrice && (
                         <span className="text-sm text-gray-500 line-through">
-                          ₹{deal.originalPrice.toString()}
+                          ₹{deal.originalPrice.toString ? deal.originalPrice.toString() : deal.originalPrice}
                         </span>
                       )}
                     </div>
