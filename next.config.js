@@ -8,9 +8,6 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    authInterception: true,
-  },
 };
 
 module.exports = nextConfig;
