@@ -58,7 +58,9 @@ export async function POST(request: NextRequest) {
 
     // Get or create default category if not provided
     let categoryId = data.categoryId;
+    
     if (!categoryId) {
+      // No category provided, create/use default
       let defaultCategory = await prisma.category.findFirst({
         where: { slug: "uncategorized" },
       });
@@ -73,6 +75,18 @@ export async function POST(request: NextRequest) {
         });
       }
       categoryId = defaultCategory.id;
+    } else {
+      // Verify that the provided category exists
+      const categoryExists = await prisma.category.findUnique({
+        where: { id: categoryId },
+      });
+
+      if (!categoryExists) {
+        return NextResponse.json(
+          { error: `Category with ID ${categoryId} does not exist` },
+          { status: 400 }
+        );
+      }
     }
 
     // Create deal

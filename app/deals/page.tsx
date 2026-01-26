@@ -33,10 +33,11 @@ async function getDealsData(search: string, category: string) {
 export default async function DealsPage({
   searchParams,
 }: {
-  searchParams: { search?: string; category?: string };
+  searchParams: Promise<{ search?: string; category?: string }>;
 }) {
-  const search = searchParams.search || "";
-  const category = searchParams.category || "";
+  const params = await searchParams;
+  const search = params.search || "";
+  const category = params.category || "";
 
   const { deals, categories } = await getDealsData(search, category);
 

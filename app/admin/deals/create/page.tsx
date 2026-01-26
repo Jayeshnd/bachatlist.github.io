@@ -9,12 +9,33 @@ export default function CreateDealPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [categories, setCategories] = useState<any[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
     }
   }, [status, router]);
+
+  // Fetch categories on mount
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  async function fetchCategories() {
+    try {
+      const response = await fetch("/api/admin/categories");
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch categories:", err);
+    } finally {
+      setCategoriesLoading(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -97,13 +118,17 @@ export default function CreateDealPage() {
             <select
               name="categoryId"
               required
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              disabled={categoriesLoading}
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-gray-100"
             >
-              <option value="">Select a category</option>
-              <option value="electronics">Electronics</option>
-              <option value="fashion">Fashion</option>
-              <option value="home">Home & Garden</option>
-              <option value="books">Books</option>
+              <option value="">
+                {categoriesLoading ? "Loading categories..." : "Select a category"}
+              </option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
           </div>
 
