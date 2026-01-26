@@ -66,7 +66,7 @@ export default async function HomePage() {
               Categories
             </Link>
             <Link
-              href="/admin/login"
+              href="/login"
               className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition"
             >
               Admin
@@ -141,8 +141,16 @@ export default async function HomePage() {
                 rel="noopener noreferrer"
                 className="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden group"
               >
-                <div className="bg-gradient-to-br from-primary/10 to-secondary/10 h-40 flex items-center justify-center group-hover:scale-105 transition transform">
-                  <span className="text-5xl opacity-80">🛍️</span>
+                <div className="bg-gradient-to-br from-primary/10 to-secondary/10 h-40 flex items-center justify-center group-hover:scale-105 transition transform overflow-hidden">
+                  {deal.primaryImage ? (
+                    <img
+                      src={deal.primaryImage}
+                      alt={deal.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-5xl opacity-80">🛍️</span>
+                  )}
                 </div>
                 <div className="p-4">
                   <p className="text-xs text-primary font-semibold uppercase">

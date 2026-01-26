@@ -14,6 +14,7 @@ interface Deal {
   originalPrice: number;
   currentPrice: number;
   discount: number;
+  primaryImage?: string;
   status: string;
 }
 
@@ -30,6 +31,8 @@ export default function EditDealPage({
   const [error, setError] = useState("");
   const [deal, setDeal] = useState<Deal | null>(null);
   const [categories, setCategories] = useState<any[]>([]);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -51,7 +54,12 @@ export default function EditDealPage({
       fetch(`/api/admin/categories`),
     ]).then(([dealRes, catRes]) => {
       if (dealRes.ok) {
-        dealRes.json().then(setDeal);
+        dealRes.json().then((d) => {
+          setDeal(d);
+          if (d.primaryImage) {
+            setImagePreview(d.primaryImage);
+          }
+        });
       }
       if (catRes.ok) {
         catRes.json().then(setCategories);
@@ -59,6 +67,18 @@ export default function EditDealPage({
       setLoading(false);
     });
   }, [dealId]);
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -68,7 +88,7 @@ export default function EditDealPage({
     setError("");
 
     const formData = new FormData(e.currentTarget);
-    const data = {
+    const data: any = {
       title: formData.get("title"),
       description: formData.get("description"),
       categoryId: formData.get("categoryId"),
@@ -78,6 +98,11 @@ export default function EditDealPage({
       discount: formData.get("discount"),
       status: formData.get("status"),
     };
+
+    // Add image if provided
+    if (imagePreview && imagePreview !== deal.primaryImage) {
+      data.image = imagePreview;
+    }
 
     try {
       const response = await fetch(`/api/admin/deals/${dealId}`, {
@@ -177,6 +202,27 @@ export default function EditDealPage({
                 </option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Product Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            {imagePreview && (
+              <div className="mt-3">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="h-40 w-40 object-cover rounded-lg"
+                />
+              </div>
+            )}
           </div>
 
           <div>

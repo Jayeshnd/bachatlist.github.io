@@ -11,6 +11,8 @@ export default function CreateDealPage() {
   const [error, setError] = useState("");
   const [categories, setCategories] = useState<any[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -37,13 +39,25 @@ export default function CreateDealPage() {
     }
   }
 
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const data = {
+    const data: any = {
       title: formData.get("title"),
       description: formData.get("description"),
       categoryId: formData.get("categoryId"),
@@ -53,6 +67,11 @@ export default function CreateDealPage() {
       discountedPrice: formData.get("discountedPrice"),
       status: "DRAFT",
     };
+
+    // Add image as base64 if provided
+    if (imagePreview) {
+      data.image = imagePreview;
+    }
 
     try {
       const response = await fetch("/api/admin/deals", {
@@ -130,6 +149,27 @@ export default function CreateDealPage() {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Product Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            {imagePreview && (
+              <div className="mt-3">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="h-40 w-40 object-cover rounded-lg"
+                />
+              </div>
+            )}
           </div>
 
           <div>

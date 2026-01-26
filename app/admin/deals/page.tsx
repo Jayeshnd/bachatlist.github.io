@@ -48,6 +48,8 @@ export default function DealsPage() {
         body: JSON.stringify({ status: newStatus }),
       });
 
+      const responseData = await response.json();
+
       if (response.ok) {
         // Update local state
         setDeals(
@@ -55,9 +57,37 @@ export default function DealsPage() {
             deal.id === dealId ? { ...deal, status: newStatus } : deal
           )
         );
+      } else {
+        console.error("Failed to update status:", responseData.error);
+        alert(`Error: ${responseData.error || "Failed to update status"}`);
       }
     } catch (error) {
       console.error("Failed to update deal status:", error);
+      alert("Failed to update deal status");
+    }
+  }
+
+  async function deleteDeal(dealId: string) {
+    if (!window.confirm("Are you sure you want to delete this deal?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/deals/${dealId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Update local state to remove the deal
+        setDeals(deals.filter((deal) => deal.id !== dealId));
+        alert("Deal deleted successfully");
+      } else {
+        const responseData = await response.json();
+        alert(`Error: ${responseData.error || "Failed to delete deal"}`);
+      }
+    } catch (error) {
+      console.error("Failed to delete deal:", error);
+      alert("Failed to delete deal");
     }
   }
 
@@ -127,12 +157,20 @@ export default function DealsPage() {
                       </button>
                     </td>
                     <td className="px-6 py-4">
-                      <Link
-                        href={`/admin/deals/${deal.id}`}
-                        className="text-primary hover:underline text-sm"
-                      >
-                        Edit
-                      </Link>
+                      <div className="flex gap-3">
+                        <Link
+                          href={`/admin/deals/${deal.id}`}
+                          className="text-primary hover:underline text-sm"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          onClick={() => deleteDeal(deal.id)}
+                          className="text-red-600 hover:underline text-sm"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

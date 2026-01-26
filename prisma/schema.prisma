@@ -74,7 +74,7 @@ model Deal {
 
   // Images
   images          String     @db.Text // JSON array of image URLs
-  primaryImage    String
+  primaryImage    String?    @db.LongText // Base64 encoded primary image
 
   // Links
   productUrl      String     // Original product URL

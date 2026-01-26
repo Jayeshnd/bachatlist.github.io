@@ -98,10 +98,6 @@ export default function LoginPage() {
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
-
-          <p className="text-center text-sm text-gray-600 mt-6">
-            Test credentials: admin@bachatlist.com / admin123
-          </p>
         </div>
       </div>
     </div>

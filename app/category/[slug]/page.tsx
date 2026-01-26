@@ -69,8 +69,16 @@ export default async function CategoryPage({
                   rel="noopener noreferrer"
                   className="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden group"
                 >
-                  <div className="bg-gradient-to-br from-primary/10 to-secondary/10 h-40 flex items-center justify-center group-hover:scale-105 transition transform">
-                    <span className="text-5xl opacity-80">🛍️</span>
+                  <div className="bg-gradient-to-br from-primary/10 to-secondary/10 h-40 flex items-center justify-center group-hover:scale-105 transition transform overflow-hidden">
+                    {deal.primaryImage ? (
+                      <img
+                        src={deal.primaryImage}
+                        alt={deal.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-5xl opacity-80">🛍️</span>
+                    )}
                   </div>
                   <div className="p-4">
                     <h3 className="font-semibold text-gray-900 mt-2 line-clamp-2 group-hover:text-primary transition">

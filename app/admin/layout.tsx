@@ -6,7 +6,8 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   // Admin layout just provides the sidebar structure
-  // Individual pages handle their own auth checks via useSession() hook or server-side auth()
+  // Note: This layout wraps all /admin/* routes including login
+  // Login page should be at /login instead
   return (
     <div className="flex min-h-screen">
       <Sidebar />
