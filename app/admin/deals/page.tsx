@@ -38,6 +38,29 @@ export default function DealsPage() {
     }
   }
 
+  async function toggleStatus(dealId: string, currentStatus: string) {
+    const newStatus = currentStatus === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
+
+    try {
+      const response = await fetch(`/api/admin/deals/${dealId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (response.ok) {
+        // Update local state
+        setDeals(
+          deals.map((deal) =>
+            deal.id === dealId ? { ...deal, status: newStatus } : deal
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update deal status:", error);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -92,20 +115,21 @@ export default function DealsPage() {
                       {deal.category?.name || "Uncategorized"}
                     </td>
                     <td className="px-6 py-4">
-                      <span
-                        className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                      <button
+                        onClick={() => toggleStatus(deal.id, deal.status)}
+                        className={`inline-block px-3 py-1 rounded-full text-sm font-medium cursor-pointer hover:opacity-80 transition ${
                           deal.status === "PUBLISHED"
                             ? "bg-green-100 text-green-800"
                             : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
                         {deal.status}
-                      </span>
+                      </button>
                     </td>
                     <td className="px-6 py-4">
                       <Link
                         href={`/admin/deals/${deal.id}`}
-                        className="text-primary hover:underline"
+                        className="text-primary hover:underline text-sm"
                       >
                         Edit
                       </Link>
