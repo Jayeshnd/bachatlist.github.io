@@ -10,19 +10,27 @@ export default async function AdminDashboard() {
     redirect("/login");
   }
 
-  const [
-    totalDeals,
-    publishedDeals,
-    draftDeals,
-    categories,
-    totalClicks,
-  ] = await Promise.all([
-    prisma.deal.count(),
-    prisma.deal.count({ where: { status: "PUBLISHED" } }),
-    prisma.deal.count({ where: { status: "DRAFT" } }),
-    prisma.category.count(),
-    prisma.clickEvent.count(),
-  ]);
+  // Fetch stats with error handling
+  let totalDeals = 0;
+  let publishedDeals = 0;
+  let draftDeals = 0;
+  let categories = 0;
+  let totalClicks = 0;
+  let dbError = false;
+
+  try {
+    const results = await Promise.all([
+      prisma.deal.count(),
+      prisma.deal.count({ where: { status: "PUBLISHED" } }),
+      prisma.deal.count({ where: { status: "DRAFT" } }),
+      prisma.category.count(),
+      prisma.clickEvent.count(),
+    ]);
+    [totalDeals, publishedDeals, draftDeals, categories, totalClicks] = results;
+  } catch (error) {
+    console.error("Failed to fetch dashboard stats:", error);
+    dbError = true;
+  }
 
   const stats = [
     {
@@ -68,6 +76,18 @@ export default async function AdminDashboard() {
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
         <p className="text-gray-600">Welcome to BachatList Admin Panel</p>
       </div>
+
+      {dbError && (
+        <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700 font-medium">⚠️ Database Connection Error</p>
+          <p className="text-red-600 text-sm mt-1">
+            Unable to connect to the database. Please check if your database server is running and accessible.
+          </p>
+          <p className="text-red-600 text-sm mt-2">
+            Database: {process.env.DATABASE_URL?.split("@")[1] || "unknown"}
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {stats.map((stat) => (
