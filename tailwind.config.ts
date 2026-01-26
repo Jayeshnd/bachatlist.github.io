@@ -1,0 +1,22 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: "#667eea",
+        secondary: "#f093fb",
+        accent: "#4facfe",
+        success: "#43e97b",
+        danger: "#f5576c",
+      },
+    },
+  },
+  plugins: [],
+};
+export default config;

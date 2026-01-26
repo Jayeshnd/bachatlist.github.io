@@ -1,8 +1,10 @@
+node_modules
+# Keep environment variables out of version control
 .env
-__pycache__/
-*.pyc
-uploaded_images/
-.replit
-replit.md
-node_modules/
-.DS_Store
+.env.local
+.env*.local
+
+/generated/prisma
+.next
+.turbo
+dist

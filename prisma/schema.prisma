@@ -1,0 +1,271 @@
+// This is your Prisma schema file for BachatList
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Users & Authentication
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String    // Hashed with bcrypt
+  role          UserRole  @default(EDITOR)
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  deals         Deal[]
+  reviews       Review[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN       // Full access
+  EDITOR      // Can create/edit content
+  VIEWER      // Read-only access
+}
+
+// Categories
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  icon        String?  // Emoji or icon name
+  image       String?
+  color       String?  // Hex color
+  dealCount   Int      @default(0)
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  deals       Deal[]
+
+  @@map("categories")
+}
+
+// Deals
+model Deal {
+  id              String     @id @default(cuid())
+  title           String
+  slug            String     @unique
+  description     String     @db.Text
+  shortDesc       String?    @db.Text // For card display
+
+  // Pricing
+  currentPrice    Decimal    @db.Decimal(10, 2)
+  originalPrice   Decimal?   @db.Decimal(10, 2)
+  discount        Int?       // Percentage
+  currency        String     @default("INR")
+
+  // Product Details
+  rating          Decimal?   @db.Decimal(2, 1)
+  reviewCount     Int?
+  features        String?    @db.Text // JSON array
+
+  // Images
+  images          String     @db.Text // JSON array of image URLs
+  primaryImage    String
+
+  // Links
+  productUrl      String     // Original product URL
+  affiliateUrl    String?    // Generated affiliate link
+
+  // Categorization
+  categoryId      String
+  category        Category   @relation(fields: [categoryId], references: [id])
+  tags            String?    @db.Text // JSON array of tags
+
+  // Status & Flags
+  status          DealStatus @default(DRAFT)
+  badge           String?    // "Hot Deal", "Lightning", "Best Value"
+  isFeatured      Boolean    @default(false)
+  isExpired       Boolean    @default(false)
+  expiresAt       DateTime?
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?    @db.Text
+
+  // Tracking
+  views           Int        @default(0)
+  clicks          Int        @default(0)
+
+  // Relationships
+  authorId        String
+  author          User       @relation(fields: [authorId], references: [id])
+
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  publishedAt     DateTime?
+
+  clickEvents     ClickEvent[]
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([slug])
+  @@map("deals")
+}
+
+enum DealStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// Reviews
+model Review {
+  id              String       @id @default(cuid())
+  title           String
+  slug            String       @unique
+  excerpt         String       @db.Text
+  content         String       @db.Text // HTML content
+
+  // Images
+  coverImage      String
+  images          String?      @db.Text // JSON array
+
+  // Metadata
+  categoryName    String?      // "Electronics", "Audio", etc.
+  readTime        Int?         // Minutes
+
+  // Products mentioned
+  products        String?      @db.Text // JSON array of product objects
+
+  // SEO
+  metaTitle       String?
+  metaDescription String?      @db.Text
+
+  // Status
+  status          ReviewStatus @default(DRAFT)
+  isFeatured      Boolean      @default(false)
+
+  // Tracking
+  views           Int          @default(0)
+
+  // Relationships
+  authorId        String
+  author          User         @relation(fields: [authorId], references: [id])
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  publishedAt     DateTime?
+
+  @@index([status])
+  @@index([slug])
+  @@map("reviews")
+}
+
+enum ReviewStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// Affiliate Networks
+model AffiliateNetwork {
+  id              String   @id @default(cuid())
+  name            String   // "Cuelink", "Amazon Associates", etc.
+  slug            String   @unique
+  type            String?  // "direct", "aggregator"
+
+  // Configuration
+  apiKey          String?  @db.Text // Encrypted
+  apiSecret       String?  @db.Text // Encrypted
+  publisherId     String?
+  trackingId      String?
+  baseUrl         String?
+
+  // Link Generation Config
+  linkFormat      String?  @db.Text // Template for link generation
+  customParams    String?  @db.Text // JSON - Additional parameters
+
+  // Status
+  isActive        Boolean  @default(true)
+  isDefault       Boolean  @default(false)
+
+  // Settings
+  priority        Int      @default(0)
+  commission      Decimal? @db.Decimal(5, 2) // Average commission %
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  clickEvents     ClickEvent[]
+
+  @@map("affiliate_networks")
+}
+
+// Click Tracking
+model ClickEvent {
+  id          String           @id @default(cuid())
+
+  // What was clicked
+  dealId      String?
+  deal        Deal?            @relation(fields: [dealId], references: [id])
+
+  // Which network
+  networkId   String?
+  network     AffiliateNetwork? @relation(fields: [networkId], references: [id])
+
+  // Tracking Data
+  url         String           @db.Text
+  userAgent   String?          @db.Text
+  ip          String?
+  country     String?
+  city        String?
+  referrer    String?          @db.Text
+
+  // Conversion tracking
+  converted   Boolean          @default(false)
+  conversionValue Decimal?     @db.Decimal(10, 2)
+  conversionDate  DateTime?
+
+  clickedAt   DateTime         @default(now())
+
+  @@index([dealId])
+  @@index([networkId])
+  @@index([clickedAt])
+  @@map("click_events")
+}
+
+// Newsletter Subscribers
+model Subscriber {
+  id          String           @id @default(cuid())
+  email       String           @unique
+  name        String?
+  status      SubscriberStatus @default(ACTIVE)
+  subscribedAt DateTime        @default(now())
+  unsubscribedAt DateTime?
+
+  // Preferences
+  preferences String?          @db.Text // JSON
+
+  @@map("subscribers")
+}
+
+enum SubscriberStatus {
+  ACTIVE
+  UNSUBSCRIBED
+  BOUNCED
+}
+
+// Site Settings
+model Setting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String   @db.Text // JSON
+  description String?  @db.Text
+  updatedAt   DateTime @updatedAt
+
+  @@map("settings")
+}

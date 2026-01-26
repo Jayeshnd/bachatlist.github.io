@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary: #667eea;
+    --secondary: #f093fb;
+    --accent: #4facfe;
+    --success: #43e97b;
+    --danger: #f5576c;
+  }
+
+  body {
+    @apply bg-white text-gray-900;
+  }
+}
