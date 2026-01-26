@@ -3,5 +3,6 @@ export default function AdminLoginLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Login page doesn't use the admin sidebar
   return <>{children}</>;
 }

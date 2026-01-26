@@ -1,5 +1,18 @@
+"use client";
+
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 export default function AnalyticsPage() {
-  return (
+  const { status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>

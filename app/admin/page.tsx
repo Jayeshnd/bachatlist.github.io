@@ -1,7 +1,15 @@
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 
 export default async function AdminDashboard() {
+  const session = await auth();
+
+  if (!session) {
+    redirect("/login");
+  }
+
   const [
     totalDeals,
     publishedDeals,

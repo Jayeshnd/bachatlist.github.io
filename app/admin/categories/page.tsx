@@ -1,16 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function CategoriesPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Check auth and redirect if not logged in
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchCategories();
+    }
+  }, [status]);
 
   async function fetchCategories() {
     try {

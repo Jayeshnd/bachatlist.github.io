@@ -1,16 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function DealsPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [deals, setDeals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Check auth and redirect if not logged in
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
   // Fetch deals on mount
   useEffect(() => {
-    fetchDeals();
-  }, []);
+    if (status === "authenticated") {
+      fetchDeals();
+    }
+  }, [status]);
 
   async function fetchDeals() {
     try {

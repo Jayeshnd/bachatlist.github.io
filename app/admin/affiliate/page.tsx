@@ -1,4 +1,19 @@
+"use client";
+
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 export default function AffiliateNetworksPage() {
+  const { status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
   const networks = [
     { name: "Amazon Associates", icon: "🛒", status: "Connected" },
     { name: "Flipkart Affiliate", icon: "🏪", status: "Disconnected" },
