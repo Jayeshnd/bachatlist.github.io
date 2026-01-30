@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { serializeDecimal } from "@/lib/utils";
 
 // GET all coupon codes
 export async function GET(request: NextRequest) {
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(coupon, { status: 201 });
+    return NextResponse.json(serializeDecimal(coupon), { status: 201 });
   } catch (error) {
     console.error("Failed to create coupon:", error);
     return NextResponse.json(
