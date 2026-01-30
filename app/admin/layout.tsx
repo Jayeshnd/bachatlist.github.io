@@ -1,18 +1,97 @@
-import { Sidebar } from "@/components/admin/sidebar";
+import Link from "next/link";
+import Logo from "@/app/components/layout/Logo";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Admin layout just provides the sidebar structure
-  // Note: This layout wraps all /admin/* routes including login
-  // Login page should be at /login instead
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 bg-gray-50">
-        <div className="p-8">{children}</div>
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
+        {/* Logo */}
+        <div className="p-6 border-b border-gray-100">
+          <Link href="/admin" className="block">
+            <Logo size="md" showTagline={true} />
+          </Link>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 p-4">
+          <ul className="space-y-1">
+            <li>
+              <Link
+                href="/admin"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 transition text-gray-700 hover:text-green-700"
+              >
+                <span className="text-xl">📊</span>
+                <span className="font-medium">Dashboard</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/admin/deals"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 transition text-gray-700 hover:text-green-700"
+              >
+                <span className="text-xl">🏷️</span>
+                <span className="font-medium">Deals</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/admin/categories"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 transition text-gray-700 hover:text-green-700"
+              >
+                <span className="text-xl">📁</span>
+                <span className="font-medium">Categories</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/admin/affiliate"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 transition text-gray-700 hover:text-green-700"
+              >
+                <span className="text-xl">🔗</span>
+                <span className="font-medium">Affiliate</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/admin/analytics"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 transition text-gray-700 hover:text-green-700"
+              >
+                <span className="text-xl">📈</span>
+                <span className="font-medium">Analytics</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/admin/settings"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 transition text-gray-700 hover:text-green-700"
+              >
+                <span className="text-xl">⚙️</span>
+                <span className="font-medium">Settings</span>
+              </Link>
+            </li>
+          </ul>
+        </nav>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-100">
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 transition text-gray-500 hover:text-green-700"
+          >
+            <span className="text-xl">🌐</span>
+            <span className="font-medium">View Site</span>
+          </Link>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-auto bg-gray-50">
+        {children}
       </main>
     </div>
   );

@@ -13,6 +13,15 @@ const navItems = [
   { href: "/admin/settings", label: "Settings", icon: "⚙️" },
 ];
 
+const publicPages = [
+  { href: "/loot", label: "Loot Deals", icon: "🎁" },
+  { href: "/blog", label: "Blog", icon: "📝" },
+  { href: "/features", label: "Features", icon: "✨" },
+  { href: "/about", label: "About Us", icon: "👥" },
+  { href: "/telegram", label: "Telegram Channel", icon: "📱" },
+  { href: "/coupon", label: "Coupon", icon: "🏷️" },
+];
+
 export function Sidebar() {
   const pathname = usePathname();
 
@@ -42,6 +51,33 @@ export function Sidebar() {
               <span className="text-xl">{item.icon}</span>
               <span>{item.label}</span>
             </Link>
+          );
+        })}
+
+        <div className="my-4 border-t border-gray-700"></div>
+
+        <p className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+          Public Pages
+        </p>
+
+        {publicPages.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <a
+              key={item.href}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 transition ${
+                isActive
+                  ? "bg-primary text-white"
+                  : "text-gray-300 hover:bg-gray-800"
+              }`}
+            >
+              <span className="text-xl">{item.icon}</span>
+              <span>{item.label}</span>
+              <span className="ml-auto text-xs">↗</span>
+            </a>
           );
         })}
       </nav>

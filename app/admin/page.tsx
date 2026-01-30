@@ -10,7 +10,7 @@ export default async function AdminDashboard() {
     redirect("/login");
   }
 
-  // Fetch stats with error handling
+  // Fetch stats
   let totalDeals = 0;
   let publishedDeals = 0;
   let draftDeals = 0;
@@ -36,45 +36,72 @@ export default async function AdminDashboard() {
     {
       label: "Total Deals",
       value: totalDeals,
-      icon: "💰",
-      color: "bg-blue-500",
+      icon: "🏷️",
+      color: "from-blue-500 to-blue-600",
       link: "/admin/deals",
     },
     {
       label: "Published",
       value: publishedDeals,
       icon: "✅",
-      color: "bg-green-500",
-      link: "/admin/deals",
+      color: "from-green-500 to-green-600",
+      link: "/admin/deals?status=published",
     },
     {
       label: "Drafts",
       value: draftDeals,
       icon: "📝",
-      color: "bg-yellow-500",
-      link: "/admin/deals",
+      color: "from-yellow-500 to-yellow-600",
+      link: "/admin/deals?status=draft",
     },
     {
       label: "Categories",
       value: categories,
       icon: "📁",
-      color: "bg-purple-500",
+      color: "from-purple-500 to-purple-600",
       link: "/admin/categories",
     },
     {
       label: "Total Clicks",
       value: totalClicks,
       icon: "👆",
-      color: "bg-pink-500",
+      color: "from-pink-500 to-pink-600",
       link: "/admin/analytics",
     },
   ];
 
+  const quickActions = [
+    {
+      label: "Create New Deal",
+      icon: "➕",
+      href: "/admin/deals/create",
+      color: "bg-gradient-to-r from-green-500 to-green-600 text-white",
+    },
+    {
+      label: "Manage Categories",
+      icon: "📁",
+      href: "/admin/categories",
+      color: "bg-gray-100 text-gray-900",
+    },
+    {
+      label: "Affiliate Networks",
+      icon: "🔗",
+      href: "/admin/affiliate",
+      color: "bg-gray-100 text-gray-900",
+    },
+    {
+      label: "View Analytics",
+      icon: "📊",
+      href: "/admin/analytics",
+      color: "bg-gray-100 text-gray-900",
+    },
+  ];
+
   return (
-    <div>
+    <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-        <p className="text-gray-600">Welcome to BachatList Admin Panel</p>
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-600 mt-1">Welcome to BachatList Admin Panel</p>
       </div>
 
       {dbError && (
@@ -83,27 +110,23 @@ export default async function AdminDashboard() {
           <p className="text-red-600 text-sm mt-1">
             Unable to connect to the database. Please check if your database server is running and accessible.
           </p>
-          <p className="text-red-600 text-sm mt-2">
-            Database: {process.env.DATABASE_URL?.split("@")[1] || "unknown"}
-          </p>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         {stats.map((stat) => (
           <Link
             key={stat.label}
             href={stat.link}
-            className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-6 border border-gray-100"
+            className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-5 border border-gray-100"
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm mb-1">{stat.label}</p>
                 <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
               </div>
-              <div
-                className={`${stat.color} w-14 h-14 rounded-full flex items-center justify-center text-2xl`}
-              >
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-2xl shadow-lg`}>
                 {stat.icon}
               </div>
             </div>
@@ -111,33 +134,23 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
+      {/* Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
           <h2 className="text-xl font-bold text-gray-900 mb-4">
             Quick Actions
           </h2>
-          <div className="space-y-3">
-            <Link
-              href="/admin/deals/create"
-              className="flex items-center space-x-3 p-4 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:opacity-90 transition"
-            >
-              <span className="text-2xl">➕</span>
-              <span className="font-semibold">Create New Deal</span>
-            </Link>
-            <Link
-              href="/admin/categories"
-              className="flex items-center space-x-3 p-4 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition"
-            >
-              <span className="text-2xl">📁</span>
-              <span className="font-semibold">Manage Categories</span>
-            </Link>
-            <Link
-              href="/admin/affiliate"
-              className="flex items-center space-x-3 p-4 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition"
-            >
-              <span className="text-2xl">🔗</span>
-              <span className="font-semibold">Affiliate Networks</span>
-            </Link>
+          <div className="grid grid-cols-2 gap-4">
+            {quickActions.map((action) => (
+              <Link
+                key={action.label}
+                href={action.href}
+                className={`flex items-center gap-3 p-4 rounded-lg transition ${action.color} hover:opacity-90`}
+              >
+                <span className="text-2xl">{action.icon}</span>
+                <span className="font-semibold">{action.label}</span>
+              </Link>
+            ))}
           </div>
         </div>
 
@@ -145,33 +158,33 @@ export default async function AdminDashboard() {
           <h2 className="text-xl font-bold text-gray-900 mb-4">
             Getting Started
           </h2>
-          <div className="space-y-4 text-gray-600">
-            <div className="flex items-start space-x-3">
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
               <span className="text-xl">1️⃣</span>
               <div>
                 <p className="font-semibold text-gray-900">Create Categories</p>
-                <p className="text-sm">Organize your deals by categories</p>
+                <p className="text-sm text-gray-600">Organize your deals by categories</p>
               </div>
             </div>
-            <div className="flex items-start space-x-3">
+            <div className="flex items-start gap-3">
               <span className="text-xl">2️⃣</span>
               <div>
                 <p className="font-semibold text-gray-900">Add Deals</p>
-                <p className="text-sm">Start adding deals with prices and links</p>
+                <p className="text-sm text-gray-600">Start adding deals with prices and links</p>
               </div>
             </div>
-            <div className="flex items-start space-x-3">
+            <div className="flex items-start gap-3">
               <span className="text-xl">3️⃣</span>
               <div>
                 <p className="font-semibold text-gray-900">Configure Affiliate</p>
-                <p className="text-sm">Setup affiliate networks for tracking</p>
+                <p className="text-sm text-gray-600">Setup affiliate networks for tracking</p>
               </div>
             </div>
-            <div className="flex items-start space-x-3">
+            <div className="flex items-start gap-3">
               <span className="text-xl">4️⃣</span>
               <div>
                 <p className="font-semibold text-gray-900">Track Performance</p>
-                <p className="text-sm">Monitor clicks and conversions</p>
+                <p className="text-sm text-gray-600">Monitor clicks and conversions</p>
               </div>
             </div>
           </div>

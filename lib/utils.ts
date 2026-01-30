@@ -53,3 +53,59 @@ export function calculateDiscount(
   if (originalPrice <= 0) return 0;
   return Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
 }
+
+/**
+ * Convert Prisma Decimal to number for client components
+ * @param value The Decimal value or number
+ * @returns The value as a number
+ */
+export function toNumber(value: any): number {
+  if (value === null || value === undefined) return 0;
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') return parseFloat(value);
+  // Handle Prisma Decimal objects
+  if (typeof value === 'object' && 'toNumber' in value) {
+    return value.toNumber();
+  }
+  return 0;
+}
+
+/**
+ * Convert Prisma Decimal to string for display
+ * @param value The Decimal value or number
+ * @returns The value as a string
+ */
+export function toString(value: any): string {
+  if (value === null || value === undefined) return '0';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number') return value.toString();
+  // Handle Prisma Decimal objects
+  if (typeof value === 'object' && 'toString' in value) {
+    return value.toString();
+  }
+  return '0';
+}
+
+/**
+ * Remove null values from an object
+ * @param obj The object to sanitize
+ * @returns A new object without null/undefined values
+ */
+export function sanitizeObject(obj: Record<string, any>): Record<string, any> {
+  const result: Record<string, any> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== null && value !== undefined) {
+      // Handle nested objects and arrays
+      if (typeof value === 'object' && !Array.isArray(value) && !(value instanceof Date)) {
+        result[key] = sanitizeObject(value);
+      } else if (typeof value === 'object' && Array.isArray(value)) {
+        result[key] = value.map(item => 
+          typeof item === 'object' ? sanitizeObject(item) : item
+        );
+      } else {
+        result[key] = value;
+      }
+    }
+  }
+  return result;
+}

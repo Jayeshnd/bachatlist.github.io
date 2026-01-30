@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import SyncStatus from './SyncStatus';
 
 interface TelegramConfig {
   botToken: string;
@@ -19,7 +20,7 @@ interface AmazonConfig {
   enabled: boolean;
 }
 
-interface SyncStatus {
+interface SyncStatusData {
   lastSync: string | null;
   successCount: number;
   failureCount: number;
@@ -59,7 +60,7 @@ export default function IntegrationsTab() {
   const [amazonStatus, setAmazonStatus] = useState<'connected' | 'disconnected' | 'testing'>('disconnected');
   
   // Sync status state
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>({
+  const [syncStatus, setSyncStatus] = useState<SyncStatusData>({
     lastSync: null,
     successCount: 0,
     failureCount: 0,
