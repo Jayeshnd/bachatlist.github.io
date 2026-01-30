@@ -1,15 +1,5 @@
 {
-  "buildCommand": "prisma generate && next build",
-  "outputDirectory": ".next",
   "framework": "nextjs",
-  "crons": [
-    {
-      "path": "/api/cron/sync-prices",
-      "schedule": "0 */6 * * *"
-    },
-    {
-      "path": "/api/cron/notifications",
-      "schedule": "0 9 * * *"
-    }
-  ]
+  "buildCommand": "prisma generate && next build",
+  "outputDirectory": ".next"
 }
