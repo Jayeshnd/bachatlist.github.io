@@ -1,6 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import HomeClient from "./HomeClient";
 
+// Helper function to convert Decimal fields to numbers for serialization
+function serializeDeal(deal: any) {
+  return {
+    ...deal,
+    currentPrice: deal.currentPrice ? Number(deal.currentPrice) : 0,
+    originalPrice: deal.originalPrice ? Number(deal.originalPrice) : null,
+    rating: deal.rating ? Number(deal.rating) : null,
+  };
+}
+
 async function getHomePageData() {
   try {
     const now = new Date();
@@ -75,7 +85,21 @@ async function getHomePageData() {
       }),
     ]);
     
-    return { categories, featuredDeals, latestDeals, banners, hotDeals };
+    // Serialize Decimal fields in deals
+    const serializedFeaturedDeals = featuredDeals.map(serializeDeal);
+    const serializedLatestDeals = latestDeals.map(serializeDeal);
+    const serializedHotDeals = hotDeals.map((hotDeal) => ({
+      ...hotDeal,
+      deal: serializeDeal(hotDeal.deal),
+    }));
+    
+    return { 
+      categories, 
+      featuredDeals: serializedFeaturedDeals, 
+      latestDeals: serializedLatestDeals, 
+      banners, 
+      hotDeals: serializedHotDeals 
+    };
   } catch (error) {
     console.error("Failed to fetch home page data:", error);
     return { categories: [], featuredDeals: [], latestDeals: [], banners: [], hotDeals: [] };

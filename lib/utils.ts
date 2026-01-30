@@ -109,3 +109,41 @@ export function sanitizeObject(obj: Record<string, any>): Record<string, any> {
   }
   return result;
 }
+
+/**
+ * Serialize Decimal and BigInt values to JSON-compatible format
+ * Prisma Decimal types don't serialize to JSON properly, this fixes that
+ * @param value The value to serialize
+ * @returns JSON-compatible value with Decimals as strings
+ */
+export function serializeDecimal(value: any): any {
+  if (value === null || value === undefined) {
+    return value;
+  }
+  
+  // Handle Prisma Decimal objects (have toString method)
+  if (typeof value === 'object' && 'toString' in value && typeof value.toString === 'function') {
+    return value.toString();
+  }
+  
+  // Handle BigInt values
+  if (typeof value === 'bigint') {
+    return value.toString();
+  }
+  
+  // Handle arrays
+  if (Array.isArray(value)) {
+    return value.map(item => serializeDecimal(item));
+  }
+  
+  // Handle objects (but not Date objects)
+  if (typeof value === 'object' && !(value instanceof Date)) {
+    const serialized: Record<string, any> = {};
+    for (const [key, val] of Object.entries(value)) {
+      serialized[key] = serializeDecimal(val);
+    }
+    return serialized;
+  }
+  
+  return value;
+}

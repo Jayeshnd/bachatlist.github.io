@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { serializeDecimal } from "@/lib/utils";
 
 // GET all hot deals
 export async function GET(request: NextRequest) {
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
       orderBy: { order: "asc" },
     });
 
-    return NextResponse.json(hotDeals);
+    return NextResponse.json(serializeDecimal(hotDeals));
   } catch (error) {
     console.error("Failed to fetch hot deals:", error);
     return NextResponse.json(
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(hotDeal, { status: 201 });
+    return NextResponse.json(serializeDecimal(hotDeal), { status: 201 });
   } catch (error) {
     console.error("Failed to add hot deal:", error);
     return NextResponse.json(

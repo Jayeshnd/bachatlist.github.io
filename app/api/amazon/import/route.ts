@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getProductDetails, generateAffiliateUrl, cacheAmazonProduct } from "@/lib/amazon";
-import { slugify } from "@/lib/utils";
+import { slugify, serializeDecimal } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 // POST: Import Amazon product as a deal
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
+    return NextResponse.json(serializeDecimal({
       success: true,
       deal: {
         id: deal.id,
@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
         imageUrl: product.imageUrl,
       },
       message: "Amazon product imported successfully as a deal",
-    });
+    }));
   } catch (error) {
     console.error("Amazon import error:", error);
 

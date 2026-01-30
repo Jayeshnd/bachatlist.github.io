@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { serializeDecimal } from "@/lib/utils";
 
 // GET loot deals
 export async function GET() {
@@ -13,7 +14,7 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(lootDeals);
+    return NextResponse.json(serializeDecimal(lootDeals));
   } catch (error) {
     console.error("Failed to fetch loot deals:", error);
     return NextResponse.json(

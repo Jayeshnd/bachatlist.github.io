@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { slugify } from "@/lib/utils";
+import { slugify, serializeDecimal } from "@/lib/utils";
 
 // GET all deals
 export async function GET(request: NextRequest) {
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(deals);
+    return NextResponse.json(serializeDecimal(deals));
   } catch (error) {
     console.error("Failed to fetch deals:", error);
     return NextResponse.json(
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
       include: { category: true },
     });
 
-    return NextResponse.json(deal, { status: 201 });
+    return NextResponse.json(serializeDecimal(deal), { status: 201 });
   } catch (error) {
     console.error("Failed to create deal:", error);
     return NextResponse.json(

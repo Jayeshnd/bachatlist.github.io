@@ -1,3 +1,4 @@
+import { serializeDecimal } from "@/lib/utils";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getProductDetails, generateAffiliateUrl, getCachedProduct, cacheAmazonProduct } from "@/lib/amazon";
@@ -36,7 +37,7 @@ export async function GET(
         ? generateAffiliateUrl(asin, config.associateTag, config.region)
         : undefined;
 
-      return NextResponse.json({
+      return NextResponse.json(serializeDecimal({
         cached: true,
         asin: cachedProduct.asin,
         title: cachedProduct.title,
@@ -49,7 +50,7 @@ export async function GET(
         affiliateUrl,
         lastCheckedAt: cachedProduct.lastCheckedAt,
         dealId: cachedProduct.dealId,
-      });
+      }));
     }
 
     // Get active Amazon config
@@ -91,11 +92,11 @@ export async function GET(
     // Cache the product
     await cacheAmazonProduct(product);
 
-    return NextResponse.json({
+    return NextResponse.json(serializeDecimal({
       cached: false,
       ...product,
       affiliateUrl: generateAffiliateUrl(asin, config.associateTag, config.region),
-    });
+    }));
   } catch (error) {
     console.error("Amazon get product error:", error);
     
