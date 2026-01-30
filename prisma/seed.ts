@@ -58,6 +58,41 @@ async function main() {
     console.log('✓ Created affiliate network:', network.name);
   }
 
+  // Create default banners for homepage slider
+  const banners = [
+    {
+      title: 'Big Savings on Electronics',
+      subtitle: 'Up to 70% off on top brands',
+      imageUrl: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1200&q=80',
+      link: '/category/electronics',
+      isActive: true,
+      order: 1,
+    },
+    {
+      title: 'Fashion Sale',
+      subtitle: 'Latest trends at unbeatable prices',
+      imageUrl: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=80',
+      link: '/category/fashion',
+      isActive: true,
+      order: 2,
+    },
+    {
+      title: 'Home & Kitchen Essentials',
+      subtitle: 'Make your home better',
+      imageUrl: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=80',
+      link: '/category/home-kitchen',
+      isActive: true,
+      order: 3,
+    },
+  ];
+
+  for (const banner of banners) {
+    await prisma.banner.create({
+      data: banner,
+    });
+    console.log('✓ Created banner:', banner.title);
+  }
+
   console.log('\n✅ Database seeded successfully!');
   console.log('\n📝 Admin credentials:');
   console.log('   Email: admin@bachatlist.com');

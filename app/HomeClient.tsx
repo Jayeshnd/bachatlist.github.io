@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatPrice, toNumber } from "@/lib/utils";
-import { BannerSlider } from "@/app/components/BannerSlider";
+import { BannerSlider } from "@/components/BannerSlider";
 
 // Stores/Brands Component
 function StoresRow({ stores }: { stores: { name: string; icon: string; logo?: string }[] }) {
