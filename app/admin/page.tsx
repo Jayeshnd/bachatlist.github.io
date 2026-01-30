@@ -118,7 +118,7 @@ export default async function AdminDashboard() {
           </h2>
           <div className="space-y-3">
             <Link
-              href="/admin/deals/new"
+              href="/admin/deals/create"
               className="flex items-center space-x-3 p-4 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:opacity-90 transition"
             >
               <span className="text-2xl">➕</span>
