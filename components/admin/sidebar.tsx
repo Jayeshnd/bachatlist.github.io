@@ -10,6 +10,7 @@ const navItems = [
   { href: "/admin/categories", label: "Categories", icon: "📁" },
   { href: "/admin/affiliate", label: "Affiliate Networks", icon: "🔗" },
   { href: "/admin/analytics", label: "Analytics", icon: "📈" },
+  { href: "/admin/settings", label: "Settings", icon: "⚙️" },
 ];
 
 export function Sidebar() {

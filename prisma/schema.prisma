@@ -109,6 +109,7 @@ model Deal {
   publishedAt     DateTime?
 
   clickEvents     ClickEvent[]
+  amazonProducts  AmazonProduct[]
 
   @@index([categoryId])
   @@index([status])
@@ -268,4 +269,79 @@ model Setting {
   updatedAt   DateTime @updatedAt
 
   @@map("settings")
+}
+
+// Telegram Bot Integration
+model TelegramBot {
+  id              String   @id @default(cuid())
+  botToken        String   @db.Text
+  webhookUrl      String?
+  chatId          String?
+  isActive        Boolean  @default(false)
+  notifications   TelegramNotification[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("telegram_bots")
+}
+
+model TelegramNotification {
+  id              String   @id @default(cuid())
+  botId           String
+  type            String   // NEW_DEAL, PRICE_DROP, DAILY_DIGEST
+  messageTemplate String?  @db.Text
+  isEnabled       Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  bot             TelegramBot @relation(fields: [botId], references: [id], onDelete: Cascade)
+
+  @@map("telegram_notifications")
+}
+
+// Amazon API Integration
+model AmazonConfig {
+  id              String   @id @default(cuid())
+  associateTag    String
+  accessKey       String   @db.Text
+  secretKey       String   @db.Text
+  region          String   @default("in")
+  marketplace     String   @default("IN")
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("amazon_configs")
+}
+
+model AmazonProduct {
+  id              String   @id @default(cuid())
+  asin            String   @unique
+  title           String   @db.Text
+  description     String?  @db.Text
+  currentPrice    Decimal? @db.Decimal(10, 2)
+  originalPrice   Decimal? @db.Decimal(10, 2)
+  currency        String   @default("INR")
+  imageUrl        String?
+  productUrl      String
+  lastCheckedAt   DateTime
+  dealId          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  deal            Deal?    @relation(fields: [dealId], references: [id])
+
+  @@map("amazon_products")
+}
+
+// API Connection Logs
+model ApiConnectionLog {
+  id              String   @id @default(cuid())
+  networkId       String
+  type            String   // TELEGRAM, AMAZON, MANUAL
+  action          String   // TEST, SYNC, IMPORT
+  status          String   // SUCCESS, FAILED
+  message         String?  @db.Text
+  createdAt       DateTime @default(now())
+
+  @@map("api_connection_logs")
 }
