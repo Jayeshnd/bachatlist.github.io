@@ -23,6 +23,7 @@ const defaultPosts = [
     categoryName: "Amazon Deals",
     featuredImage: "https://m.media-amazon.com/images/I/81Qq3V3E3JL._AC_UY327_FMwebp_QL65_.jpg",
     isFeatured: true,
+    slug: "top-10-amazon-deals-under-500",
   },
   {
     id: "2",
@@ -34,6 +35,7 @@ const defaultPosts = [
     categoryName: "Shopping Guide",
     featuredImage: "https://m.media-amazon.com/images/I/61Nr0k0jvOL._AC_UY327_FMwebp_QL65_.jpg",
     isFeatured: true,
+    slug: "flipkart-big-billion-days-guide",
   },
 ];
 

@@ -1,124 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { formatPrice, toNumber } from "@/lib/utils";
 
-const lootDeals = [
-  {
-    id: 1,
-    title: "OnePlus Nord CE 3 Lite 5G",
-    shortDesc: "8GB RAM, 128GB Storage",
-    currentPrice: 14999,
-    originalPrice: 19999,
-    discount: 25,
-    image: "https://m.media-amazon.com/images/I/81Qq3V3E3JL._AC_UY327_FMwebp_QL65_.jpg",
-    store: "Amazon",
-    badge: "HOT",
-    rating: 4.3,
-    reviewCount: 1245,
-    urgency: "high",
-  },
-  {
-    id: 2,
-    title: "boAt Rockerz 550 Wireless Headphone",
-    shortDesc: "Over Ear Bluetooth Headphones",
-    currentPrice: 1299,
-    originalPrice: 3990,
-    discount: 67,
-    image: "https://m.media-amazon.com/images/I/61Nr0k0jvOL._AC_UY327_FMwebp_QL65_.jpg",
-    store: "Amazon",
-    badge: "LOOT",
-    rating: 4.5,
-    reviewCount: 8921,
-    urgency: "high",
-  },
-  {
-    id: 3,
-    title: "Puma Men's T-Shirt",
-    shortDesc: "Regular Fit Cotton Blend",
-    currentPrice: 599,
-    originalPrice: 1599,
-    discount: 62,
-    image: "https://m.media-amazon.com/images/I/61QrVT-8rGL._AC_UY327_FMwebp_QL65_.jpg",
-    store: "Amazon",
-    badge: "LIMITED",
-    rating: 4.2,
-    reviewCount: 2341,
-    urgency: "medium",
-  },
-  {
-    id: 4,
-    title: "Samsung Galaxy M14 5G",
-    shortDesc: "6GB RAM, 128GB Storage",
-    currentPrice: 12499,
-    originalPrice: 17999,
-    discount: 31,
-    image: "https://m.media-amazon.com/images/I/81Qq3V3E3JL._AC_UY327_FMwebp_QL65_.jpg",
-    store: "Amazon",
-    badge: "HOT",
-    rating: 4.4,
-    reviewCount: 3421,
-    urgency: "high",
-  },
-  {
-    id: 5,
-    title: "Crocs Unisex-Adult Clogs",
-    shortDesc: "Classic Comfort Water Shoes",
-    currentPrice: 1699,
-    originalPrice: 3499,
-    discount: 51,
-    image: "https://m.media-amazon.com/images/I/81Qq3V3E3JL._AC_UY327_FMwebp_QL65_.jpg",
-    store: "Amazon",
-    badge: "LOOT",
-    rating: 4.6,
-    reviewCount: 5678,
-    urgency: "high",
-  },
-  {
-    id: 6,
-    title: "Noise Pulse 2 Max Smartwatch",
-    shortDesc: "Bluetooth Calling, 1.83\" Display",
-    currentPrice: 1799,
-    originalPrice: 4999,
-    discount: 64,
-    image: "https://m.media-amazon.com/images/I/61Nr0k0jvOL._AC_UY327_FMwebp_QL65_.jpg",
-    store: "Amazon",
-    badge: "DEAL",
-    rating: 4.3,
-    reviewCount: 4567,
-    urgency: "medium",
-  },
-  {
-    id: 7,
-    title: "Wildcraft Backpack 25L",
-    shortDesc: "Waterproof Laptop Backpack",
-    currentPrice: 1499,
-    originalPrice: 3999,
-    discount: 62,
-    image: "https://m.media-amazon.com/images/I/61QrVT-8rGL._AC_UY327_FMwebp_QL65_.jpg",
-    store: "Amazon",
-    badge: "LOOT",
-    rating: 4.4,
-    reviewCount: 1234,
-    urgency: "high",
-  },
-  {
-    id: 8,
-    title: "Amul Butter 500g Pack",
-    shortDesc: "Pure Salted Butter",
-    currentPrice: 265,
-    originalPrice: 340,
-    discount: 22,
-    image: "https://m.media-amazon.com/images/I/81Qq3V3E3JL._AC_UY327_FMwebp_QL65_.jpg",
-    store: "Amazon",
-    badge: "ESSENTIAL",
-    rating: 4.7,
-    reviewCount: 8901,
-    urgency: "low",
-  },
-];
-
-function formatPrice(price: number): string {
+function formatPriceINR(price: number): string {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
@@ -126,70 +12,77 @@ function formatPrice(price: number): string {
   }).format(price);
 }
 
-function LootDealCard({ deal }: { deal: typeof lootDeals[0] }) {
-  const urgencyColors = {
-    high: "bg-red-500 animate-pulse",
-    medium: "bg-orange-500",
-    low: "bg-yellow-500",
-  };
+function LootDealCard({ deal }: { deal: any }) {
+  const currentPrice = toNumber(deal.currentPrice);
+  const originalPrice = toNumber(deal.originalPrice);
+  const discount = deal.discount || (originalPrice > 0 ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : 0);
 
   return (
     <div className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 group relative">
       {/* Urgent Badge */}
-      {deal.urgency === "high" && (
-        <div className={`absolute top-3 left-3 ${urgencyColors[deal.urgency as keyof typeof urgencyColors]} text-white text-xs font-bold px-2 py-1 rounded-md z-10 flex items-center gap-1`}>
+      {discount > 50 && (
+        <div className="absolute top-3 left-3 bg-red-500 animate-pulse text-white text-xs font-bold px-2 py-1 rounded-md z-10 flex items-center gap-1">
           <span>⚡</span> HOT
         </div>
       )}
 
       {/* Discount Badge */}
       <div className="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10">
-        {deal.discount}% OFF
+        {discount}% OFF
       </div>
 
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-        <img
-          src={deal.image}
-          alt={deal.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+        {deal.primaryImage ? (
+          <img
+            src={deal.primaryImage}
+            alt={deal.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+            <span className="text-4xl opacity-50">🛍️</span>
+          </div>
+        )}
       </div>
 
       <div className="p-4">
-        {/* Store Badge */}
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
-            📦 {deal.store}
-          </span>
-          {deal.badge && deal.urgency !== "high" && (
+        {/* Coupon Badge */}
+        {deal.coupon && (
+          <div className="flex items-center gap-2 mb-2">
             <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-md">
-              {deal.badge}
+              🎁 {deal.coupon}
             </span>
-          )}
-        </div>
+          </div>
+        )}
 
         <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 group-hover:text-green-600 transition-colors">
           {deal.title}
         </h3>
 
-        <p className="text-xs text-gray-500 mt-1">{deal.shortDesc}</p>
+        {deal.shortDesc && (
+          <p className="text-xs text-gray-500 mt-1">{deal.shortDesc}</p>
+        )}
 
         <div className="mt-3">
           <div className="flex items-baseline gap-2">
-            <span className="text-xl font-bold text-gray-900">{formatPrice(deal.currentPrice)}</span>
-            <span className="text-sm text-gray-400 line-through">{formatPrice(deal.originalPrice)}</span>
+            <span className="text-xl font-bold text-gray-900">{formatPriceINR(currentPrice)}</span>
+            {originalPrice > currentPrice && (
+              <span className="text-sm text-gray-400 line-through">{formatPriceINR(originalPrice)}</span>
+            )}
           </div>
 
-          <div className="flex items-center gap-1 mt-2">
-            <span className="text-yellow-500 text-sm">★</span>
-            <span className="text-sm font-medium text-gray-700">{deal.rating}</span>
-            <span className="text-xs text-gray-400">({deal.reviewCount})</span>
-          </div>
+          {deal.rating && deal.rating > 0 && (
+            <div className="flex items-center gap-1 mt-2">
+              <span className="text-yellow-500 text-sm">★</span>
+              <span className="text-sm font-medium text-gray-700">{deal.rating}</span>
+              <span className="text-xs text-gray-400">({deal.reviewCount || 0})</span>
+            </div>
+          )}
         </div>
 
         <a
-          href="#"
+          href={deal.affiliateUrl || deal.productUrl || "#"}
           className="mt-3 block w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-center py-2.5 rounded-lg font-semibold text-sm hover:opacity-90 transition"
         >
           Grab Now →
@@ -199,8 +92,116 @@ function LootDealCard({ deal }: { deal: typeof lootDeals[0] }) {
   );
 }
 
+// Carousel Component
+function LootCarousel({ deals }: { deals: any[] }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % deals.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [deals.length]);
+
+  if (deals.length === 0) return null;
+
+  const currentDeal = deals[currentIndex];
+  const currentPrice = toNumber(currentDeal.currentPrice);
+  const originalPrice = toNumber(currentDeal.originalPrice);
+  const discount = currentDeal.discount || (originalPrice > 0 ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : 0);
+
+  return (
+    <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden rounded-2xl mb-8">
+      {deals.map((deal, index) => (
+        <div
+          key={deal.id}
+          className={`absolute inset-0 transition-opacity duration-500 ${
+            index === currentIndex ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <div className="absolute inset-0">
+            {deal.primaryImage ? (
+              <img
+                src={deal.primaryImage}
+                alt={deal.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-red-400/30 to-orange-500/30" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-900/85 via-gray-900/50 to-transparent" />
+          </div>
+
+          <div className="relative h-full flex items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl">
+              <span className="inline-block bg-red-500 text-white text-lg font-bold px-4 py-2 rounded-full mb-4">
+                🔥 {discount}% OFF - LOOT DEAL
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mt-2 mb-3">
+                {deal.title}
+              </h2>
+              {deal.shortDesc && (
+                <p className="text-gray-200 text-base mb-4 line-clamp-2">
+                  {deal.shortDesc}
+                </p>
+              )}
+              <div className="flex items-center gap-4 mb-6">
+                <span className="text-3xl font-bold text-white">
+                  {formatPriceINR(currentPrice)}
+                </span>
+                {originalPrice > currentPrice && (
+                  <span className="text-xl text-gray-400 line-through">
+                    {formatPriceINR(originalPrice)}
+                  </span>
+                )}
+              </div>
+              <a
+                href={deal.affiliateUrl || deal.productUrl || "#"}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition shadow-lg"
+              >
+                Grab Now ⚡
+              </a>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {/* Carousel Indicators */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+        {deals.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-2 h-2 rounded-full transition ${
+              index === currentIndex ? "bg-white" : "bg-white/50"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function LootPage() {
-  const [filter, setFilter] = useState("all");
+  const [lootDeals, setLootDeals] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchLootDeals() {
+      try {
+        const response = await fetch("/api/deals/loot");
+        if (response.ok) {
+          const data = await response.json();
+          setLootDeals(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch loot deals:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchLootDeals();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -217,40 +218,38 @@ export default function LootPage() {
         </div>
       </section>
 
-      {/* Filters */}
-      <section className="bg-white border-b border-gray-100 sticky top-16 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-3 overflow-x-auto pb-2">
-            {["all", "hot", "loot", "electronics", "fashion"].map((filterOption) => (
-              <button
-                key={filterOption}
-                onClick={() => setFilter(filterOption)}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition ${
-                  filter === filterOption
-                    ? "bg-green-500 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                {filterOption === "all" ? "🔥 All Deals" : filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
-              </button>
-            ))}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
           </div>
-        </div>
-      </section>
+        ) : lootDeals.length > 0 ? (
+          <>
+            {/* Carousel for Top Loot Deals */}
+            <LootCarousel deals={lootDeals.slice(0, 5)} />
 
-      {/* Deals Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">🔥 Hot Loot Deals</h2>
-          <span className="text-sm text-gray-500">{lootDeals.length} deals found</span>
-        </div>
+            {/* All Loot Deals Grid */}
+            <section>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">🔥 All Loot Deals</h2>
+                <span className="text-sm text-gray-500">{lootDeals.length} deals found</span>
+              </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {lootDeals.map((deal) => (
-            <LootDealCard key={deal.id} deal={deal} />
-          ))}
-        </div>
-      </section>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {lootDeals.map((deal) => (
+                  <LootDealCard key={deal.id} deal={deal} />
+                ))}
+              </div>
+            </section>
+          </>
+        ) : (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">📦</div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">No Loot Deals Available</h2>
+            <p className="text-gray-600">Check back soon for amazing loot deals!</p>
+          </div>
+        )}
+      </div>
 
       {/* CTA Section */}
       <section className="bg-gradient-to-r from-green-500 to-emerald-600 py-12 mt-8">

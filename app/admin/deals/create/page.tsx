@@ -65,12 +65,14 @@ export default function CreateDealPage() {
       discount: formData.get("discount"),
       originalPrice: formData.get("originalPrice"),
       discountedPrice: formData.get("discountedPrice"),
+      coupon: formData.get("coupon"),
+      isLoot: formData.get("isLoot") === "on",
       status: "DRAFT",
     };
 
     // Add image as base64 if provided
     if (imagePreview) {
-      data.image = imagePreview;
+      data.primaryImage = imagePreview;
     }
 
     try {
@@ -224,6 +226,30 @@ export default function CreateDealPage() {
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="0.00"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Coupon Code
+            </label>
+            <input
+              type="text"
+              name="coupon"
+              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="e.g., SAVE20"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="isLoot"
+              id="isLoot"
+              className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+            />
+            <label htmlFor="isLoot" className="text-sm font-medium text-gray-700">
+              This is a Loot Deal
+            </label>
           </div>
         </div>
 

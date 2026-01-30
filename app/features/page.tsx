@@ -11,6 +11,8 @@ const defaultFeatures = [
       "Browser notifications for price drops",
       "Daily deal digest emails",
     ],
+    linkUrl: "/telegram",
+    linkText: "Join Telegram",
   },
   {
     icon: "💰",
@@ -21,6 +23,8 @@ const defaultFeatures = [
       "Regularly updated codes",
       "Category-wise organization",
     ],
+    linkUrl: "/coupon",
+    linkText: "Browse Coupons",
   },
   {
     icon: "📊",
@@ -31,6 +35,8 @@ const defaultFeatures = [
       "Price drop alerts",
       "Price comparison across sites",
     ],
+    linkUrl: null,
+    linkText: null,
   },
   {
     icon: "🔍",
@@ -41,6 +47,8 @@ const defaultFeatures = [
       "Sort by price or popularity",
       "Search by product name or category",
     ],
+    linkUrl: null,
+    linkText: null,
   },
   {
     icon: "📱",
@@ -51,6 +59,8 @@ const defaultFeatures = [
       "Fast loading pages",
       "Easy navigation",
     ],
+    linkUrl: null,
+    linkText: null,
   },
   {
     icon: "🛡️",
@@ -61,6 +71,8 @@ const defaultFeatures = [
       "Secure affiliate links",
       "No hidden terms",
     ],
+    linkUrl: null,
+    linkText: null,
   },
 ];
 

@@ -1,0 +1,243 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+export default function EditBannerForm({ banner }: { banner: any }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      const response = await fetch(`/api/admin/banners/${banner.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        router.push("/admin/banners");
+        router.refresh();
+      } else {
+        setError(responseData.error || "Failed to update banner");
+      }
+    } catch (err) {
+      setError("Failed to update banner");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const formatDateForInput = (date: Date | null) => {
+    if (!date) return "";
+    return new Date(date).toISOString().slice(0, 16);
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+    >
+      {error && (
+        <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg mb-6">
+          {error}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Image URL */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Banner Image URL *
+          </label>
+          <input
+            type="url"
+            name="imageUrl"
+            required
+            defaultValue={banner.imageUrl}
+            placeholder="https://example.com/banner.jpg"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+
+        {/* Mobile Image URL */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Mobile Banner Image URL
+          </label>
+          <input
+            type="url"
+            name="mobileImageUrl"
+            defaultValue={banner.mobileImageUrl || ""}
+            placeholder="https://example.com/banner-mobile.jpg"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+
+        {/* Title */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Title
+          </label>
+          <input
+            type="text"
+            name="title"
+            defaultValue={banner.title || ""}
+            placeholder="e.g., Summer Sale"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+
+        {/* Subtitle */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Subtitle
+          </label>
+          <textarea
+            name="subtitle"
+            rows={2}
+            defaultValue={banner.subtitle || ""}
+            placeholder="e.g., Get up to 50% off on all electronics"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+
+        {/* Link */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Link URL
+          </label>
+          <input
+            type="url"
+            name="link"
+            defaultValue={banner.link || ""}
+            placeholder="https://example.com/deals"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+
+        {/* Link Text */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Link Text
+          </label>
+          <input
+            type="text"
+            name="linkText"
+            defaultValue={banner.linkText || ""}
+            placeholder="e.g., Shop Now"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+
+        {/* Position */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Position (Order)
+          </label>
+          <input
+            type="number"
+            name="position"
+            min="0"
+            defaultValue={banner.position}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+
+        {/* Background Color */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Background Color
+          </label>
+          <input
+            type="color"
+            name="backgroundColor"
+            defaultValue={banner.backgroundColor || "#000000"}
+            className="w-full h-10 px-2 py-1 border border-gray-300 rounded-lg"
+          />
+        </div>
+
+        {/* Text Color */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Text Color
+          </label>
+          <input
+            type="color"
+            name="textColor"
+            defaultValue={banner.textColor || "#ffffff"}
+            className="w-full h-10 px-2 py-1 border border-gray-300 rounded-lg"
+          />
+        </div>
+
+        {/* Start Date */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Start Date
+          </label>
+          <input
+            type="datetime-local"
+            name="startDate"
+            defaultValue={formatDateForInput(banner.startDate)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+
+        {/* End Date */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            End Date
+          </label>
+          <input
+            type="datetime-local"
+            name="endDate"
+            defaultValue={formatDateForInput(banner.endDate)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+
+        {/* Active Status */}
+        <div className="md:col-span-2">
+          <label className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              name="isActive"
+              defaultChecked={banner.isActive}
+              className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
+            />
+            <span className="text-sm font-medium text-gray-700">
+              Active (Banner is visible on homepage)
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-100">
+        <Link
+          href="/admin/banners"
+          className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+        >
+          Cancel
+        </Link>
+        <button
+          type="submit"
+          disabled={loading}
+          className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition disabled:opacity-50"
+        >
+          {loading ? "Saving..." : "Save Changes"}
+        </button>
+      </div>
+    </form>
+  );
+}

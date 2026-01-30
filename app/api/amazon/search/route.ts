@@ -43,8 +43,8 @@ export async function GET(request: NextRequest) {
     const results = await searchProducts({
       keywords,
       region: config.region,
-      accessKey: config.accessKey,
-      secretKey: config.secretKey,
+      accessKey: config.accessKey ?? '',
+      secretKey: config.secretKey ?? '',
       associateTag: config.associateTag,
       category,
       page,
@@ -132,8 +132,8 @@ export async function POST(request: NextRequest) {
     const results = await searchProducts({
       keywords,
       region: config.region,
-      accessKey: config.accessKey,
-      secretKey: config.secretKey,
+      accessKey: config.accessKey ?? '',
+      secretKey: config.secretKey ?? '',
       associateTag: config.associateTag,
       category,
       page,

@@ -58,6 +58,8 @@ model Deal {
   features        String?      @db.Text
   images          String       @db.Text
   primaryImage    String?      @db.LongText
+  coupon          String?      @db.Text
+  isLoot          Boolean      @default(false)
   productUrl      String
   affiliateUrl    String?
   categoryId      String
@@ -79,6 +81,7 @@ model Deal {
   author          User         @relation(fields: [authorId], references: [id])
   category        Category     @relation(fields: [categoryId], references: [id])
   amazonProduct   AmazonProduct?
+  hotDeal         HotDeal?
 
   @@index([categoryId])
   @@index([status])
@@ -608,4 +611,160 @@ model ApiConnectionLog {
   @@index([action])
   @@index([createdAt])
   @@map("api_connection_logs")
+}
+
+// =====================================================
+// TELEGRAM BOT CONFIGURATION
+// =====================================================
+
+model TelegramBot {
+  id            String              @id @default(cuid())
+  name          String?
+  botToken      String
+  webhookUrl    String?
+  chatId        String?
+  isActive      Boolean             @default(true)
+  
+  notifications TelegramNotification[]
+  
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  
+  @@map("telegram_bots")
+}
+
+model TelegramNotification {
+  id              String          @id @default(cuid())
+  botId           String
+  bot             TelegramBot     @relation(fields: [botId], references: [id], onDelete: Cascade)
+  
+  type            NotificationType
+  messageTemplate String?         @db.Text
+  isEnabled       Boolean         @default(true)
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  @@unique([botId, type])
+  @@index([botId])
+  @@map("telegram_notifications")
+}
+
+enum NotificationType {
+  NEW_DEAL
+  PRICE_DROP
+  DAILY_DIGEST
+  EXPIRY_WARNING
+}
+
+// =====================================================
+// COUPON CODES MANAGEMENT
+// =====================================================
+
+model CouponCode {
+  id              String        @id @default(cuid())
+  code            String        @unique
+  description     String?       @db.Text
+  discountType    DiscountType  @default(PERCENTAGE)
+  discountValue   Decimal       @db.Decimal(10, 2)
+  
+  expiryDate      DateTime?
+  isActive        Boolean       @default(true)
+  
+  minPurchase     Decimal?      @db.Decimal(10, 2)
+  maxDiscount     Decimal?      @db.Decimal(10, 2)
+  
+  usageLimit      Int?
+  usageCount      Int           @default(0)
+  
+  applicableCategories String?   @db.Text
+  applicableDeals      String?   @db.Text
+  
+  // SEO & Display
+  metaTitle       String?
+  metaDescription String?       @db.Text
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  @@index([isActive])
+  @@index([expiryDate])
+  @@map("coupon_codes")
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+// =====================================================
+// BANNERS MANAGEMENT
+// =====================================================
+
+model Banner {
+  id              String      @id @default(cuid())
+  imageUrl        String      @db.Text
+  
+  title           String?
+  subtitle        String?     @db.Text
+  
+  link            String?
+  linkText        String?
+  
+  position        Int         @default(0)
+  isActive        Boolean     @default(true)
+  
+  startDate       DateTime?
+  endDate         DateTime?
+  
+  // Styling
+  backgroundColor String?
+  textColor       String?
+  
+  // Mobile
+  mobileImageUrl  String?     @db.Text
+  
+  // Click tracking
+  clicks          Int         @default(0)
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([isActive])
+  @@index([position])
+  @@index([startDate, endDate])
+  @@map("banners")
+}
+
+// =====================================================
+// HOT DEALS MANAGEMENT
+// =====================================================
+
+model HotDeal {
+  id              String    @id @default(cuid())
+  dealId          String    @unique
+  deal            Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  
+  order           Int       @default(0)
+  isActive        Boolean   @default(true)
+  
+  // Customization
+  customTitle     String?
+  customBadge     String?
+  
+  // Scheduling
+  startDate       DateTime?
+  endDate         DateTime?
+  
+  // Display settings
+  showOnHomepage  Boolean   @default(true)
+  showOnLootPage  Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([order])
+  @@index([isActive])
+  @@index([startDate, endDate])
+  @@map("hot_deals")
 }

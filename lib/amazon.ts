@@ -574,8 +574,8 @@ export async function syncAllAmazonPrices() {
       const freshProduct = await getProductDetails({
         asin: product.asin,
         region: config.region,
-        accessKey: config.accessKey,
-        secretKey: config.secretKey,
+        accessKey: config.accessKey ?? '',
+        secretKey: config.secretKey ?? '',
         associateTag: config.associateTag,
       });
 

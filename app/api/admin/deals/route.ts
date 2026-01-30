@@ -100,7 +100,9 @@ export async function POST(request: NextRequest) {
         originalPrice: originalPrice,
         discount: discount,
         productUrl: data.url,
-        primaryImage: data.image || "", // Store base64 image or empty
+        primaryImage: data.primaryImage || "", // Store base64 image or empty
+        coupon: data.coupon || null,
+        isLoot: data.isLoot || false,
         images: JSON.stringify([]),
         status: data.status || "DRAFT",
         categoryId: categoryId,

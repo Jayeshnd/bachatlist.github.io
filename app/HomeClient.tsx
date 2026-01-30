@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatPrice, toNumber } from "@/lib/utils";
+import { BannerSlider } from "@/app/components/BannerSlider";
 
 // Stores/Brands Component
 function StoresRow({ stores }: { stores: { name: string; icon: string; logo?: string }[] }) {
@@ -221,7 +222,7 @@ function CategoryCard({ category }: { category: any }) {
   );
 }
 
-export default function HomeClient({ featuredDeals, categories, latestDeals }: any) {
+export default function HomeClient({ featuredDeals, categories, latestDeals, banners, hotDeals }: any) {
   // Flipshope-style stores list
   const stores = [
     { name: "Amazon", icon: "📦" },
@@ -236,8 +237,32 @@ export default function HomeClient({ featuredDeals, categories, latestDeals }: a
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Banner Slider */}
+      {banners && banners.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <BannerSlider banners={banners} autoPlay={true} autoPlayInterval={5000} />
+        </section>
+      )}
+
       {/* Stores/Brands Row */}
       <StoresRow stores={stores} />
+
+      {/* Hot Deals Section (if available) */}
+      {hotDeals && hotDeals.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">🔥 Hot Deals</h2>
+            <Link href="/loot" className="text-green-600 font-medium hover:underline text-sm">
+              View All →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {hotDeals.slice(0, 5).map((hotDeal: any) => (
+              <DealCard key={hotDeal.id} deal={{ ...hotDeal.deal, customBadge: hotDeal.customBadge }} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Hero Slider */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

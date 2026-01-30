@@ -34,6 +34,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate required config values
+    if (!config.accessKey || !config.secretKey || !config.associateTag) {
+      return NextResponse.json(
+        { error: "Amazon configuration is incomplete. Please check API credentials." },
+        { status: 400 }
+      );
+    }
+
     // Get product details from Amazon or cache
     let product = await getCachedProduct(asin);
 
@@ -111,7 +119,7 @@ export async function POST(request: NextRequest) {
         currency: product.currency || (config.region === "in" ? "INR" : "USD"),
         images: JSON.stringify(product.imageUrl ? [product.imageUrl] : []),
         primaryImage: product.imageUrl || undefined,
-        productUrl: product.productUrl,
+        productUrl: product.productUrl ?? "",
         affiliateUrl,
         categoryId: dealCategoryId,
         status: "DRAFT",

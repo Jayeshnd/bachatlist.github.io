@@ -64,6 +64,14 @@ export async function GET(
       );
     }
 
+    // Validate required config fields
+    if (!config.accessKey || !config.secretKey || !config.associateTag) {
+      return NextResponse.json(
+        { error: "Amazon API credentials are incomplete" },
+        { status: 400 }
+      );
+    }
+
     // Fetch from Amazon
     const product = await getProductDetails({
       asin,
