@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import Hero from "@/app/components/home/Hero";
 
 async function getHomePageData() {
   try {
@@ -48,54 +49,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-3xl">💰</span>
-            <span className="text-2xl font-bold text-gray-900">BachatList</span>
-          </Link>
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/" className="text-gray-600 hover:text-gray-900">
-              Home
-            </Link>
-            <Link href="/deals" className="text-gray-600 hover:text-gray-900">
-              All Deals
-            </Link>
-            <Link href="/categories" className="text-gray-600 hover:text-gray-900">
-              Categories
-            </Link>
-            <Link
-              href="/login"
-              className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition"
-            >
-              Admin
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary to-secondary text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold mb-4">Find Amazing Deals & Save Big!</h1>
-          <p className="text-xl mb-8 opacity-90">
-            Discover the best offers from across the web. Never miss a deal again.
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Link
-              href="/deals"
-              className="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
-            >
-              Browse Deals
-            </Link>
-            <button className="border-2 border-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition">
-              Subscribe
-            </button>
-          </div>
-        </div>
-      </section>
-
+      <Hero />
       {/* Categories Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <h2 className="text-3xl font-bold text-gray-900 mb-8">Browse by Category</h2>
@@ -185,75 +139,6 @@ export default async function HomePage() {
           </div>
         )}
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <span className="text-3xl">💰</span>
-                <span className="text-xl font-bold">BachatList</span>
-              </div>
-              <p className="text-gray-400 text-sm">
-                Your ultimate destination for finding amazing deals and saving money.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>
-                  <Link href="/deals" className="hover:text-white transition">
-                    All Deals
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/categories" className="hover:text-white transition">
-                    Categories
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/about" className="hover:text-white transition">
-                    About Us
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>
-                  <Link href="/privacy" className="hover:text-white transition">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/terms" className="hover:text-white transition">
-                    Terms of Service
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Follow Us</h4>
-              <div className="flex gap-4">
-                <a href="#" className="text-gray-400 hover:text-white transition">
-                  Twitter
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition">
-                  Facebook
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition">
-                  Instagram
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-sm text-gray-400">
-            <p>&copy; 2025 BachatList. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

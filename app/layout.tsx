@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import Header from "@/app/components/layout/Header";
+import Footer from "@/app/components/layout/Footer";
 
 export const metadata: Metadata = {
   title: "BachatList - Best Deals & Smart Shopping",
@@ -15,7 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <Header />
+        <main>
+          <Providers>{children}</Providers>
+        </main>
+        <Footer />
       </body>
     </html>
   );
