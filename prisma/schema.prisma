@@ -78,6 +78,7 @@ model Deal {
   clickEvents     ClickEvent[]
   author          User         @relation(fields: [authorId], references: [id])
   category        Category     @relation(fields: [categoryId], references: [id])
+  amazonProduct   AmazonProduct?
 
   @@index([categoryId])
   @@index([status])
@@ -539,4 +540,72 @@ model Testimonial {
   updatedAt       DateTime  @updatedAt
   
   @@map("testimonials")
+}
+
+// =====================================================
+// AMAZON API CONFIGURATION
+// =====================================================
+
+model AmazonConfig {
+  id            String    @id @default(cuid())
+  associateTag  String
+  accessKey     String?   @db.Text
+  secretKey     String?   @db.Text
+  region        String    @default("in")
+  marketplace   String    @default("IN")
+  isActive      Boolean   @default(true)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@map("amazon_config")
+}
+
+// =====================================================
+// AMAZON PRODUCTS CACHE
+// =====================================================
+
+model AmazonProduct {
+  asin           String    @id
+  title          String
+  description    String?   @db.Text
+  currentPrice   Decimal?  @db.Decimal(10, 2)
+  originalPrice  Decimal?  @db.Decimal(10, 2)
+  currency       String    @default("INR")
+  imageUrl       String?   @db.Text
+  productUrl     String?   @db.Text
+  
+  // Relationship to Deal
+  dealId         String?     @unique
+  deal           Deal?     @relation(fields: [dealId], references: [id])
+  
+  // Tracking
+  lastCheckedAt  DateTime?
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  
+  @@index([dealId])
+  @@map("amazon_products")
+}
+
+// =====================================================
+// API CONNECTION LOGS
+// =====================================================
+
+model ApiConnectionLog {
+  id          String    @id @default(cuid())
+  networkId   String
+  type        String    // AMAZON, TELEGRAM, etc.
+  action      String    // SYNC, NOTIFICATION, IMPORT, etc.
+  status      String    // SUCCESS, FAILED, PARTIAL
+  message     String?   @db.Text
+  
+  createdAt   DateTime  @default(now())
+  
+  @@index([networkId])
+  @@index([type])
+  @@index([action])
+  @@index([createdAt])
+  @@map("api_connection_logs")
 }
