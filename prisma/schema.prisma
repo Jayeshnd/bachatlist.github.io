@@ -1,5 +1,3 @@
-// This is your Prisma schema file for BachatList
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,112 +7,185 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Users & Authentication
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
   name          String?
-  password      String    // Hashed with bcrypt
+  password      String
   role          UserRole  @default(EDITOR)
   image         String?
   emailVerified DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-
   deals         Deal[]
   reviews       Review[]
+  pages         Page[]
+  blogPosts     BlogPost[]
 
   @@map("users")
 }
 
-enum UserRole {
-  ADMIN       // Full access
-  EDITOR      // Can create/edit content
-  VIEWER      // Read-only access
-}
-
-// Categories
 model Category {
   id          String   @id @default(cuid())
   name        String
   slug        String   @unique
   description String?  @db.Text
-  icon        String?  // Emoji or icon name
+  icon        String?
   image       String?
-  color       String?  // Hex color
+  color       String?
   dealCount   Int      @default(0)
   order       Int      @default(0)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
   deals       Deal[]
 
   @@map("categories")
 }
 
-// Deals
 model Deal {
-  id              String     @id @default(cuid())
+  id              String       @id @default(cuid())
   title           String
-  slug            String     @unique
-  description     String     @db.Text
-  shortDesc       String?    @db.Text // For card display
-
-  // Pricing
-  currentPrice    Decimal    @db.Decimal(10, 2)
-  originalPrice   Decimal?   @db.Decimal(10, 2)
-  discount        Int?       // Percentage
-  currency        String     @default("INR")
-
-  // Product Details
-  rating          Decimal?   @db.Decimal(2, 1)
+  slug            String       @unique
+  description     String       @db.Text
+  shortDesc       String?      @db.Text
+  currentPrice    Decimal      @db.Decimal(10, 2)
+  originalPrice   Decimal?     @db.Decimal(10, 2)
+  discount        Int?
+  currency        String       @default("INR")
+  rating          Decimal?     @db.Decimal(2, 1)
   reviewCount     Int?
-  features        String?    @db.Text // JSON array
-
-  // Images
-  images          String     @db.Text // JSON array of image URLs
-  primaryImage    String?    @db.LongText // Base64 encoded primary image
-
-  // Links
-  productUrl      String     // Original product URL
-  affiliateUrl    String?    // Generated affiliate link
-
-  // Categorization
+  features        String?      @db.Text
+  images          String       @db.Text
+  primaryImage    String?      @db.LongText
+  productUrl      String
+  affiliateUrl    String?
   categoryId      String
-  category        Category   @relation(fields: [categoryId], references: [id])
-  tags            String?    @db.Text // JSON array of tags
-
-  // Status & Flags
-  status          DealStatus @default(DRAFT)
-  badge           String?    // "Hot Deal", "Lightning", "Best Value"
-  isFeatured      Boolean    @default(false)
-  isExpired       Boolean    @default(false)
+  tags            String?      @db.Text
+  status          DealStatus   @default(DRAFT)
+  badge           String?
+  isFeatured      Boolean      @default(false)
+  isExpired       Boolean      @default(false)
   expiresAt       DateTime?
-
-  // SEO
   metaTitle       String?
-  metaDescription String?    @db.Text
-
-  // Tracking
-  views           Int        @default(0)
-  clicks          Int        @default(0)
-
-  // Relationships
+  metaDescription String?      @db.Text
+  views           Int          @default(0)
+  clicks          Int          @default(0)
   authorId        String
-  author          User       @relation(fields: [authorId], references: [id])
-
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
   publishedAt     DateTime?
-
   clickEvents     ClickEvent[]
-  amazonProducts  AmazonProduct[]
+  author          User         @relation(fields: [authorId], references: [id])
+  category        Category     @relation(fields: [categoryId], references: [id])
 
   @@index([categoryId])
   @@index([status])
   @@index([slug])
+  @@index([authorId], map: "deals_authorId_fkey")
   @@map("deals")
+}
+
+model Review {
+  id              String       @id @default(cuid())
+  title           String
+  slug            String       @unique
+  excerpt         String       @db.Text
+  content         String       @db.Text
+  coverImage      String
+  images          String?      @db.Text
+  categoryName    String?
+  readTime        Int?
+  products        String?      @db.Text
+  metaTitle       String?
+  metaDescription String?      @db.Text
+  status          ReviewStatus @default(DRAFT)
+  isFeatured      Boolean      @default(false)
+  views           Int          @default(0)
+  authorId        String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  publishedAt     DateTime?
+  author          User         @relation(fields: [authorId], references: [id])
+
+  @@index([status])
+  @@index([slug])
+  @@index([authorId], map: "reviews_authorId_fkey")
+  @@map("reviews")
+}
+
+model AffiliateNetwork {
+  id           String       @id @default(cuid())
+  name         String
+  slug         String       @unique
+  type         String?
+  apiKey       String?      @db.Text
+  apiSecret    String?      @db.Text
+  publisherId  String?
+  trackingId   String?
+  baseUrl      String?
+  linkFormat   String?      @db.Text
+  customParams String?      @db.Text
+  isActive     Boolean      @default(true)
+  isDefault    Boolean      @default(false)
+  priority     Int          @default(0)
+  commission   Decimal?     @db.Decimal(5, 2)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  clickEvents  ClickEvent[]
+
+  @@map("affiliate_networks")
+}
+
+model ClickEvent {
+  id              String            @id @default(cuid())
+  dealId          String?
+  networkId       String?
+  url             String            @db.Text
+  userAgent       String?           @db.Text
+  ip              String?
+  country         String?
+  city            String?
+  referrer        String?           @db.Text
+  converted       Boolean           @default(false)
+  conversionValue Decimal?          @db.Decimal(10, 2)
+  conversionDate  DateTime?
+  clickedAt       DateTime          @default(now())
+  deal            Deal?             @relation(fields: [dealId], references: [id])
+  network         AffiliateNetwork? @relation(fields: [networkId], references: [id])
+
+  @@index([dealId])
+  @@index([networkId])
+  @@index([clickedAt])
+  @@map("click_events")
+}
+
+model Subscriber {
+  id             String           @id @default(cuid())
+  email          String           @unique
+  name           String?
+  status         SubscriberStatus @default(ACTIVE)
+  subscribedAt   DateTime         @default(now())
+  unsubscribedAt DateTime?
+  preferences    String?          @db.Text
+
+  @@map("subscribers")
+}
+
+model Setting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String   @db.Text
+  description String?  @db.Text
+  updatedAt   DateTime @updatedAt
+
+  @@map("settings")
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+  VIEWER
 }
 
 enum DealStatus {
@@ -123,135 +194,10 @@ enum DealStatus {
   ARCHIVED
 }
 
-// Reviews
-model Review {
-  id              String       @id @default(cuid())
-  title           String
-  slug            String       @unique
-  excerpt         String       @db.Text
-  content         String       @db.Text // HTML content
-
-  // Images
-  coverImage      String
-  images          String?      @db.Text // JSON array
-
-  // Metadata
-  categoryName    String?      // "Electronics", "Audio", etc.
-  readTime        Int?         // Minutes
-
-  // Products mentioned
-  products        String?      @db.Text // JSON array of product objects
-
-  // SEO
-  metaTitle       String?
-  metaDescription String?      @db.Text
-
-  // Status
-  status          ReviewStatus @default(DRAFT)
-  isFeatured      Boolean      @default(false)
-
-  // Tracking
-  views           Int          @default(0)
-
-  // Relationships
-  authorId        String
-  author          User         @relation(fields: [authorId], references: [id])
-
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  publishedAt     DateTime?
-
-  @@index([status])
-  @@index([slug])
-  @@map("reviews")
-}
-
 enum ReviewStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
-}
-
-// Affiliate Networks
-model AffiliateNetwork {
-  id              String   @id @default(cuid())
-  name            String   // "Cuelink", "Amazon Associates", etc.
-  slug            String   @unique
-  type            String?  // "direct", "aggregator"
-
-  // Configuration
-  apiKey          String?  @db.Text // Encrypted
-  apiSecret       String?  @db.Text // Encrypted
-  publisherId     String?
-  trackingId      String?
-  baseUrl         String?
-
-  // Link Generation Config
-  linkFormat      String?  @db.Text // Template for link generation
-  customParams    String?  @db.Text // JSON - Additional parameters
-
-  // Status
-  isActive        Boolean  @default(true)
-  isDefault       Boolean  @default(false)
-
-  // Settings
-  priority        Int      @default(0)
-  commission      Decimal? @db.Decimal(5, 2) // Average commission %
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  clickEvents     ClickEvent[]
-
-  @@map("affiliate_networks")
-}
-
-// Click Tracking
-model ClickEvent {
-  id          String           @id @default(cuid())
-
-  // What was clicked
-  dealId      String?
-  deal        Deal?            @relation(fields: [dealId], references: [id])
-
-  // Which network
-  networkId   String?
-  network     AffiliateNetwork? @relation(fields: [networkId], references: [id])
-
-  // Tracking Data
-  url         String           @db.Text
-  userAgent   String?          @db.Text
-  ip          String?
-  country     String?
-  city        String?
-  referrer    String?          @db.Text
-
-  // Conversion tracking
-  converted   Boolean          @default(false)
-  conversionValue Decimal?     @db.Decimal(10, 2)
-  conversionDate  DateTime?
-
-  clickedAt   DateTime         @default(now())
-
-  @@index([dealId])
-  @@index([networkId])
-  @@index([clickedAt])
-  @@map("click_events")
-}
-
-// Newsletter Subscribers
-model Subscriber {
-  id          String           @id @default(cuid())
-  email       String           @unique
-  name        String?
-  status      SubscriberStatus @default(ACTIVE)
-  subscribedAt DateTime        @default(now())
-  unsubscribedAt DateTime?
-
-  // Preferences
-  preferences String?          @db.Text // JSON
-
-  @@map("subscribers")
 }
 
 enum SubscriberStatus {
@@ -260,88 +206,337 @@ enum SubscriberStatus {
   BOUNCED
 }
 
-// Site Settings
-model Setting {
-  id          String   @id @default(cuid())
-  key         String   @unique
-  value       String   @db.Text // JSON
-  description String?  @db.Text
-  updatedAt   DateTime @updatedAt
+// =====================================================
+// DYNAMIC PAGES MANAGEMENT
+// =====================================================
 
-  @@map("settings")
+model Page {
+  id              String      @id @default(cuid())
+  title           String
+  slug            String      @unique
+  excerpt         String?     @db.Text
+  content         String?     @db.LongText
+  
+  // SEO Fields
+  metaTitle       String?
+  metaDescription String?     @db.Text
+  metaKeywords    String?     @db.Text
+  ogImage         String?
+  
+  // Media
+  featuredImage   String?
+  
+  // Status & Publishing
+  status          PageStatus  @default(DRAFT)
+  publishedAt     DateTime?
+  
+  // Ordering
+  order           Int         @default(0)
+  
+  // Template Selection
+  template        PageTemplate @default(DEFAULT)
+  
+  // Relationships
+  authorId        String?
+  author          User?       @relation(fields: [authorId], references: [id])
+  
+  // Sections for page builder
+  sections        PageSection[]
+  
+  // Timestamps
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([slug])
+  @@index([status])
+  @@map("pages")
 }
 
-// Telegram Bot Integration
-model TelegramBot {
-  id              String   @id @default(cuid())
-  botToken        String   @db.Text
-  webhookUrl      String?
-  chatId          String?
-  isActive        Boolean  @default(false)
-  notifications   TelegramNotification[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@map("telegram_bots")
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }
 
-model TelegramNotification {
-  id              String   @id @default(cuid())
-  botId           String
-  type            String   // NEW_DEAL, PRICE_DROP, DAILY_DIGEST
-  messageTemplate String?  @db.Text
-  isEnabled       Boolean  @default(true)
-  createdAt       DateTime @default(now())
-
-  bot             TelegramBot @relation(fields: [botId], references: [id], onDelete: Cascade)
-
-  @@map("telegram_notifications")
+enum PageTemplate {
+  DEFAULT
+  LANDING
+  BLOG_LIST
+  BLOG_POST
+  FEATURES
+  ABOUT
+  CONTACT
+  LOOT_DEALS
+  COUPON
+  TELEGRAM
 }
 
-// Amazon API Integration
-model AmazonConfig {
-  id              String   @id @default(cuid())
-  associateTag    String
-  accessKey       String   @db.Text
-  secretKey       String   @db.Text
-  region          String   @default("in")
-  marketplace     String   @default("IN")
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@map("amazon_configs")
+model PageSection {
+  id              String        @id @default(cuid())
+  pageId          String
+  page            Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  
+  sectionType     SectionType
+  title           String?
+  content         String?       @db.LongText
+  data            String?       @db.Text
+  
+  // Styling
+  backgroundColor String?
+  textColor       String?
+  padding         String?
+  
+  // Ordering
+  order           Int           @default(0)
+  
+  // Visibility
+  isActive        Boolean       @default(true)
+  
+  // Timestamps
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  @@index([pageId])
+  @@map("page_sections")
 }
 
-model AmazonProduct {
-  id              String   @id @default(cuid())
-  asin            String   @unique
-  title           String   @db.Text
-  description     String?  @db.Text
-  currentPrice    Decimal? @db.Decimal(10, 2)
-  originalPrice   Decimal? @db.Decimal(10, 2)
-  currency        String   @default("INR")
-  imageUrl        String?
-  productUrl      String
-  lastCheckedAt   DateTime
-  dealId          String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  deal            Deal?    @relation(fields: [dealId], references: [id])
-
-  @@map("amazon_products")
+enum SectionType {
+  HERO
+  FEATURES_GRID
+  TESTIMONIALS
+  CTA
+  CONTENT_BLOCK
+  IMAGE_GALLERY
+  FAQ
+  PRICING
+  TEAM
+  STATS
+  CUSTOM_HTML
+  BLOG_POSTS
+  DEALS_GRID
+  COUPONS_GRID
+  TELEGRAM_JOIN
+  CONTACT_FORM
 }
 
-// API Connection Logs
-model ApiConnectionLog {
-  id              String   @id @default(cuid())
-  networkId       String
-  type            String   // TELEGRAM, AMAZON, MANUAL
-  action          String   // TEST, SYNC, IMPORT
-  status          String   // SUCCESS, FAILED
-  message         String?  @db.Text
-  createdAt       DateTime @default(now())
+// =====================================================
+// BLOG MANAGEMENT
+// =====================================================
 
-  @@map("api_connection_logs")
+model BlogCategory {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  description String?     @db.Text
+  image       String?
+  
+  order       Int         @default(0)
+  isActive    Boolean     @default(true)
+  
+  metaTitle   String?
+  metaDescription String? @db.Text
+  
+  posts       BlogPost[]
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  @@index([slug])
+  @@map("blog_categories")
+}
+
+model BlogPost {
+  id              String          @id @default(cuid())
+  title           String
+  slug            String          @unique
+  excerpt         String?         @db.Text
+  content         String          @db.LongText
+  
+  featuredImage   String?
+  images          String?         @db.Text
+  
+  categoryId      String?
+  category        BlogCategory?   @relation(fields: [categoryId], references: [id])
+  tags            String?         @db.Text
+  
+  authorName      String?
+  authorImage     String?
+  
+  readTime        Int?
+  
+  metaTitle       String?
+  metaDescription String?         @db.Text
+  metaKeywords    String?         @db.Text
+  ogImage         String?
+  
+  status          BlogStatus      @default(DRAFT)
+  isFeatured      Boolean         @default(false)
+  isSticky        Boolean         @default(false)
+  
+  publishedAt     DateTime?
+  scheduledAt     DateTime?
+  
+  views           Int             @default(0)
+  
+  authorId        String?
+  author          User?           @relation(fields: [authorId], references: [id])
+  
+  relatedPosts    BlogPostRelated[] @relation("RelatedPost")
+  relatedTo       BlogPostRelated[] @relation("MainPost")
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  @@index([slug])
+  @@index([status])
+  @@index([categoryId])
+  @@index([publishedAt])
+  @@map("blog_posts")
+}
+
+model BlogPostRelated {
+  id              String    @id @default(cuid())
+  mainPostId      String
+  mainPost        BlogPost  @relation("MainPost", fields: [mainPostId], references: [id], onDelete: Cascade)
+  relatedPostId   String
+  relatedPost     BlogPost  @relation("RelatedPost", fields: [relatedPostId], references: [id], onDelete: Cascade)
+  order           Int       @default(0)
+  
+  @@unique([mainPostId, relatedPostId])
+  @@map("blog_post_related")
+}
+
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// =====================================================
+// FEATURES MANAGEMENT
+// =====================================================
+
+model Feature {
+  id              String    @id @default(cuid())
+  title           String
+  description     String    @db.Text
+  
+  icon            String?
+  image           String?
+  
+  linkUrl         String?
+  linkText        String?
+  
+  order           Int       @default(0)
+  isActive        Boolean   @default(true)
+  isFeatured      Boolean   @default(false)
+  
+  color           String?
+  backgroundColor String?
+  
+  featureGroupId  String?
+  featureGroup    FeatureGroup? @relation(fields: [featureGroupId], references: [id])
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([order])
+  @@index([isActive])
+  @@map("features")
+}
+
+model FeatureGroup {
+  id              String    @id @default(cuid())
+  title           String
+  description     String?   @db.Text
+  
+  order           Int       @default(0)
+  isActive        Boolean   @default(true)
+  
+  layout          FeatureLayout @default(GRID)
+  
+  features        Feature[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("feature_groups")
+}
+
+enum FeatureLayout {
+  GRID
+  LIST
+  CARDS
+  ICONS
+  HORIZONTAL_SCROLL
+}
+
+// =====================================================
+// ABOUT PAGE SECTIONS
+// =====================================================
+
+model AboutSection {
+  id              String        @id @default(cuid())
+  sectionKey      String        @unique
+  title           String
+  content         String?       @db.LongText
+  
+  image           String?
+  imagePosition   ImagePosition @default(RIGHT)
+  
+  order           Int           @default(0)
+  isActive        Boolean       @default(true)
+  
+  metaTitle       String?
+  metaDescription String?       @db.Text
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  @@map("about_sections")
+}
+
+enum ImagePosition {
+  LEFT
+  RIGHT
+  TOP
+  BOTTOM
+  BACKGROUND
+}
+
+model TeamMember {
+  id              String    @id @default(cuid())
+  name            String
+  role            String
+  bio             String?   @db.Text
+  
+  image           String?
+  socialLinks     String?   @db.Text
+  
+  order           Int       @default(0)
+  isActive        Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("team_members")
+}
+
+model Testimonial {
+  id              String    @id @default(cuid())
+  quote           String    @db.Text
+  authorName      String
+  authorRole      String?
+  authorImage     String?
+  company         String?
+  rating          Int?
+  
+  order           Int       @default(0)
+  isActive        Boolean   @default(true)
+  isFeatured      Boolean   @default(false)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("testimonials")
 }

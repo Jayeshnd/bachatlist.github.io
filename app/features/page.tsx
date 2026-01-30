@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
-const features = [
+const defaultFeatures = [
   {
     icon: "🔥",
     title: "Real-Time Deal Alerts",
@@ -63,14 +64,14 @@ const features = [
   },
 ];
 
-const stats = [
+const defaultStats = [
   { value: "50K+", label: "Active Users" },
   { value: "10K+", label: "Deals Posted" },
   { value: "500+", label: "Working Coupons" },
   { value: "₹1Cr+", label: "Savings Delivered" },
 ];
 
-const howItWorks = [
+const defaultHowItWorks = [
   {
     step: 1,
     icon: "🔍",
@@ -97,7 +98,33 @@ const howItWorks = [
   },
 ];
 
-export default function FeaturesPage() {
+async function getFeatures() {
+  try {
+    const features = await prisma.feature.findMany({
+      where: { isActive: true },
+      include: {
+        featureGroup: true,
+      },
+      orderBy: { order: "asc" },
+    });
+
+    return features.map((feature) => ({
+      icon: feature.icon || "✨",
+      title: feature.title,
+      description: feature.description,
+      details: feature.linkUrl ? [`Learn more about ${feature.title}`] : [],
+      linkUrl: feature.linkUrl,
+      linkText: feature.linkText,
+    }));
+  } catch (error) {
+    console.error("Failed to fetch features:", error);
+    return defaultFeatures;
+  }
+}
+
+export default async function FeaturesPage() {
+  const features = await getFeatures();
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -117,7 +144,7 @@ export default function FeaturesPage() {
       <section className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
+            {defaultStats.map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">{stat.value}</div>
                 <div className="text-gray-600">{stat.label}</div>
@@ -147,14 +174,24 @@ export default function FeaturesPage() {
                 {feature.title}
               </h3>
               <p className="text-gray-600 mb-4">{feature.description}</p>
-              <ul className="space-y-2">
-                {feature.details.map((detail, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-gray-500">
-                    <span className="text-green-500">✓</span>
-                    {detail}
-                  </li>
-                ))}
-              </ul>
+              {feature.details.length > 0 && (
+                <ul className="space-y-2">
+                  {feature.details.map((detail, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-500">
+                      <span className="text-green-500">✓</span>
+                      {detail}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {feature.linkUrl && (
+                <Link
+                  href={feature.linkUrl}
+                  className="inline-flex items-center gap-1 text-green-600 font-medium mt-4 hover:underline"
+                >
+                  {feature.linkText || "Learn More"} →
+                </Link>
+              )}
             </div>
           ))}
         </div>
@@ -171,7 +208,7 @@ export default function FeaturesPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {howItWorks.map((step) => (
+            {defaultHowItWorks.map((step) => (
               <div key={step.step} className="text-center relative">
                 {step.step < 4 && (
                   <div className="hidden lg:block absolute top-8 left-1/2 w-full h-0.5 bg-gray-200">

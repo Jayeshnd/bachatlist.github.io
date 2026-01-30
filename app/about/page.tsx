@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
-const team = [
+// Default fallback data
+const defaultTeam = [
   {
     name: "Rahul Sharma",
     role: "Founder & CEO",
@@ -21,7 +23,7 @@ const team = [
   },
 ];
 
-const milestones = [
+const defaultMilestones = [
   { year: "2020", title: "Founded", description: "Started with a mission to help Indians save money" },
   { year: "2021", title: "10K Users", description: "Reached our first 10,000 active users" },
   { year: "2022", title: "100K+ Deals", description: "Published over 100,000 verified deals" },
@@ -29,7 +31,57 @@ const milestones = [
   { year: "2024", title: "₹1Cr Saved", description: "Helped users save over 1 crore rupees" },
 ];
 
-export default function AboutPage() {
+async function getAboutContent() {
+  try {
+    // Fetch sections
+    const sections = await prisma.aboutSection.findMany({
+      where: { isActive: true },
+      orderBy: { order: "asc" },
+    });
+
+    // Fetch team members
+    const teamMembers = await prisma.teamMember.findMany({
+      where: { isActive: true },
+      orderBy: { order: "asc" },
+    });
+
+    // Fetch testimonials
+    const testimonials = await prisma.testimonial.findMany({
+      where: { isActive: true },
+      orderBy: { order: "asc" },
+    });
+
+    return {
+      sections,
+      teamMembers: teamMembers.map((member) => ({
+        name: member.name,
+        role: member.role,
+        bio: member.bio || "",
+        icon: member.image || "👤",
+      })),
+      testimonials: testimonials.map((t) => ({
+        quote: t.quote,
+        authorName: t.authorName,
+        authorRole: t.authorRole,
+        company: t.company,
+        rating: t.rating,
+      })),
+    };
+  } catch (error) {
+    console.error("Failed to fetch about content:", error);
+    return { sections: [], teamMembers: [], testimonials: [] };
+  }
+}
+
+export default async function AboutPage() {
+  const aboutData = await getAboutContent();
+  const team = aboutData.teamMembers.length > 0 ? aboutData.teamMembers : defaultTeam;
+
+  // Find specific sections
+  const missionSection = aboutData.sections.find((s) => s.sectionKey === "mission");
+  const storySection = aboutData.sections.find((s) => s.sectionKey === "our_story");
+  const valuesSection = aboutData.sections.find((s) => s.sectionKey === "values");
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -49,18 +101,20 @@ export default function AboutPage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Mission</h2>
-            <p className="text-gray-600 mb-4">
-              BachatList was founded with a simple goal: to make saving money accessible to everyone. 
-              We believe that everyone deserves to get the best value for their hard-earned money.
-            </p>
-            <p className="text-gray-600 mb-4">
-              Our team works tirelessly to find the best deals, verify coupons, and bring you 
-              real-time alerts so you never miss an opportunity to save.
-            </p>
-            <p className="text-gray-600">
-              Join thousands of smart shoppers who trust BachatList for their shopping needs.
-            </p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+              {missionSection?.title || "Our Mission"}
+            </h2>
+            <div 
+              className="text-gray-600 mb-4"
+              dangerouslySetInnerHTML={{ 
+                __html: missionSection?.content || `
+                  <p>BachatList was founded with a simple goal: to make saving money accessible to everyone.</p>
+                  <p>We believe that everyone deserves to get the best value for their hard-earned money.</p>
+                  <p>Our team works tirelessly to find the best deals, verify coupons, and bring you real-time alerts so you never miss an opportunity to save.</p>
+                  <p>Join thousands of smart shoppers who trust BachatList for their shopping needs.</p>
+                `
+              }}
+            />
           </div>
           <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl p-8">
             <div className="text-center">
@@ -122,7 +176,7 @@ export default function AboutPage() {
         <div className="relative">
           <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-green-200 hidden md:block" />
           <div className="space-y-8">
-            {milestones.map((milestone, index) => (
+            {defaultMilestones.map((milestone, index) => (
               <div
                 key={index}
                 className={`flex items-center gap-8 ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
