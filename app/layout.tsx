@@ -7,6 +7,9 @@ import Footer from "@/app/components/layout/Footer";
 export const metadata: Metadata = {
   title: "BachatList - Best Deals & Smart Shopping",
   description: "Find the best deals and save more on every purchase",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
