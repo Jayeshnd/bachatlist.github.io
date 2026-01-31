@@ -121,6 +121,16 @@ export function serializeDecimal(value: any): any {
     return value;
   }
   
+  // Handle strings - clean any hidden characters or BOM
+  if (typeof value === 'string') {
+    // Remove BOM character if present
+    if (value.charCodeAt(0) === 0xFEFF) {
+      value = value.slice(1);
+    }
+    // Remove null characters and other invisible chars
+    return value.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\u200B-\u200F\u2028\u2029\uFEFF]/g, '').trim();
+  }
+  
   // Handle Prisma Decimal objects (have special toString method for decimals)
   // Check if it's NOT a plain object by verifying it has a different toString than Object.prototype
   if (
@@ -129,7 +139,12 @@ export function serializeDecimal(value: any): any {
     typeof value.toString === 'function' &&
     value.toString !== Object.prototype.toString
   ) {
-    return value.toString();
+    const strValue = value.toString();
+    // Clean any hidden characters
+    if (typeof strValue === 'string') {
+      return strValue.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\u200B-\u200F\u2028\u2029\uFEFF]/g, '').trim();
+    }
+    return strValue;
   }
   
   // Handle BigInt values

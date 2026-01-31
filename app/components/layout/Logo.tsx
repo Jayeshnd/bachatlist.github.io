@@ -14,62 +14,66 @@ export default function Logo({ size = "md", showTagline = false }: LogoProps) {
   };
 
   const iconSizes = {
-    sm: "w-6 h-6",
-    md: "w-8 h-8",
-    lg: "w-10 h-10",
-    xl: "w-12 h-12",
+    sm: "w-8 h-8",
+    md: "w-10 h-10",
+    lg: "w-12 h-12",
+    xl: "w-14 h-14",
   };
 
-  // SVG for the leaf/saver icon from your logo
-  const leafIcon = (
+  // Modern shield icon with B letter
+  const shieldIcon = (
     <svg
       className={iconSizes[size]}
-      viewBox="0 0 100 100"
+      viewBox="0 0 64 64"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Outer leaf shape */}
+      {/* Blue shield background */}
       <path
-        d="M50 5C25 5 5 30 5 55C5 80 25 95 50 95C75 95 95 80 95 55C95 30 75 5 50 5Z"
-        fill="#22C55E"
+        d="M32 4L56 14V30C56 46 44 58 32 60C20 58 8 46 8 30V14L32 4Z"
+        fill="url(#shieldGradient)"
       />
-      {/* Inner leaf detail */}
+      {/* White shield inner */}
       <path
-        d="M50 15C30 15 15 35 15 55C15 75 30 85 50 85C70 85 85 75 85 55C85 35 70 15 50 15Z"
-        fill="#16A34A"
-      />
-      {/* Dollar/Saver symbol */}
-      <text
-        x="50"
-        y="58"
-        textAnchor="middle"
-        dominantBaseline="middle"
+        d="M32 10L50 17V27C50 40 41 51 32 53C23 51 14 40 14 27V17L32 10Z"
         fill="white"
-        fontSize="28"
+      />
+      {/* Letter B */}
+      <text
+        x="32"
+        y="38"
+        textAnchor="middle"
+        fontSize="20"
         fontWeight="bold"
-        fontFamily="Arial, sans-serif"
+        fill="#1D4ED8"
+        fontFamily="Arial, Helvetica, sans-serif"
       >
-        $
+        B
       </text>
+      <defs>
+        <linearGradient id="shieldGradient" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#3B82F6" />
+          <stop offset="1" stopColor="#1D4ED8" />
+        </linearGradient>
+      </defs>
     </svg>
   );
 
   return (
-    <Link href="/" className="flex items-center gap-3">
+    <Link href="/" className="flex items-center gap-2 group">
       {/* Logo Icon */}
-      <div className="flex-shrink-0">
-        {leafIcon}
+      <div className="flex-shrink-0 transform group-hover:scale-105 transition-transform duration-300">
+        {shieldIcon}
       </div>
       
       {/* Logo Text */}
       <div className="flex flex-col">
-        <span className={`${sizeClasses[size]} font-bold tracking-tight leading-none`}>
-          <span className="text-green-600">BACHAT</span>
-          <span className="text-gray-900">LIST</span>
+        <span className={`${sizeClasses[size]} font-bold tracking-tight leading-none font-sans text-slate-800`}>
+          bachatlist
         </span>
         {showTagline && (
-          <span className="text-[10px] text-gray-500 font-medium tracking-wider uppercase">
-            India's Biggest Saving Community
+          <span className="text-[9px] text-slate-500 font-medium tracking-wider uppercase">
+            Best Deals & Smart Shopping
           </span>
         )}
       </div>
