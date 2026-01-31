@@ -15,7 +15,10 @@ export default function NewBannerPage() {
     setError("");
 
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
+    const data: Record<string, any> = Object.fromEntries(formData.entries());
+
+    // Convert isActive from string "on" to boolean
+    data.isActive = data.isActive === "on";
 
     try {
       const response = await fetch("/api/admin/banners", {
