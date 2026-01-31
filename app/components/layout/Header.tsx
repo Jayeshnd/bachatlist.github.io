@@ -46,12 +46,6 @@ export default function Header() {
             <Link href="/login" className="text-gray-600 hover:text-primary font-medium">
               Login
             </Link>
-            <Link
-              href="/deals/create"
-              className="bg-gradient-to-r from-primary to-primary/90 text-white px-5 py-2 rounded-lg font-medium hover:opacity-90 transition shadow-lg shadow-primary/25"
-            >
-              Add Deal
-            </Link>
           </div>
           
           {/* Mobile Menu Button */}

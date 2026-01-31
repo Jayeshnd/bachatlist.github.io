@@ -192,7 +192,7 @@ export default function LootPage() {
         const response = await fetch("/api/deals/loot");
         if (response.ok) {
           const data = await response.json();
-          setLootDeals(data);
+          setLootDeals(Array.isArray(data) ? data : []);
         }
       } catch (error) {
         console.error("Failed to fetch loot deals:", error);

@@ -15,24 +15,10 @@ async function getHomePageData() {
   try {
     const now = new Date();
     
-    // Fetch banners with date filtering
+    // Fetch banners (show all active banners)
     const banners = await prisma.banner.findMany({
       where: {
         isActive: true,
-        AND: [
-          {
-            OR: [
-              { startDate: null },
-              { startDate: { lte: now } },
-            ],
-          },
-          {
-            OR: [
-              { endDate: null },
-              { endDate: { gte: now } },
-            ],
-          },
-        ],
       },
       orderBy: { position: "asc" },
     });
