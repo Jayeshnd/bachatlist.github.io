@@ -1,7 +1,49 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { serializeDecimal } from "@/lib/utils";
+
+// Custom serialization that doesn't break objects
+function serializeData(data: any): any {
+  if (data === null || data === undefined) {
+    return data;
+  }
+  
+  // Handle Prisma Decimal objects
+  if (
+    typeof data === 'object' && 
+    'toString' in data && 
+    typeof data.toString === 'function' &&
+    data.toString !== Object.prototype.toString
+  ) {
+    return data.toString();
+  }
+  
+  // Handle BigInt
+  if (typeof data === 'bigint') {
+    return data.toString();
+  }
+  
+  // Handle arrays
+  if (Array.isArray(data)) {
+    return data.map(item => serializeData(item));
+  }
+  
+  // Handle Date objects
+  if (data instanceof Date) {
+    return data.toISOString();
+  }
+  
+  // Handle plain objects (don't stringify them!)
+  if (typeof data === 'object') {
+    const serialized: Record<string, any> = {};
+    for (const [key, val] of Object.entries(data)) {
+      serialized[key] = serializeData(val);
+    }
+    return serialized;
+  }
+  
+  return data;
+}
 
 // GET a single coupon
 export async function GET(
@@ -24,7 +66,7 @@ export async function GET(
       return NextResponse.json({ error: "Coupon not found" }, { status: 404 });
     }
 
-    return NextResponse.json(serializeDecimal(coupon));
+    return NextResponse.json(serializeData(coupon));
   } catch (error) {
     console.error("Failed to fetch coupon:", error);
     return NextResponse.json(
@@ -110,7 +152,7 @@ export async function PUT(
       data: updateData,
     });
 
-    return NextResponse.json(serializeDecimal(coupon));
+    return NextResponse.json(serializeData(coupon));
   } catch (error) {
     console.error("Failed to update coupon:", error);
     return NextResponse.json(

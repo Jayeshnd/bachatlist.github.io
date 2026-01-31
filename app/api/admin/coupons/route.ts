@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { serializeDecimal } from "@/lib/utils";
 
 // GET all coupon codes
 export async function GET(request: NextRequest) {
@@ -99,7 +98,26 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(serializeDecimal(coupon), { status: 201 });
+    // Return sanitized coupon
+    return NextResponse.json({
+      id: coupon.id,
+      code: coupon.code,
+      description: coupon.description,
+      discountType: coupon.discountType,
+      discountValue: parseFloat(coupon.discountValue.toString()),
+      expiryDate: coupon.expiryDate?.toISOString() || null,
+      isActive: coupon.isActive,
+      minPurchase: coupon.minPurchase ? parseFloat(coupon.minPurchase.toString()) : null,
+      maxDiscount: coupon.maxDiscount ? parseFloat(coupon.maxDiscount.toString()) : null,
+      usageLimit: coupon.usageLimit,
+      usageCount: coupon.usageCount,
+      applicableCategories: coupon.applicableCategories,
+      applicableDeals: coupon.applicableDeals,
+      metaTitle: coupon.metaTitle,
+      metaDescription: coupon.metaDescription,
+      createdAt: coupon.createdAt.toISOString(),
+      updatedAt: coupon.updatedAt.toISOString(),
+    }, { status: 201 });
   } catch (error) {
     console.error("Failed to create coupon:", error);
     return NextResponse.json(
