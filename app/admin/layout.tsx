@@ -101,6 +101,15 @@ export default function AdminLayout({
                 <span className="font-medium">Contact</span>
               </Link>
             </li>
+            <li>
+              <Link
+                href="/admin/stores"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 transition text-gray-700 hover:text-green-700"
+              >
+                <span className="text-xl">🏪</span>
+                <span className="font-medium">Stores</span>
+              </Link>
+            </li>
             <li className="pt-4 mt-4 border-t border-gray-100">
               <Link
                 href="/admin/affiliate"

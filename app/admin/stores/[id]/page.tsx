@@ -30,8 +30,7 @@ export default async function EditStorePage({ params }: PageProps) {
           id: store.id,
           name: store.name,
           slug: store.slug,
-          logo: store.logo,
-          affiliateUrl: store.affiliateUrl,
+          logo: store.logo || "",
           isActive: store.isActive,
         }}
       />

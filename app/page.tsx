@@ -51,7 +51,7 @@ async function getHomePageData() {
       orderBy: { order: "asc" },
     });
 
-    const [categories, featuredDeals, latestDeals] = await Promise.all([
+    const [categories, featuredDeals, latestDeals, stores] = await Promise.all([
       prisma.category.findMany({
         take: 6,
         where: { isActive: true },
@@ -68,6 +68,10 @@ async function getHomePageData() {
         where: { status: "PUBLISHED" },
         orderBy: { createdAt: "desc" },
         include: { category: true },
+      }),
+      prisma.store.findMany({
+        where: { isActive: true },
+        orderBy: { order: "asc" },
       }),
     ]);
     

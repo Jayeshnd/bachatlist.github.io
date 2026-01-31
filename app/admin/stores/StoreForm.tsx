@@ -9,7 +9,6 @@ interface StoreFormProps {
     name: string;
     slug: string;
     logo: string;
-    affiliateUrl: string;
     isActive: boolean;
   };
 }
@@ -30,7 +29,6 @@ export default function StoreForm({ initialData }: StoreFormProps) {
       name: formData.get("name"),
       slug: formData.get("slug"),
       logo: formData.get("logo"),
-      affiliateUrl: formData.get("affiliateUrl"),
       isActive: formData.get("isActive") === "on",
     };
 
@@ -95,19 +93,6 @@ export default function StoreForm({ initialData }: StoreFormProps) {
           name="logo"
           required
           defaultValue={initialData?.logo}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Affiliate URL
-        </label>
-        <input
-          type="url"
-          name="affiliateUrl"
-          required
-          defaultValue={initialData?.affiliateUrl}
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>

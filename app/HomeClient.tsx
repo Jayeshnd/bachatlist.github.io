@@ -223,17 +223,27 @@ function CategoryCard({ category }: { category: any }) {
 }
 
 export default function HomeClient({ featuredDeals, categories, latestDeals, banners, hotDeals }: any) {
-  // Flipshope-style stores list
-  const stores = [
-    { name: "Amazon", icon: "📦" },
-    { name: "Flipkart", icon: "🛒" },
-    { name: "Myntra", icon: "👕" },
-    { name: "Ajio", icon: "👗" },
-    { name: "Snapdeal", icon: "🛍️" },
-    { name: "Paytm", icon: "💳" },
-    { name: "ShopClues", icon: "🏪" },
-    { name: "Flipshope", icon: "💰" },
-  ];
+  // Flipshope-style stores list - now fetched from API
+  const [stores, setStores] = useState<{ name: string; icon: string; logo?: string }[]>([]);
+  const [storesLoading, setStoresLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const response = await fetch("/api/stores");
+        if (response.ok) {
+          const data = await response.json();
+          setStores(data.stores || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch stores:", error);
+      } finally {
+        setStoresLoading(false);
+      }
+    };
+
+    fetchStores();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -245,7 +255,22 @@ export default function HomeClient({ featuredDeals, categories, latestDeals, ban
       )}
 
       {/* Stores/Brands Row */}
-      <StoresRow stores={stores} />
+      {storesLoading ? (
+        <div className="bg-white border-b border-gray-100 py-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-8 overflow-x-auto pb-2 scrollbar-hide">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="flex flex-col items-center gap-2 min-w-fit animate-pulse">
+                  <div className="w-16 h-16 bg-gray-200 rounded-xl" />
+                  <div className="h-4 w-16 bg-gray-200 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : stores.length > 0 ? (
+        <StoresRow stores={stores} />
+      ) : null}
 
       {/* Hot Deals Section (if available) */}
       {hotDeals && hotDeals.length > 0 && (
