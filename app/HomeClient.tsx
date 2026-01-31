@@ -8,16 +8,17 @@ import { BannerSlider } from "@/components/BannerSlider";
 // Stores/Brands Component
 function StoresRow({ stores }: { stores: { name: string; icon: string; logo?: string }[] }) {
   return (
-    <div className="bg-white border-b border-gray-100 py-4">
+    <div className="bg-white border-b border-slate-200 py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-8 overflow-x-auto pb-2 scrollbar-hide">
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Top Brands</p>
+        <div className="flex items-center gap-6 overflow-x-auto pb-2 scrollbar-hide">
           {stores.map((store, index) => (
             <Link
               key={index}
               href={`/deals?store=${(store.name || '').toLowerCase()}`}
-              className="flex flex-col items-center gap-2 min-w-fit hover:opacity-80 transition"
+              className="flex flex-col items-center gap-2 min-w-fit group"
             >
-              <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center text-3xl border border-gray-100 hover:border-green-200 hover:bg-green-50 transition overflow-hidden">
+              <div className="w-18 h-18 bg-white rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center text-4xl group-hover:shadow-md group-hover:border-primary-200 group-hover:-translate-y-1 transition-all duration-300">
                 {store.logo ? (
                   <img 
                     src={store.logo} 
@@ -28,7 +29,7 @@ function StoresRow({ stores }: { stores: { name: string; icon: string; logo?: st
                   store.icon
                 )}
               </div>
-              <span className="text-sm font-medium text-gray-700">{store.name}</span>
+              <span className="text-sm font-medium text-slate-600 group-hover:text-primary-600 transition-colors">{store.name}</span>
             </Link>
           ))}
         </div>
@@ -51,11 +52,11 @@ function FeaturedDealsSlider({ deals }: { deals: any[] }) {
   if (deals.length === 0) return null;
 
   return (
-    <div className="relative w-full h-[350px] md:h-[400px] overflow-hidden rounded-2xl">
+    <div className="relative w-full h-[350px] md:h-[400px] overflow-hidden rounded-2xl shadow-xl">
       {deals.map((deal, index) => (
         <div
           key={deal.id}
-          className={`absolute inset-0 transition-opacity duration-500 ${
+          className={`absolute inset-0 transition-opacity duration-700 ${
             index === currentSlide ? "opacity-100" : "opacity-0"
           }`}
         >
@@ -67,35 +68,35 @@ function FeaturedDealsSlider({ deals }: { deals: any[] }) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-green-400/20 to-emerald-500/20" />
+              <div className="w-full h-full bg-gradient-to-br from-slate-400/30 to-slate-600/30" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-900/85 via-gray-900/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-transparent" />
           </div>
 
           <div className="relative h-full flex items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl">
               {deal.discount && (
-                <span className="inline-block bg-red-500 text-white text-lg font-bold px-4 py-2 rounded-full mb-4">
-                  🔥 {deal.discount}% OFF
+                <span className="inline-flex items-center gap-2 bg-red-500 text-white text-lg font-bold px-4 py-2 rounded-full mb-4 shadow-lg shadow-red-500/30">
+                  <span>🔥</span> {deal.discount}% OFF
                 </span>
               )}
-              <span className="text-green-400 font-semibold text-sm uppercase tracking-wide">
+              <span className="inline-block text-primary-300 font-semibold text-sm uppercase tracking-wider">
                 {deal.category?.name || "Featured Deal"}
               </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mt-2 mb-3">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mt-2 mb-3 leading-tight">
                 {deal.title}
               </h2>
               {deal.shortDesc && (
-                <p className="text-gray-200 text-base mb-4 line-clamp-2">
+                <p className="text-slate-200 text-base mb-5 line-clamp-2">
                   {deal.shortDesc}
                 </p>
               )}
               <div className="flex items-center gap-4 mb-6">
-                <span className="text-3xl font-bold text-white">
+                <span className="text-3xl md:text-4xl font-bold text-white">
                   {formatPrice(toNumber(deal.currentPrice), deal.currency || "INR")}
                 </span>
                 {deal.originalPrice && toNumber(deal.originalPrice) > toNumber(deal.currentPrice) && (
-                  <span className="text-xl text-gray-400 line-through">
+                  <span className="text-xl text-slate-400 line-through">
                     {formatPrice(toNumber(deal.originalPrice), deal.currency || "INR")}
                   </span>
                 )}
@@ -104,23 +105,25 @@ function FeaturedDealsSlider({ deals }: { deals: any[] }) {
                 href={deal.affiliateUrl || deal.productUrl || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition shadow-lg shadow-green-500/25"
+                className="inline-flex items-center gap-2 bg-white text-slate-900 px-6 py-3 rounded-lg font-semibold hover:bg-slate-100 transition shadow-lg hover:shadow-xl hover:scale-105 transform duration-200"
               >
                 Get Deal
-                <span>→</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
               </a>
             </div>
           </div>
         </div>
       ))}
 
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2">
         {deals.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              index === currentSlide ? "bg-white w-6" : "bg-white/50 hover:bg-white/75"
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              index === currentSlide ? "bg-white w-8" : "bg-white/40 hover:bg-white/60"
             }`}
           />
         ))}
@@ -140,60 +143,62 @@ function DealCard({ deal }: { deal: any }) {
       href={deal.affiliateUrl || deal.productUrl || "#"}
       target="_blank"
       rel="noopener noreferrer"
-      className="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 h-full flex flex-col"
+      className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-200 h-full flex flex-col hover:-translate-y-1"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+      <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
         {deal.primaryImage ? (
           <img
             src={deal.primaryImage}
             alt={deal.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-            <span className="text-6xl opacity-50">🛍️</span>
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
+            <span className="text-6xl opacity-40">🛍️</span>
           </div>
         )}
         
         {discount > 0 && (
-          <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">
+          <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
             {discount}% OFF
           </div>
         )}
         
         {deal.badge && (
-          <div className="absolute top-3 right-3 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-md">
+          <div className="absolute top-3 right-3 bg-primary-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md">
             {deal.badge}
           </div>
         )}
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
 
       <div className="p-4 flex-1 flex flex-col">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-md">
+          <span className="text-xs font-medium text-primary-600 bg-primary-50 px-2.5 py-1 rounded-full">
             {deal.category?.name || "General"}
           </span>
         </div>
 
-        <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 group-hover:text-green-600 transition-colors">
+        <h3 className="font-semibold text-slate-800 text-sm line-clamp-2 group-hover:text-primary-600 transition-colors">
           {deal.title}
         </h3>
 
         {deal.shortDesc && (
-          <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+          <p className="text-xs text-slate-500 mt-1 line-clamp-2">
             {deal.shortDesc}
           </p>
         )}
 
         <div className="flex-1" />
 
-        <div className="mt-3 pt-3 border-t border-gray-100">
+        <div className="mt-4 pt-3 border-t border-slate-100">
           <div className="flex items-baseline gap-2">
-            <span className="text-xl font-bold text-gray-900">
+            <span className="text-xl font-bold text-slate-900">
               {formatPrice(currentPrice, deal.currency || "INR")}
             </span>
             {originalPrice > currentPrice && (
-              <span className="text-sm text-gray-400 line-through">
+              <span className="text-sm text-slate-400 line-through">
                 {formatPrice(originalPrice, deal.currency || "INR")}
               </span>
             )}
@@ -201,14 +206,17 @@ function DealCard({ deal }: { deal: any }) {
 
           {deal.rating && deal.rating > 0 && (
             <div className="flex items-center gap-1 mt-2">
-              <span className="text-yellow-500 text-sm">★</span>
-              <span className="text-sm font-medium text-gray-700">{deal.rating}</span>
-              <span className="text-xs text-gray-400">({deal.reviewCount || 0})</span>
+              <span className="text-amber-400 text-sm">★</span>
+              <span className="text-sm font-medium text-slate-700">{deal.rating}</span>
+              <span className="text-xs text-slate-400">({deal.reviewCount || 0})</span>
             </div>
           )}
 
-          <button className="mt-3 w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-2.5 rounded-lg font-semibold text-sm hover:opacity-90 transition">
-            View Deal →
+          <button className="mt-3 w-full bg-slate-900 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-primary-600 transition-colors flex items-center justify-center gap-2">
+            View Deal
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
           </button>
         </div>
       </div>
@@ -221,11 +229,13 @@ function CategoryCard({ category }: { category: any }) {
   return (
     <Link
       href={`/category/${category.slug}`}
-      className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-4 text-center border border-gray-100 hover:border-green-200"
+      className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-5 text-center border border-slate-200 hover:border-primary-200 hover:-translate-y-1 group"
     >
-      <div className="text-4xl mb-3">{category.icon || "📦"}</div>
-      <h3 className="font-semibold text-gray-900 text-sm">{category.name}</h3>
-      <p className="text-xs text-gray-500 mt-1">{category.dealCount || 0} deals</p>
+      <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 group-hover:bg-primary-50 transition-colors">
+        {category.icon || "📦"}
+      </div>
+      <h3 className="font-semibold text-slate-800 text-sm group-hover:text-primary-600 transition-colors">{category.name}</h3>
+      <p className="text-xs text-slate-500 mt-1">{category.dealCount || 0} deals</p>
     </Link>
   );
 }
@@ -255,42 +265,70 @@ export default function HomeClient({ featuredDeals, categories, latestDeals, ban
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Banner Slider */}
       {banners && banners.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <BannerSlider banners={banners} autoPlay={true} autoPlayInterval={5000} />
         </section>
       )}
 
       {/* Stores/Brands Row */}
       {storesLoading ? (
-        <div className="bg-white border-b border-gray-100 py-4">
+        <div className="bg-white border-b border-slate-200 py-4">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-8 overflow-x-auto pb-2 scrollbar-hide">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="flex flex-col items-center gap-2 min-w-fit animate-pulse">
-                  <div className="w-16 h-16 bg-gray-200 rounded-xl" />
-                  <div className="h-4 w-16 bg-gray-200 rounded" />
+                  <div className="w-16 h-16 bg-slate-200 rounded-xl" />
+                  <div className="h-4 w-16 bg-slate-200 rounded" />
                 </div>
               ))}
             </div>
           </div>
         </div>
       ) : stores.length > 0 ? (
-        <StoresRow stores={stores} />
+        <div className="bg-white border-b border-slate-200 py-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Top Brands</p>
+            <div className="flex items-center gap-6 overflow-x-auto pb-2 scrollbar-hide">
+              {stores.map((store, index) => (
+                <Link
+                  key={index}
+                  href={`/deals?store=${(store.name || '').toLowerCase()}`}
+                  className="flex flex-col items-center gap-2 min-w-fit group"
+                >
+                  <div className="w-18 h-18 bg-white rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center text-4xl group-hover:shadow-md group-hover:border-primary-200 group-hover:-translate-y-1 transition-all duration-300">
+                    {store.logo ? (
+                      <img 
+                        src={store.logo} 
+                        alt={store.name || 'Store'}
+                        className="w-full h-full object-contain p-2"
+                      />
+                    ) : (
+                      store.icon
+                    )}
+                  </div>
+                  <span className="text-sm font-medium text-slate-600 group-hover:text-primary-600 transition-colors">{store.name}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
       ) : null}
 
       {/* Hot Deals Section (if available) */}
       {hotDeals && hotDeals.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">🔥 Hot Deals</h2>
-            <Link href="/loot" className="text-green-600 font-medium hover:underline text-sm">
-              View All →
+            <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <span className="text-red-500">🔥</span> Hot Deals
+            </h2>
+            <Link href="/loot" className="text-primary-600 font-medium hover:underline text-sm flex items-center gap-1">
+              View All <span>→</span>
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
             {hotDeals.slice(0, 5).map((hotDeal: any) => (
               <DealCard key={hotDeal.id} deal={{ ...hotDeal.deal, customBadge: hotDeal.customBadge }} />
             ))}
@@ -304,11 +342,11 @@ export default function HomeClient({ featuredDeals, categories, latestDeals, ban
       </section>
 
       {/* Categories Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Shop by Category</h2>
-          <Link href="/categories" className="text-green-600 font-medium hover:underline text-sm">
-            View All →
+          <h2 className="text-2xl font-bold text-slate-900">Shop by Category</h2>
+          <Link href="/categories" className="text-primary-600 font-medium hover:underline text-sm flex items-center gap-1">
+            View All <span>→</span>
           </Link>
         </div>
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -319,22 +357,26 @@ export default function HomeClient({ featuredDeals, categories, latestDeals, ban
       </section>
 
       {/* Latest Deals Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Latest Deals</h2>
-          <Link href="/deals" className="text-green-600 font-medium hover:underline text-sm">
-            View All →
+          <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <span className="text-primary-600">⚡</span> Latest Deals
+          </h2>
+          <Link href="/deals" className="text-primary-600 font-medium hover:underline text-sm flex items-center gap-1">
+            View All <span>→</span>
           </Link>
         </div>
 
         {latestDeals.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl shadow-sm">
-            <div className="text-6xl mb-4">🎁</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No deals available yet</h3>
-            <p className="text-gray-600">Check back soon for amazing deals!</p>
+          <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-slate-200">
+            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-4xl">🎁</span>
+            </div>
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">No deals available yet</h3>
+            <p className="text-slate-500">Check back soon for amazing deals!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
             {latestDeals.map((deal: any) => (
               <DealCard key={deal.id} deal={deal} />
             ))}
@@ -343,43 +385,62 @@ export default function HomeClient({ featuredDeals, categories, latestDeals, ban
       </section>
 
       {/* Features Section */}
-      <section className="bg-white py-12 mt-8">
+      <section className="bg-white py-16 mt-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="text-center p-4">
-              <div className="text-4xl mb-3">🎯</div>
-              <h3 className="font-bold text-gray-900 mb-1">Verified Deals</h3>
-              <p className="text-sm text-gray-600">100% verified offers</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="text-center p-6">
+              <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-slate-900 mb-2">Verified Deals</h3>
+              <p className="text-sm text-slate-500">100% verified offers</p>
             </div>
-            <div className="text-center p-4">
-              <div className="text-4xl mb-3">💰</div>
-              <h3 className="font-bold text-gray-900 mb-1">Best Prices</h3>
-              <p className="text-sm text-gray-600">Lowest prices guaranteed</p>
+            <div className="text-center p-6">
+              <div className="w-16 h-16 bg-success-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-slate-900 mb-2">Best Prices</h3>
+              <p className="text-sm text-slate-500">Lowest prices guaranteed</p>
             </div>
-            <div className="text-center p-4">
-              <div className="text-4xl mb-3">⚡</div>
-              <h3 className="font-bold text-gray-900 mb-1">Fast Updates</h3>
-              <p className="text-sm text-gray-600">Daily new deals</p>
+            <div className="text-center p-6">
+              <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-slate-900 mb-2">Fast Updates</h3>
+              <p className="text-sm text-slate-500">Daily new deals</p>
             </div>
-            <div className="text-center p-4">
-              <div className="text-4xl mb-3">🔒</div>
-              <h3 className="font-bold text-gray-900 mb-1">Secure</h3>
-              <p className="text-sm text-gray-600">Safe transactions</p>
+            <div className="text-center p-6">
+              <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-slate-900 mb-2">Secure</h3>
+              <p className="text-sm text-slate-500">Safe transactions</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-green-500 to-emerald-600 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Start Saving Today!</h2>
-          <p className="text-white/80 mb-6">Browse thousands of deals and find your perfect match</p>
+      <section className="bg-gradient-to-r from-slate-800 to-slate-900 py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Start Saving Today!</h2>
+          <p className="text-slate-300 mb-8 text-lg">Browse thousands of deals and find your perfect match</p>
           <Link
             href="/deals"
-            className="inline-block bg-white text-green-600 px-8 py-3 rounded-xl font-semibold hover:bg-gray-100 transition shadow-lg"
+            className="inline-flex items-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-xl font-semibold hover:bg-slate-100 transition shadow-lg hover:shadow-xl"
           >
             Explore Deals
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
           </Link>
         </div>
       </section>
