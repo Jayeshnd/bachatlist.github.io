@@ -233,7 +233,7 @@ export default function HomeClient({ featuredDeals, categories, latestDeals, ban
         const response = await fetch("/api/stores");
         if (response.ok) {
           const data = await response.json();
-          setStores(data.stores || []);
+          setStores(data || []);
         }
       } catch (error) {
         console.error("Failed to fetch stores:", error);
