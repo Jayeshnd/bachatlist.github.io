@@ -12,6 +12,7 @@ interface Banner {
   linkText?: string | null;
   backgroundColor?: string | null;
   textColor?: string | null;
+  bannerType?: string | null; // 'slider' or 'full-width'
 }
 
 interface BannerSliderProps {
@@ -80,20 +81,23 @@ export function BannerSlider({
               <img
                 src={isMobile && banner.mobileImageUrl ? banner.mobileImageUrl : banner.imageUrl}
                 alt={banner.title || "Banner"}
-                className="w-full h-full object-cover"
+                className={`w-full h-full ${banner.bannerType === 'full-width' ? 'object-contain' : 'object-cover'}`}
               />
-              {/* Overlay gradient */}
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: `linear-gradient(90deg, ${bgColor}cc 0%, ${bgColor}66 50%, transparent 100%)`,
-                }}
-              />
+              {/* Full-width banner: no overlay, just the image */}
+              {banner.bannerType !== 'full-width' && (
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: `linear-gradient(90deg, ${bgColor}cc 0%, ${bgColor}66 50%, transparent 100%)`,
+                  }}
+                />
+              )}
             </div>
 
-            {/* Content */}
-            <div className="relative h-full flex items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="max-w-xl md:max-w-2xl">
+            {/* Content - only show for slider type */}
+            {banner.bannerType !== 'full-width' && (
+              <div className="relative h-full flex items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-xl md:max-w-2xl">
                 {banner.title && (
                   <h2
                     className="text-2xl md:text-4xl font-bold mb-3"
@@ -121,11 +125,12 @@ export function BannerSlider({
                     <span>→</span>
                   </a>
                 )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
-        );
-      })}
+        )}
+      )}
 
       {/* Navigation Arrows */}
       {banners.length > 1 && (

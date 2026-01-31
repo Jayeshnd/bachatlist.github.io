@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
         backgroundColor: data.backgroundColor || null,
         textColor: data.textColor || null,
         mobileImageUrl: data.mobileImageUrl || null,
+        bannerType: data.bannerType || "slider",
       },
     });
 

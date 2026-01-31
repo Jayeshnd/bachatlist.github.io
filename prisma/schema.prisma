@@ -727,6 +727,9 @@ model Banner {
   // Click tracking
   clicks          Int         @default(0)
   
+  // Banner Type: 'slider' for content overlay, 'full-width' for image only
+  bannerType      String      @default("slider")
+  
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   

@@ -69,6 +69,7 @@ export async function PUT(
     if (data.backgroundColor !== undefined) updateData.backgroundColor = data.backgroundColor;
     if (data.textColor !== undefined) updateData.textColor = data.textColor;
     if (data.mobileImageUrl !== undefined) updateData.mobileImageUrl = data.mobileImageUrl;
+    if (data.bannerType !== undefined) updateData.bannerType = data.bannerType;
     if (data.clicks !== undefined) updateData.clicks = parseInt(data.clicks);
 
     const banner = await prisma.banner.update({

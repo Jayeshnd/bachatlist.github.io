@@ -224,6 +224,35 @@ export default function EditBannerForm({ banner }: { banner: any }) {
             </span>
           </label>
         </div>
+
+        {/* Banner Type */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Banner Type
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="bannerType"
+                value="slider"
+                defaultChecked={banner.bannerType !== 'full-width'}
+                className="w-4 h-4 text-primary border-gray-300 focus:ring-primary"
+              />
+              <span className="text-sm text-gray-700">Slider (with content overlay)</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="bannerType"
+                value="full-width"
+                defaultChecked={banner.bannerType === 'full-width'}
+                className="w-4 h-4 text-primary border-gray-300 focus:ring-primary"
+              />
+              <span className="text-sm text-gray-700">Full Width (image only)</span>
+            </label>
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-100">
