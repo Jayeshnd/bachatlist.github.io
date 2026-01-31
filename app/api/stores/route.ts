@@ -18,9 +18,10 @@ export async function GET(request: NextRequest) {
       orderBy: { order: "asc" },
     });
     
-    console.log("[DEBUG] Stores from DB:", JSON.stringify(stores, null, 2));
-
-    return NextResponse.json(stores.map((s: any) => serializeDecimal(s)));
+    // Ensure stores is always an array
+    const storesArray = Array.isArray(stores) ? stores : [];
+    
+    return NextResponse.json(storesArray.map((s: any) => serializeDecimal(s)));
   } catch (error) {
     console.error("Failed to fetch stores:", error);
     return NextResponse.json(
