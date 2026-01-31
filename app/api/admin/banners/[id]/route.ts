@@ -55,7 +55,7 @@ export async function PUT(
     if (data.link !== undefined) updateData.link = data.link;
     if (data.linkText !== undefined) updateData.linkText = data.linkText;
     if (data.position !== undefined) updateData.position = parseInt(data.position);
-    if (data.isActive !== undefined) updateData.isActive = data.isActive;
+    if (data.isActive !== undefined) updateData.isActive = data.isActive === "on";
     if (data.startDate) {
       updateData.startDate = new Date(data.startDate);
     } else if (data.startDate === null) {

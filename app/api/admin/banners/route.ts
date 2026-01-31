@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         link: data.link || null,
         linkText: data.linkText || null,
         position: newPosition,
-        isActive: data.isActive !== false,
+        isActive: data.isActive === "on",
         startDate: data.startDate ? new Date(data.startDate) : null,
         endDate: data.endDate ? new Date(data.endDate) : null,
         backgroundColor: data.backgroundColor || null,
