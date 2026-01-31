@@ -14,11 +14,19 @@ function StoresRow({ stores }: { stores: { name: string; icon: string; logo?: st
           {stores.map((store, index) => (
             <Link
               key={index}
-              href={`/deals?store=${store.name.toLowerCase()}`}
+              href={`/deals?store=${(store.name || '').toLowerCase()}`}
               className="flex flex-col items-center gap-2 min-w-fit hover:opacity-80 transition"
             >
-              <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center text-3xl border border-gray-100 hover:border-green-200 hover:bg-green-50 transition">
-                {store.icon}
+              <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center text-3xl border border-gray-100 hover:border-green-200 hover:bg-green-50 transition overflow-hidden">
+                {store.logo ? (
+                  <img 
+                    src={store.logo} 
+                    alt={store.name || 'Store'}
+                    className="w-full h-full object-contain p-2"
+                  />
+                ) : (
+                  store.icon
+                )}
               </div>
               <span className="text-sm font-medium text-gray-700">{store.name}</span>
             </Link>
@@ -233,6 +241,7 @@ export default function HomeClient({ featuredDeals, categories, latestDeals, ban
         const response = await fetch("/api/stores");
         if (response.ok) {
           const data = await response.json();
+          console.log("[DEBUG] Stores API response:", data);
           setStores(data || []);
         }
       } catch (error) {

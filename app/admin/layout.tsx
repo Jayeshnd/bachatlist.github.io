@@ -12,9 +12,7 @@ export default function AdminLayout({
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
         {/* Logo */}
         <div className="p-6 border-b border-gray-100">
-          <Link href="/admin" className="block">
             <Logo size="md" showTagline={true} />
-          </Link>
         </div>
 
         {/* Navigation */}

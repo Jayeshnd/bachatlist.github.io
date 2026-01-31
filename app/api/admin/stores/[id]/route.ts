@@ -1,6 +1,14 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { serializeDecimal } from "@/lib/utils";
+
+/**
+ * Serialize store for API response
+ */
+function serializeStoreForResponse(store: any) {
+  return serializeDecimal(store);
+}
 
 // GET a single store
 export async function GET(
@@ -23,7 +31,7 @@ export async function GET(
       return NextResponse.json({ error: "Store not found" }, { status: 404 });
     }
 
-    return NextResponse.json(store);
+    return NextResponse.json(serializeStoreForResponse(store));
   } catch (error) {
     console.error("Failed to fetch store:", error);
     return NextResponse.json(
@@ -69,7 +77,7 @@ export async function PUT(
       data: updateData,
     });
 
-    return NextResponse.json(store);
+    return NextResponse.json(serializeStoreForResponse(store));
   } catch (error) {
     console.error("Failed to update store:", error);
     return NextResponse.json(
