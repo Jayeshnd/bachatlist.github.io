@@ -121,8 +121,14 @@ export function serializeDecimal(value: any): any {
     return value;
   }
   
-  // Handle Prisma Decimal objects (have toString method)
-  if (typeof value === 'object' && 'toString' in value && typeof value.toString === 'function') {
+  // Handle Prisma Decimal objects (have special toString method for decimals)
+  // Check if it's NOT a plain object by verifying it has a different toString than Object.prototype
+  if (
+    typeof value === 'object' && 
+    'toString' in value && 
+    typeof value.toString === 'function' &&
+    value.toString !== Object.prototype.toString
+  ) {
     return value.toString();
   }
   
