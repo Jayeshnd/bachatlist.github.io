@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         discountType: data.discountType || "PERCENTAGE",
         discountValue: parseFloat(data.discountValue) || 0,
         expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
-        isActive: data.isActive !== false,
+        isActive: data.isActive === "on" || data.isActive === true,
         minPurchase: data.minPurchase ? parseFloat(data.minPurchase) : null,
         maxDiscount: data.maxDiscount ? parseFloat(data.maxDiscount) : null,
         usageLimit: data.usageLimit ? parseInt(data.usageLimit) : null,

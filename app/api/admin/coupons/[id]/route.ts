@@ -121,7 +121,10 @@ export async function PUT(
     } else if (data.expiryDate === null) {
       updateData.expiryDate = null;
     }
-    if (data.isActive !== undefined) updateData.isActive = data.isActive;
+    if (data.isActive !== undefined) {
+      // Convert checkbox value to boolean (checkbox sends "on" when checked)
+      updateData.isActive = data.isActive === "on" || data.isActive === true;
+    }
     if (data.minPurchase !== undefined) {
       updateData.minPurchase = data.minPurchase ? parseFloat(data.minPurchase) : null;
     }
