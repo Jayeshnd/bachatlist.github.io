@@ -5,6 +5,8 @@ import { serializeDecimal } from "@/lib/utils";
 // GET all active stores (public endpoint)
 export async function GET(request: NextRequest) {
   try {
+    console.log("[Stores] Fetching stores from database...");
+    
     const { searchParams } = new URL(request.url);
     const includeInactive = searchParams.get("includeInactive") === "true";
 
@@ -13,20 +15,32 @@ export async function GET(request: NextRequest) {
       where.isActive = true;
     }
 
-    const stores = await prisma.store.findMany({
-      where,
-      orderBy: { order: "asc" },
-    });
+    console.log("[Stores] Query params:", { where, includeInactive });
+
+    let stores;
+    try {
+      stores = await prisma.store.findMany({
+        where,
+        orderBy: { order: "asc" },
+      });
+    } catch (dbError) {
+      console.error("[Stores] Database error:", dbError);
+      // Return empty array if database is unavailable
+      return NextResponse.json([]);
+    }
+    
+    console.log("[Stores] Found:", stores?.length || 0, "stores");
     
     // Ensure stores is always an array
     const storesArray = Array.isArray(stores) ? stores : [];
     
-    return NextResponse.json(storesArray.map((s: any) => serializeDecimal(s)));
+    const serializedStores = storesArray.map((s: any) => serializeDecimal(s));
+    console.log("[Stores] Serialized successfully:", serializedStores.length, "stores");
+    
+    return NextResponse.json(serializedStores);
   } catch (error) {
-    console.error("Failed to fetch stores:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch stores" },
-      { status: 500 }
-    );
+    console.error("[Stores] Error fetching stores:", error);
+    // Return empty array instead of 500 error to prevent page failure
+    return NextResponse.json([]);
   }
 }
