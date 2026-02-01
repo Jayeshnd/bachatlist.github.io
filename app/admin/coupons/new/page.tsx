@@ -93,6 +93,32 @@ export default function NewCouponPage() {
               />
             </div>
 
+            {/* Store Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Store/Merchant Name
+              </label>
+              <input
+                type="text"
+                name="storeName"
+                placeholder="e.g., Amazon, Flipkart, Myntra"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+            </div>
+
+            {/* Store Logo */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Store Logo URL
+              </label>
+              <input
+                type="url"
+                name="storeLogo"
+                placeholder="https://example.com/logo.png"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+            </div>
+
             {/* Discount Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -700,6 +700,10 @@ model CouponCode {
   // Affiliate URL for tracking
   affiliateUrl    String?       @db.Text
   
+  // Store/Merchant Info
+  storeName       String?
+  storeLogo       String?       @db.Text
+  
   // SEO & Display
   metaTitle       String?
   metaDescription String?       @db.Text

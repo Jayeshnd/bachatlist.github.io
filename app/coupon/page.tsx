@@ -19,6 +19,9 @@ interface CouponCode {
   metaTitle: string | null;
   metaDescription: string | null;
   affiliateUrl?: string | null;
+  // Store/Merchant Info
+  storeName: string | null;
+  storeLogo: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -297,6 +300,24 @@ export default function CouponPage() {
                 </div>
 
                 <div className="p-5">
+                  {/* Merchant/Store Info */}
+                  {(coupon.storeName || coupon.storeLogo) && (
+                    <div className="flex items-center gap-2 mb-3">
+                      {coupon.storeLogo && (
+                        <img
+                          src={coupon.storeLogo}
+                          alt={coupon.storeName || "Store"}
+                          className="w-6 h-6 rounded-full object-cover"
+                        />
+                      )}
+                      {coupon.storeName && (
+                        <span className="text-sm font-medium text-gray-600">
+                          {coupon.storeName}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   {/* Description */}
                   <h3 className="font-semibold text-gray-800 mb-3 text-lg leading-relaxed line-clamp-2">
                     {stripHtml(coupon.description) || "Special discount coupon"}
@@ -404,6 +425,23 @@ export default function CouponPage() {
                   <div className="flex-1 p-5">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="flex-1">
+                        {/* Merchant/Store Info */}
+                        {(coupon.storeName || coupon.storeLogo) && (
+                          <div className="flex items-center gap-2 mb-2">
+                            {coupon.storeLogo && (
+                              <img
+                                src={coupon.storeLogo}
+                                alt={coupon.storeName || "Store"}
+                                className="w-5 h-5 rounded-full object-cover"
+                              />
+                            )}
+                            {coupon.storeName && (
+                              <span className="text-sm font-medium text-gray-600">
+                                {coupon.storeName}
+                              </span>
+                            )}
+                          </div>
+                        )}
                         <h3 className="font-semibold text-gray-800 mb-2 text-lg">
                           {stripHtml(coupon.description) || "Special discount coupon"}
                         </h3>
