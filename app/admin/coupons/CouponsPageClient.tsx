@@ -43,8 +43,8 @@ export default function CouponsPageClient({ initialCoupons }: { initialCoupons: 
       const response = await fetch("/api/cuelinks/campaigns");
       const data = await response.json();
 
-      if (response.ok) {
-        const couponCampaigns = data.filter((c: Campaign) => c.couponCode);
+      if (response.ok && data.campaigns) {
+        const couponCampaigns = data.campaigns.filter((c: Campaign) => c.couponCode);
         setCuelinksCoupons(couponCampaigns);
         setShowCuelinks(true);
       } else {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const CUELINKS_API_BASE = "https://api.cuelinks.com";
+const CUELINKS_API_BASE = "https://www.cuelinks.com/api/v2";
 const API_KEY = process.env.CUELINKS_API_KEY || "ZmIYjVViu4gjZnVq9vM0lrjRMdEq3qaGswlhVscNmLw";
 
 interface CuelinksCampaign {
@@ -12,35 +12,70 @@ interface CuelinksCampaign {
   url: string;
   coupon_code?: string;
   cashback?: string;
+  commission_rate?: string;
+  country_id?: number;
+  store_name?: string;
+  category_name?: string;
 }
 
 interface CuelinksResponse {
-  success: boolean;
-  data?: {
-    campaigns?: CuelinksCampaign[];
-    campaigns_list?: CuelinksCampaign[];
+  campaigns?: CuelinksCampaign[];
+  meta?: {
+    current_page: number;
+    total_pages: number;
+    total_campaigns: number;
+    per_page: number;
   };
   message?: string;
 }
 
+// Cuelinks category mapping
+const CATEGORIES = [
+  { id: "", name: "All Offers" },
+  { id: "shopping", name: "Shopping" },
+  { id: "travel", name: "Travel" },
+  { id: "food", name: "Food" },
+  { id: "recharge", name: "Recharge" },
+  { id: "fashion", name: "Fashion" },
+  { id: "electronics", name: "Electronics" },
+  { id: "beauty", name: "Beauty" },
+  { id: "fitness", name: "Fitness" },
+];
+
 export async function GET(request: Request) {
   try {
-    // Get query parameters for pagination
     const { searchParams } = new URL(request.url);
     const page = searchParams.get("page") || "1";
-    const perPage = searchParams.get("per_page") || "20";
+    const perPage = searchParams.get("per_page") || "50";
+    const searchTerm = searchParams.get("search_term") || "";
+    const category = searchParams.get("category") || "";
+    const countryId = searchParams.get("country_id") || "252";
 
-    const url = `${CUELINKS_API_BASE}/api/v2/campaigns/getCampaigns?page=${page}&per_page=${perPage}`;
+    // Build URL with parameters
+    const params = new URLSearchParams({
+      sort_column: "id",
+      sort_direction: "asc",
+      page: page,
+      per_page: perPage,
+      country_id: countryId,
+    });
 
-    // Diagnostic logging
+    if (searchTerm) {
+      params.append("search_term", searchTerm);
+    }
+    if (category) {
+      params.append("category", category);
+    }
+
+    const url = `${CUELINKS_API_BASE}/campaigns.json?${params.toString()}`;
+
     console.log("[Cuelinks] Request URL:", url);
     console.log("[Cuelinks] API Key configured:", API_KEY ? "Yes" : "No");
-    console.log("[Cuelinks] API Key length:", API_KEY?.length);
 
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${API_KEY}`,
+        "Authorization": `Token token=${API_KEY}`,
         "Content-Type": "application/json",
         "Accept": "application/json",
       },
@@ -48,49 +83,52 @@ export async function GET(request: Request) {
 
     if (!response.ok) {
       console.error(`Cuelinks API error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      console.error("[Cuelinks] Error response:", errorText);
       return NextResponse.json(
-        { error: "Failed to fetch Cuelinks campaigns" },
+        { error: "Failed to fetch Cuelinks campaigns", details: errorText },
         { status: response.status }
       );
     }
 
-    // Diagnostic logging for response
     console.log("[Cuelinks] Response status:", response.status);
-    console.log("[Cuelinks] Response headers:", Object.fromEntries(response.headers.entries()));
 
     const data: CuelinksResponse = await response.json();
 
-    // Log raw response for debugging
-    console.log("[Cuelinks] Raw response:", JSON.stringify(data, null, 2).substring(0, 500));
+    console.log("[Cuelinks] Meta:", data.meta);
+    console.log("[Cuelinks] Campaigns count:", data.campaigns?.length || 0);
 
-    if (!data.success || !data.data) {
-      console.error("Cuelinks API returned unsuccessful response:", data);
+    if (!data.campaigns) {
+      console.error("Cuelinks API returned no campaigns:", data);
       return NextResponse.json(
-        { error: data.message || "Failed to fetch campaigns" },
+        { error: data.message || "No campaigns found", data },
         { status: 500 }
       );
     }
 
-    // Extract campaigns from different response formats
-    const campaigns = data.data.campaigns || data.data.campaigns_list || [];
-
     // Transform to our format
-    const transformedCampaigns = campaigns.map((campaign: CuelinksCampaign) => ({
+    const transformedCampaigns = data.campaigns.map((campaign: CuelinksCampaign) => ({
       id: campaign.id.toString(),
       name: campaign.name,
       description: campaign.description,
       imageUrl: campaign.image_url,
-      categories: campaign.categories,
+      categories: campaign.categories || [campaign.category_name].filter(Boolean),
       url: campaign.url,
       couponCode: campaign.coupon_code || null,
-      cashback: campaign.cashback || null,
+      cashback: campaign.cashback || campaign.commission_rate || null,
+      storeName: campaign.store_name || null,
+      categoryName: campaign.category_name || null,
     }));
 
-    return NextResponse.json(transformedCampaigns);
+    return NextResponse.json({
+      campaigns: transformedCampaigns,
+      categories: CATEGORIES,
+      meta: data.meta,
+    });
   } catch (error) {
     console.error("Failed to fetch Cuelinks campaigns:", error);
     return NextResponse.json(
-      { error: "Failed to fetch Cuelinks campaigns" },
+      { error: "Failed to fetch Cuelinks campaigns", message: String(error) },
       { status: 500 }
     );
   }
