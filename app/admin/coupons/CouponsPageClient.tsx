@@ -65,7 +65,7 @@ export default function CouponsPageClient({ initialCoupons }: { initialCoupons: 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           code: campaign.couponCode,
-          description: `${campaign.name} - ${campaign.description?.substring(0, 200)}`,
+          description: campaign.description?.substring(0, 300) || "Imported from Cuelinks",
           discountType: "percentage",
           discountValue: campaign.cashback ? parseFloat(campaign.cashback.replace(/[^0-9.]/g, "")) : 10,
           isActive: true,

@@ -75,12 +75,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Log the data being sent for debugging
+    console.log("Creating coupon with data:", JSON.stringify(data, null, 2));
+
     // Create coupon
     const coupon = await prisma.couponCode.create({
       data: {
         code: data.code.toUpperCase(),
         description: data.description || null,
-        discountType: data.discountType || "PERCENTAGE",
+        discountType: (data.discountType || "PERCENTAGE").toUpperCase(),
         discountValue: String(typeof data.discountValue === 'number' ? data.discountValue : parseFloat(data.discountValue || '0')),
         expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
         isActive: data.isActive === "on" || data.isActive === true,
