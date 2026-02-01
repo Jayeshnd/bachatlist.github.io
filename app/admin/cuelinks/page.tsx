@@ -41,6 +41,7 @@ export default function CuelinksAdminPage() {
 
   async function fetchCampaigns() {
     try {
+      setLoading(true);
       const params = new URLSearchParams();
       if (selectedCategory) params.append("category", selectedCategory);
       if (searchTerm) params.append("search_term", searchTerm);
@@ -63,7 +64,6 @@ export default function CuelinksAdminPage() {
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     fetchCampaigns();
   }
 
@@ -100,168 +100,152 @@ export default function CuelinksAdminPage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">💰 Cuelinks Offers</h1>
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">💰 Cuelinks Offers</h1>
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-          {error}
-        </div>
-        <button
-          onClick={fetchCampaigns}
-          className="mt-4 bg-primary text-white px-4 py-2 rounded-lg hover:opacity-90"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">💰 Cuelinks Offers</h1>
-        <button
-          onClick={fetchCampaigns}
-          className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300"
-        >
-          Refresh
-        </button>
+    <div className="p-8">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Cuelinks Offers</h1>
+          <p className="text-gray-600 mt-1">Browse and import offers from Cuelinks</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500">{campaigns.length} offers</span>
+        </div>
       </div>
 
-      {/* Search Bar */}
-      <form onSubmit={handleSearch} className="mb-6">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Search offers (e.g., amazon, flipkart)..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
-          <button
-            type="submit"
-            className="bg-primary text-white px-6 py-2 rounded-lg hover:opacity-90"
+      {/* Filters */}
+      <div className="bg-white rounded-xl shadow-md p-4 mb-6">
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Search */}
+          <form onSubmit={handleSearch} className="flex-1 min-w-[200px]">
+            <input
+              type="text"
+              placeholder="Search offers..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+          </form>
+
+          {/* Category Filter */}
+          <select
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+              setLoading(true);
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           >
-            Search
+            {CATEGORIES.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Refresh Button */}
+          <button
+            onClick={() => {
+              setLoading(true);
+              fetchCampaigns();
+            }}
+            disabled={loading}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+          >
+            {loading ? "Loading..." : "Refresh"}
           </button>
         </div>
-      </form>
-
-      {/* Category Filters */}
-      <div className="mb-6">
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => {
-                setSelectedCategory(cat.id);
-                setLoading(true);
-              }}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                selectedCategory === cat.id
-                  ? "bg-primary text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
       </div>
 
-      {/* Results Count */}
-      <p className="text-gray-600 mb-4">
-        Showing {campaigns.length} offers
-        {selectedCategory && ` in ${CATEGORIES.find(c => c.id === selectedCategory)?.name}`}
-        {searchTerm && ` for "${searchTerm}"`}
-      </p>
-
-      {campaigns.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow-sm">
-          <p className="text-gray-500">No offers available in this category.</p>
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          {error}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {campaigns.map((campaign) => (
-            <div
-              key={campaign.id}
-              className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 hover:shadow-md transition"
-            >
-              <div className="h-48 bg-gray-100 relative">
-                {campaign.imageUrl ? (
-                  <img
-                    src={campaign.imageUrl}
-                    alt={campaign.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    No Image
-                  </div>
-                )}
-                {campaign.couponCode && (
-                  <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-                    {campaign.couponCode}
-                  </div>
-                )}
-                {campaign.categoryName && (
-                  <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded">
-                    {campaign.categoryName}
-                  </div>
-                )}
-              </div>
+      )}
 
-              <div className="p-4">
-                {campaign.storeName && (
-                  <p className="text-xs text-gray-500 mb-1">{campaign.storeName}</p>
-                )}
-                <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
-                  {campaign.name}
-                </h3>
-                <p className="text-sm text-gray-500 mb-3 line-clamp-2">
-                  {campaign.description}
-                </p>
+      {/* Table View - Cuelinks Style */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading offers from Cuelinks...</p>
+          </div>
+        ) : campaigns.length === 0 ? (
+          <div className="p-8 text-center">
+            <p className="text-gray-600">No offers found. Try adjusting your filters.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Title</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Merchant</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Categories</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Coupon Code</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Valid Till</th>
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {campaigns.map((campaign) => (
+                  <tr key={campaign.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      <div className="max-w-md">
+                        <p className="font-medium text-gray-900 line-clamp-1">{campaign.name}</p>
+                        <p className="text-sm text-gray-500 line-clamp-2">{campaign.description?.replace(/<[^>]*>/g, "").substring(0, 100)}</p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {campaign.storeName || campaign.categoryName || "N/A"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {campaign.categories?.slice(0, 2).map((cat, idx) => (
+                          <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                            {cat}
+                          </span>
+                        ))}
+                        {campaign.categories && campaign.categories.length > 2 && (
+                          <span className="text-xs text-gray-500">+{campaign.categories.length - 2}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {campaign.couponCode ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                          {campaign.couponCode}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-400">No Coupon Required</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-sm text-gray-600">2026-12-31</span>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        onClick={() => handleImportCampaign(campaign)}
+                        disabled={importing === campaign.id}
+                        className="px-3 py-1 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                      >
+                        {importing === campaign.id ? "Importing..." : "Import"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
-                {campaign.cashback && (
-                  <div className="mb-3">
-                    <span className="text-sm font-medium text-green-600">
-                      💰 {campaign.cashback}
-                    </span>
-                  </div>
-                )}
-
-                <div className="flex gap-2">
-                  <a
-                    href={campaign.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 bg-gray-100 text-gray-700 text-center py-2 rounded-lg text-sm font-medium hover:bg-gray-200"
-                  >
-                    View Offer
-                  </a>
-                  <button
-                    onClick={() => handleImportCampaign(campaign)}
-                    disabled={importing === campaign.id}
-                    className="flex-1 bg-primary text-white py-2 rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
-                  >
-                    {importing === campaign.id ? "Importing..." : "Import"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+      {/* Pagination Info */}
+      {!loading && campaigns.length > 0 && (
+        <div className="mt-4 text-center text-sm text-gray-500">
+          Showing {campaigns.length} offers from Cuelinks
         </div>
       )}
     </div>
