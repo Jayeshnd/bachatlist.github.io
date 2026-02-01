@@ -19,11 +19,13 @@ interface CuelinksCampaign {
 }
 
 interface CuelinksResponse {
+  offers?: CuelinksCampaign[];
   campaigns?: CuelinksCampaign[];
   meta?: {
     current_page: number;
     total_pages: number;
-    total_campaigns: number;
+    total_offers?: number;
+    total_campaigns?: number;
     per_page: number;
   };
   message?: string;
@@ -67,7 +69,8 @@ export async function GET(request: Request) {
       params.append("category", category);
     }
 
-    const url = `${CUELINKS_API_BASE}/campaigns.json?${params.toString()}`;
+    // Use offers.json to get coupon codes
+    const url = `${CUELINKS_API_BASE}/offers.json?${params.toString()}`;
 
     console.log("[Cuelinks] Request URL:", url);
     console.log("[Cuelinks] API Key configured:", API_KEY ? "Yes" : "No");
@@ -96,18 +99,22 @@ export async function GET(request: Request) {
     const data: CuelinksResponse = await response.json();
 
     console.log("[Cuelinks] Meta:", data.meta);
-    console.log("[Cuelinks] Campaigns count:", data.campaigns?.length || 0);
-
-    if (!data.campaigns) {
-      console.error("Cuelinks API returned no campaigns:", data);
+    
+    // Support both offers.json and campaigns.json response formats
+    const items = data.offers || data.campaigns || [];
+    
+    if (!items || items.length === 0) {
+      console.error("Cuelinks API returned no data:", data);
       return NextResponse.json(
-        { error: data.message || "No campaigns found", data },
+        { error: data.message || "No offers found", data },
         { status: 500 }
       );
     }
 
+    console.log("[Cuelinks] Items count:", items.length);
+
     // Transform to our format
-    const transformedCampaigns = data.campaigns.map((campaign: CuelinksCampaign) => ({
+    const transformedCampaigns = items.map((campaign: CuelinksCampaign) => ({
       id: campaign.id.toString(),
       name: campaign.name,
       description: campaign.description,
@@ -123,7 +130,10 @@ export async function GET(request: Request) {
     return NextResponse.json({
       campaigns: transformedCampaigns,
       categories: CATEGORIES,
-      meta: data.meta,
+      meta: {
+        ...data.meta,
+        total_offers: data.meta?.total_offers || data.meta?.total_campaigns || 0,
+      },
     });
   } catch (error) {
     console.error("Failed to fetch Cuelinks campaigns:", error);
