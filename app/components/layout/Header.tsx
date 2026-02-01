@@ -8,7 +8,6 @@ const navItems = [
   { name: "Deals", href: "/deals" },
   { name: "Loot", href: "/loot", badge: "HOT" },
   { name: "Coupon", href: "/coupon" },
-  { name: "Cuelinks", href: "/cuelinks" },
   { name: "Blog", href: "/blog" },
   { name: "Features", href: "/features" },
   { name: "Telegram", href: "/telegram" },
