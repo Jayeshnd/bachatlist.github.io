@@ -697,6 +697,9 @@ model CouponCode {
   applicableCategories String?   @db.Text
   applicableDeals      String?   @db.Text
   
+  // Affiliate URL for tracking
+  affiliateUrl    String?       @db.Text
+  
   // SEO & Display
   metaTitle       String?
   metaDescription String?       @db.Text

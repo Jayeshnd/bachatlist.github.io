@@ -91,6 +91,7 @@ export default function CouponsPageClient({ initialCoupons }: { initialCoupons: 
           discountType: "percentage",
           discountValue: campaign.cashback ? parseFloat(campaign.cashback.replace(/[^0-9.]/g, "")) : 10,
           isActive: true,
+          affiliateUrl: campaign.url, // Use the affiliate/tracked URL
         }),
       });
 

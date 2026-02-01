@@ -90,7 +90,7 @@ export default function CuelinksAdminPage() {
           url: campaign.url,
           currentPrice: 0,
           originalPrice: 0,
-          categoryId: "default",
+          // No categoryId - will use "uncategorized" automatically
           status: "DRAFT",
           coupon: campaign.couponCode,
         }),

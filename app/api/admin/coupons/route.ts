@@ -96,6 +96,7 @@ export async function POST(request: NextRequest) {
         applicableDeals: data.applicableDeals
           ? JSON.stringify(data.applicableDeals)
           : null,
+        affiliateUrl: data.affiliateUrl || null,
         metaTitle: data.metaTitle || null,
         metaDescription: data.metaDescription || null,
       },
