@@ -1,13 +1,73 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+interface CuelinksCampaign {
+  id: number;
+  campaign: string;
+  title: string;
+  description: string;
+  image_url?: string;
+  coupon_code?: string;
+}
 
 export default function NewCouponPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [cuelinksCampaigns, setCuelinksCampaigns] = useState<CuelinksCampaign[]>([]);
+  const [selectedCampaign, setSelectedCampaign] = useState<CuelinksCampaign | null>(null);
+  const [loadingCampaigns, setLoadingCampaigns] = useState(false);
+
+  // Fetch Cuelinks campaigns on mount
+  useEffect(() => {
+    async function fetchCuelinksCampaigns() {
+      try {
+        setLoadingCampaigns(true);
+        const res = await fetch("/api/cuelinks/campaigns?per_page=100");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.campaigns) {
+            setCuelinksCampaigns(data.campaigns);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch Cuelinks campaigns:", err);
+      } finally {
+        setLoadingCampaigns(false);
+      }
+    }
+
+    fetchCuelinksCampaigns();
+  }, []);
+
+  // Handle Cuelinks campaign selection
+  const handleCampaignSelect = (campaign: CuelinksCampaign) => {
+    setSelectedCampaign(campaign);
+    // Auto-fill form fields
+    const form = document.querySelector('form') as HTMLFormElement;
+    if (form) {
+      const codeInput = form.elements.namedItem('code') as HTMLInputElement;
+      const descInput = form.elements.namedItem('description') as HTMLTextAreaElement;
+      const storeNameInput = form.elements.namedItem('storeName') as HTMLInputElement;
+      const storeLogoInput = form.elements.namedItem('storeLogo') as HTMLInputElement;
+      
+      if (codeInput && campaign.coupon_code) {
+        codeInput.value = campaign.coupon_code;
+      }
+      if (descInput) {
+        descInput.value = campaign.description || "";
+      }
+      if (storeNameInput) {
+        storeNameInput.value = campaign.campaign;
+      }
+      if (storeLogoInput && campaign.image_url) {
+        storeLogoInput.value = campaign.image_url;
+      }
+    }
+  };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -64,6 +124,59 @@ export default function NewCouponPage() {
               {error}
             </div>
           )}
+
+          {/* Cuelinks Campaign Selector */}
+          <div className="mb-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
+            <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <span className="text-xl">🔗</span>
+              Import from Cuelinks
+            </h3>
+            <p className="text-sm text-gray-600 mb-3">
+              Select a campaign from Cuelinks to auto-fill the coupon details
+            </p>
+            {loadingCampaigns ? (
+              <div className="text-center py-4">
+                <span className="text-gray-500">Loading campaigns...</span>
+              </div>
+            ) : (
+              <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg">
+                {cuelinksCampaigns.length === 0 ? (
+                  <div className="p-4 text-center text-gray-500 text-sm">
+                    No campaigns available. Enter details manually below.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 p-2">
+                    {cuelinksCampaigns.map((campaign) => (
+                      <button
+                        key={campaign.id}
+                        type="button"
+                        onClick={() => handleCampaignSelect(campaign)}
+                        className={`flex items-center gap-2 p-2 rounded-lg text-left text-sm transition-all ${
+                          selectedCampaign?.id === campaign.id
+                            ? "bg-blue-600 text-white"
+                            : "bg-white border border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                        }`}
+                      >
+                        {campaign.image_url && (
+                          <img
+                            src={campaign.image_url}
+                            alt={campaign.campaign}
+                            className="w-6 h-6 rounded-full object-cover flex-shrink-0"
+                          />
+                        )}
+                        <span className="truncate">{campaign.campaign}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {selectedCampaign && (
+              <div className="mt-2 text-sm text-green-600">
+                ✓ Selected: {selectedCampaign.campaign}
+              </div>
+            )}
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Coupon Code */}
