@@ -15,6 +15,8 @@ async function getHomePageData() {
   try {
     const now = new Date();
     
+    console.log("[HomePage] Fetching banners...");
+    
     // Fetch banners (show all active banners)
     const banners = await prisma.banner.findMany({
       where: {
@@ -22,6 +24,11 @@ async function getHomePageData() {
       },
       orderBy: { position: "asc" },
     });
+
+    console.log("[HomePage] Found", banners?.length || 0, "banners");
+    if (banners?.length > 0) {
+      console.log("[HomePage] Banner IDs:", banners.map(b => b.id));
+    }
 
     // Fetch hot deals with date filtering
     const hotDeals = await prisma.hotDeal.findMany({
