@@ -81,11 +81,11 @@ export async function POST(request: NextRequest) {
         code: data.code.toUpperCase(),
         description: data.description || null,
         discountType: data.discountType || "PERCENTAGE",
-        discountValue: typeof data.discountValue === 'number' ? data.discountValue : parseFloat(data.discountValue || '0'),
+        discountValue: String(typeof data.discountValue === 'number' ? data.discountValue : parseFloat(data.discountValue || '0')),
         expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
         isActive: data.isActive === "on" || data.isActive === true,
-        minPurchase: data.minPurchase ? (typeof data.minPurchase === 'number' ? data.minPurchase : parseFloat(data.minPurchase)) : null,
-        maxDiscount: data.maxDiscount ? (typeof data.maxDiscount === 'number' ? data.maxDiscount : parseFloat(data.maxDiscount)) : null,
+        minPurchase: data.minPurchase ? String(typeof data.minPurchase === 'number' ? data.minPurchase : parseFloat(data.minPurchase)) : null,
+        maxDiscount: data.maxDiscount ? String(typeof data.maxDiscount === 'number' ? data.maxDiscount : parseFloat(data.maxDiscount)) : null,
         usageLimit: data.usageLimit ? (typeof data.usageLimit === 'number' ? data.usageLimit : parseInt(data.usageLimit)) : null,
         applicableCategories: data.applicableCategories
           ? JSON.stringify(data.applicableCategories)
