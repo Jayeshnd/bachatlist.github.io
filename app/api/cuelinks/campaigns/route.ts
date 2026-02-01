@@ -3,45 +3,43 @@ import { NextResponse } from "next/server";
 const CUELINKS_API_BASE = "https://www.cuelinks.com/api/v2";
 const API_KEY = process.env.CUELINKS_API_KEY || "ZmIYjVViu4gjZnVq9vM0lrjRMdEq3qaGswlhVscNmLw";
 
+// Cuelinks API response format
 interface CuelinksCampaign {
   id: number;
-  name: string;
+  camapign_id?: number;
+  campaign: string; // Merchant name
+  title: string; // Offer title
   description: string;
-  image_url: string;
-  categories: string[];
-  url: string;
+  terms_and_condition?: string;
   coupon_code?: string;
-  cashback?: string;
-  commission_rate?: string;
-  country_id?: number;
-  store_name?: string;
-  category_name?: string;
+  image_url?: string;
+  type?: string;
+  shipping_charge?: string;
+  status?: string;
+  url: string; // Merchant URL
+  affiliate_url: string; // Tracked URL
+  start_date?: string;
+  end_date?: string;
+  categories: Record<string, string>; // Object like {"6": "Flowers & Gifts", "14": "Services"}
 }
 
 interface CuelinksResponse {
+  total_count?: number;
   offers?: CuelinksCampaign[];
   campaigns?: CuelinksCampaign[];
-  meta?: {
-    current_page: number;
-    total_pages: number;
-    total_offers?: number;
-    total_campaigns?: number;
-    per_page: number;
-  };
-  message?: string;
 }
 
 // Cuelinks category mapping
 const CATEGORIES = [
   { id: "", name: "All Offers" },
-  { id: "shopping", name: "Shopping" },
-  { id: "travel", name: "Travel" },
-  { id: "food", name: "Food" },
-  { id: "recharge", name: "Recharge" },
-  { id: "fashion", name: "Fashion" },
-  { id: "electronics", name: "Electronics" },
-  { id: "beauty", name: "Beauty" },
-  { id: "fitness", name: "Fitness" },
+  { id: "shopping", name: "🛒 Shopping" },
+  { id: "travel", name: "✈️ Travel" },
+  { id: "food", name: "🍔 Food" },
+  { id: "recharge", name: "📱 Recharge" },
+  { id: "fashion", name: "👗 Fashion" },
+  { id: "electronics", name: "💻 Electronics" },
+  { id: "beauty", name: "💄 Beauty" },
+  { id: "fitness", name: "💪 Fitness" },
 ];
 
 export async function GET(request: Request) {
@@ -98,7 +96,7 @@ export async function GET(request: Request) {
 
     const data: CuelinksResponse = await response.json();
 
-    console.log("[Cuelinks] Meta:", data.meta);
+    console.log("[Cuelinks] Total count:", data.total_count);
     
     // Support both offers.json and campaigns.json response formats
     const items = data.offers || data.campaigns || [];
@@ -106,39 +104,47 @@ export async function GET(request: Request) {
     if (!items || items.length === 0) {
       console.error("Cuelinks API returned no data:", data);
       return NextResponse.json(
-        { error: data.message || "No offers found", data },
+        { error: "No offers found", data },
         { status: 500 }
       );
     }
 
     console.log("[Cuelinks] Items count:", items.length);
 
-    // Transform to our format
-    const transformedCampaigns = items.map((campaign: CuelinksCampaign) => ({
-      id: campaign.id.toString(),
-      name: campaign.name,
-      description: campaign.description,
-      imageUrl: campaign.image_url,
-      categories: campaign.categories || [campaign.category_name].filter(Boolean),
-      url: campaign.url,
-      couponCode: campaign.coupon_code || null,
-      cashback: campaign.cashback || campaign.commission_rate || null,
-      storeName: campaign.store_name || null,
-      categoryName: campaign.category_name || null,
-    }));
+    // Transform to our format - use correct field names from Cuelinks API
+    const transformedCampaigns = items.map((campaign: CuelinksCampaign) => {
+      // Convert categories object to array
+      const categoriesArray = campaign.categories 
+        ? Object.values(campaign.categories)
+        : [];
+
+      return {
+        id: campaign.id.toString(),
+        title: campaign.title,
+        name: campaign.title, // For compatibility
+        description: campaign.description,
+        imageUrl: campaign.image_url || "",
+        categories: categoriesArray,
+        url: campaign.affiliate_url || campaign.url, // Use tracked URL
+        affiliateUrl: campaign.affiliate_url,
+        couponCode: campaign.coupon_code || null,
+        storeName: campaign.campaign,
+        merchantName: campaign.campaign,
+        endDate: campaign.end_date,
+      };
+    });
 
     return NextResponse.json({
       campaigns: transformedCampaigns,
       categories: CATEGORIES,
       meta: {
-        ...data.meta,
-        total_offers: data.meta?.total_offers || data.meta?.total_campaigns || 0,
+        total_count: data.total_count || transformedCampaigns.length,
       },
     });
   } catch (error) {
     console.error("Failed to fetch Cuelinks campaigns:", error);
     return NextResponse.json(
-      { error: "Failed to fetch Cuelinks campaigns", message: String(error) },
+      { error: "Failed to fetch Cuelinks campaigns" },
       { status: 500 }
     );
   }

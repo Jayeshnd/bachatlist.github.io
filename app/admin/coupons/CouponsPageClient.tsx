@@ -23,6 +23,7 @@ interface Coupon {
 interface Campaign {
   id: string;
   title: string;
+  name: string;
   description: string;
   imageUrl: string;
   categories: string[];
@@ -30,7 +31,7 @@ interface Campaign {
   couponCode: string | null;
   cashback: string | null;
   storeName: string | null;
-  categoryName: string | null;
+  merchantName: string | null;
 }
 
 const CATEGORIES = [
@@ -86,7 +87,7 @@ export default function CouponsPageClient({ initialCoupons }: { initialCoupons: 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           code: campaign.couponCode,
-          description: campaign.description?.substring(0, 300) || "Imported from Cuelinks",
+          description: campaign.title + " - " + campaign.description?.substring(0, 300),
           discountType: "percentage",
           discountValue: campaign.cashback ? parseFloat(campaign.cashback.replace(/[^0-9.]/g, "")) : 10,
           isActive: true,
@@ -109,6 +110,14 @@ export default function CouponsPageClient({ initialCoupons }: { initialCoupons: 
 
   function stripHtml(html: string): string {
     return html.replace(/<[^>]*>/g, "").substring(0, 200);
+  }
+
+  function getCategoriesArray(categories: any): string[] {
+    if (Array.isArray(categories)) return categories;
+    if (typeof categories === 'object' && categories !== null) {
+      return Object.values(categories);
+    }
+    return [];
   }
 
   return (
@@ -223,7 +232,7 @@ export default function CouponsPageClient({ initialCoupons }: { initialCoupons: 
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1">
-                          {campaign.categories?.slice(0, 2).map((cat, idx) => (
+                          {getCategoriesArray(campaign.categories).slice(0, 2).map((cat, idx) => (
                             <span key={idx} className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded">
                               {cat}
                             </span>

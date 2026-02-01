@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 
 interface Campaign {
   id: string;
+  title: string;
   name: string;
   description: string;
   imageUrl: string;
@@ -12,7 +13,7 @@ interface Campaign {
   couponCode: string | null;
   cashback: string | null;
   storeName: string | null;
-  categoryName: string | null;
+  merchantName: string | null;
 }
 
 const CATEGORIES = [
@@ -64,7 +65,16 @@ export default function CuelinksAdminPage() {
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
+    setLoading(true);
     fetchCampaigns();
+  }
+
+  function getCategoriesArray(categories: any): string[] {
+    if (Array.isArray(categories)) return categories;
+    if (typeof categories === 'object' && categories !== null) {
+      return Object.values(categories);
+    }
+    return [];
   }
 
   async function handleImportCampaign(campaign: Campaign) {
@@ -74,7 +84,7 @@ export default function CuelinksAdminPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: campaign.name,
+          title: campaign.title,
           description: campaign.description,
           shortDesc: campaign.description?.substring(0, 150),
           url: campaign.url,
@@ -87,7 +97,7 @@ export default function CuelinksAdminPage() {
       });
 
       if (response.ok) {
-        alert(`Successfully imported "${campaign.name}" as a draft deal!`);
+        alert(`Successfully imported "${campaign.title}" as a draft deal!`);
       } else {
         const data = await response.json();
         alert(`Failed to import: ${data.error || "Unknown error"}`);
@@ -192,24 +202,24 @@ export default function CuelinksAdminPage() {
                   <tr key={campaign.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
                       <div className="max-w-md">
-                        <p className="font-medium text-gray-900 line-clamp-1">{campaign.name}</p>
+                        <p className="font-medium text-gray-900 line-clamp-1">{campaign.title}</p>
                         <p className="text-sm text-gray-500 line-clamp-2">{campaign.description?.replace(/<[^>]*>/g, "").substring(0, 100)}</p>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {campaign.storeName || campaign.categoryName || "N/A"}
+                        {campaign.storeName || campaign.merchantName || "N/A"}
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
-                        {campaign.categories?.slice(0, 2).map((cat, idx) => (
+                        {getCategoriesArray(campaign.categories).slice(0, 2).map((cat, idx) => (
                           <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
                             {cat}
                           </span>
                         ))}
-                        {campaign.categories && campaign.categories.length > 2 && (
-                          <span className="text-xs text-gray-500">+{campaign.categories.length - 2}</span>
+                        {getCategoriesArray(campaign.categories).length > 2 && (
+                          <span className="text-xs text-gray-500">+{getCategoriesArray(campaign.categories).length - 2}</span>
                         )}
                       </div>
                     </td>
