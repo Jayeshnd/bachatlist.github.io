@@ -95,9 +95,11 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <LayoutWrapper>
-          <Providers>{children}</Providers>
-        </LayoutWrapper>
+        <Providers>
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
+        </Providers>
       </body>
     </html>
   );

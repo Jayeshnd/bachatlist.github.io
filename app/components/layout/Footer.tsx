@@ -40,7 +40,7 @@ const Footer = () => {
           {/* Brand Section */}
           <div>
             <Link href="/" aria-label="BachatList Home">
-              <Logo size="md" />
+              <Logo size="md" darkMode />
             </Link>
             <p className="text-gray-400 mt-4">Your one-stop destination for coupons and discounts.</p>
             <div className="flex space-x-4 mt-4">

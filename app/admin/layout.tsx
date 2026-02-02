@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 import Logo from "@/app/components/layout/Logo";
 
 export default function AdminLayout({
@@ -13,7 +16,7 @@ export default function AdminLayout({
         {/* Logo */}
         <div className="p-6 border-b border-gray-100">
           <Link href="/">
-            <Logo size="md" showTagline={true} />
+            <Logo size="md" />
           </Link>
         </div>
 
@@ -151,7 +154,14 @@ export default function AdminLayout({
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-100">
+        <div className="p-4 border-t border-gray-100 space-y-2">
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition text-red-600 hover:text-red-700"
+          >
+            <span className="text-xl">🚪</span>
+            <span className="font-medium">Logout</span>
+          </button>
           <Link
             href="/"
             className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 transition text-gray-500 hover:text-green-700"

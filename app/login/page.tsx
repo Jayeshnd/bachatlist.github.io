@@ -3,6 +3,8 @@
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import Link from "next/link";
+import Logo from "@/app/components/layout/Logo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,29 +28,40 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        // Check for rate limiting error
+        if (result.error.includes("Too many")) {
+          setError(result.error);
+        } else {
+          setError("Invalid email or password");
+        }
       } else {
         router.push("/admin");
         router.refresh();
       }
-    } catch (error) {
-      setError("Something went wrong");
+    } catch (error: any) {
+      // Handle rate limiting response
+      if (error.message?.includes("429") || error.message?.includes("Too many")) {
+        setError("Too many login attempts. Please try again in 1 minute.");
+      } else {
+        setError("Something went wrong");
+      }
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary to-secondary p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary to-secondary p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              💰 BachatList
-            </h1>
-            <p className="text-gray-600">Admin Panel Login</p>
-          </div>
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link href="/">
+            <Logo size="xl" darkMode />
+          </Link>
+          <p className="text-white/80 mt-2">Admin Panel Login</p>
+        </div>
 
+        <div className="bg-white rounded-2xl shadow-2xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -98,6 +111,16 @@ export default function LoginPage() {
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
+        </div>
+
+        {/* Back to site */}
+        <div className="text-center mt-6">
+          <Link
+            href="/"
+            className="text-white/80 hover:text-white text-sm transition"
+          >
+            ← Back to BachatList
+          </Link>
         </div>
       </div>
     </div>
