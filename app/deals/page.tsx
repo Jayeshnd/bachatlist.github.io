@@ -8,6 +8,7 @@ async function getDealsData(search: string, category: string) {
       prisma.deal.findMany({
         where: {
           status: "PUBLISHED",
+          // Include all deals (both regular and loot deals)
           ...(search && {
             OR: [
               { title: { contains: search } },
@@ -148,22 +149,6 @@ export default async function DealsPage({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2">
-              <span className="text-3xl">💰</span>
-              <span className="text-2xl font-bold text-gray-900">BachatList</span>
-            </Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="/deals" className="text-primary font-medium">All Deals</Link>
-              <Link href="/categories" className="text-gray-600 hover:text-primary">Categories</Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Title */}
         <div className="mb-8">
@@ -253,13 +238,6 @@ export default async function DealsPage({
           </div>
         )}
       </div>
-
-      {/* Footer */}
-      <footer className="bg-white border-t mt-12 py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center text-gray-600">
-          <p>© {new Date().getFullYear()} BachatList. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   );
 }

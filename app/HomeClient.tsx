@@ -324,7 +324,7 @@ export default function HomeClient({ featuredDeals, categories, latestDeals, ban
             <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
               <span className="text-red-500">🔥</span> Hot Deals
             </h2>
-            <Link href="/loot" className="text-primary-600 font-medium hover:underline text-sm flex items-center gap-1">
+            <Link href="/deals" className="text-primary-600 font-medium hover:underline text-sm flex items-center gap-1">
               View All <span>→</span>
             </Link>
           </div>

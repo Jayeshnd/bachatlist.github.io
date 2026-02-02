@@ -1,0 +1,16 @@
+{
+  "name": "BachatList",
+  "short_name": "BachatList",
+  "description": "Find the best deals and save more on every purchase",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

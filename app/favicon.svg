@@ -1,11 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs>
-    <linearGradient id="shieldGradient" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#3B82F6"/>
-      <stop offset="1" stop-color="#1D4ED8"/>
-    </linearGradient>
-  </defs>
-  <path d="M32 4L56 14V30C56 46 44 58 32 60C20 58 8 46 8 30V14L32 4Z" fill="url(#shieldGradient)"/>
-  <path d="M32 10L50 17V27C50 40 41 51 32 53C23 51 14 40 14 27V17L32 10Z" fill="white"/>
-  <text x="32" y="38" text-anchor="middle" font-size="20" font-weight="bold" fill="#1D4ED8" font-family="Arial, sans-serif">B</text>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer green rectangle border -->
+  <rect x="4" y="4" width="56" height="56" rx="8" stroke="#16a34a" stroke-width="4" fill="#f0fdf4"/>
+  <!-- Inner green solid rectangle -->
+  <rect x="10" y="10" width="44" height="44" rx="6" fill="#22c55e"/>
+  <!-- Dollar/Rupee symbol -->
+  <text x="32" y="42" text-anchor="middle" font-size="28" font-weight="bold" fill="white" font-family="sans-serif">₹</text>
+  <!-- Checkmark badge -->
+  <circle cx="50" cy="50" r="10" fill="#22c55e" stroke="white" stroke-width="2"/>
+  <path d="M46 50L48.5 52.5L54 47" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

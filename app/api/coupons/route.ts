@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { serializeDecimal } from "@/lib/utils";
+
+// Cache key for ISR
+const CACHE_TAGS = ['coupons'];
 
 export async function GET() {
   try {
@@ -15,9 +17,26 @@ export async function GET() {
       orderBy: {
         createdAt: "desc",
       },
+      // Select only needed fields for better performance
+      select: {
+        id: true,
+        code: true,
+        description: true,
+        discountType: true,
+        discountValue: true,
+        expiryDate: true,
+        isActive: true,
+        minPurchase: true,
+        maxDiscount: true,
+        usageLimit: true,
+        usageCount: true,
+        affiliateUrl: true,
+        storeName: true,
+        storeLogo: true,
+      }
     });
 
-    // Serialize the data to handle Decimal types and include all fields
+    // Serialize the data to handle Decimal types
     const serializedCoupons = couponCodes.map((coupon) => ({
       id: coupon.id,
       code: coupon.code,
@@ -30,18 +49,21 @@ export async function GET() {
       maxDiscount: coupon.maxDiscount ? parseFloat(coupon.maxDiscount.toString()) : null,
       usageLimit: coupon.usageLimit,
       usageCount: coupon.usageCount,
-      applicableCategories: coupon.applicableCategories,
-      applicableDeals: coupon.applicableDeals,
       affiliateUrl: coupon.affiliateUrl,
       storeName: coupon.storeName,
       storeLogo: coupon.storeLogo,
-      metaTitle: coupon.metaTitle,
-      metaDescription: coupon.metaDescription,
-      createdAt: coupon.createdAt.toISOString(),
-      updatedAt: coupon.updatedAt.toISOString(),
     }));
 
-    return NextResponse.json(serializedCoupons);
+    // Return with caching headers
+    return new NextResponse(JSON.stringify(serializedCoupons), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        'CDN-Cache-Control': 'public, s-maxage=60',
+        'Vercel-Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
+    });
   } catch (error) {
     console.error("Error fetching coupons:", error);
     return NextResponse.json(

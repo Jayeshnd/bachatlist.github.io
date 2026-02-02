@@ -1,0 +1,12 @@
+# BachatList Robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://bachatlist.com/sitemap.xml
+
+# Disallow admin paths
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login
+Disallow: /auth

@@ -6,7 +6,7 @@ import Logo from "./Logo";
 
 const navItems = [
   { name: "Deals", href: "/deals" },
-  { name: "Loot", href: "/loot", badge: "HOT" },
+  { name: "Categories", href: "/categories" },
   { name: "Coupon", href: "/coupon" },
   { name: "Blog", href: "/blog" },
   { name: "Features", href: "/features" },
@@ -17,42 +17,43 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
+    <header className="bg-white shadow-sm sticky top-0 z-50" role="banner">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
-          <Logo size="md" />
+          <Link href="/" aria-label="BachatList Home">
+            <Logo size="md" />
+          </Link>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-5">
+          <nav className="hidden md:flex items-center gap-5" role="navigation" aria-label="Main navigation">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`relative text-gray-600 hover:text-primary font-medium transition ${
-                  item.badge === "HOT" ? "text-red-500" : ""
-                }`}
+                className="text-gray-600 hover:text-primary font-medium transition duration-200"
+                aria-label={item.name}
               >
                 {item.name}
-                {item.badge && (
-                  <span className="absolute -top-5 -right-5 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded font-bold animate-pulse">
-                    {item.badge}
-                  </span>
-                )}
               </Link>
             ))}
           </nav>
           
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/login" className="text-gray-600 hover:text-primary font-medium">
+            <Link 
+              href="/login" 
+              className="text-gray-600 hover:text-primary font-medium transition duration-200"
+              aria-label="Login to your account"
+            >
               Login
             </Link>
           </div>
           
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-gray-600 hover:text-primary"
+            className="md:hidden p-2 text-gray-600 hover:text-primary transition duration-200"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenuOpen}
           >
             <svg
               className="w-6 h-6"
@@ -81,40 +82,26 @@ export default function Header() {
         
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <nav className="md:hidden mt-4 pb-4 border-t pt-4 space-y-3">
+          <nav className="md:hidden mt-4 pb-4 border-t pt-4 space-y-3" role="navigation" aria-label="Mobile navigation">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`block py-2 text-gray-600 hover:text-primary font-medium ${
-                  item.badge === "HOT" ? "text-red-500" : ""
-                }`}
+                className="block py-2 text-gray-600 hover:text-primary font-medium transition duration-200"
                 onClick={() => setMobileMenuOpen(false)}
+                aria-label={item.name}
               >
                 {item.name}
-                {item.badge && (
-                  <span className="ml-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded font-bold">
-                    {item.badge}
-                  </span>
-                )}
               </Link>
             ))}
-            <div className="pt-4 space-y-3">
-              <Link
-                href="/login"
-                className="block text-gray-600 hover:text-primary font-medium"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Login
-              </Link>
-              <Link
-                href="/deals/create"
-                className="block bg-gradient-to-r from-primary to-primary/90 text-white px-5 py-2 rounded-lg font-medium text-center"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Add Deal
-              </Link>
-            </div>
+            <Link
+              href="/login"
+              className="block py-2 text-gray-600 hover:text-primary font-medium transition duration-200"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-label="Login to your account"
+            >
+              Login
+            </Link>
           </nav>
         )}
       </div>

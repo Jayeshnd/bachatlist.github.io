@@ -12,7 +12,9 @@ export default function AdminLayout({
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
         {/* Logo */}
         <div className="p-6 border-b border-gray-100">
+          <Link href="/">
             <Logo size="md" showTagline={true} />
+          </Link>
         </div>
 
         {/* Navigation */}
@@ -54,15 +56,7 @@ export default function AdminLayout({
                 <span className="font-medium">Categories</span>
               </Link>
             </li>
-            <li>
-              <Link
-                href="/admin/pages"
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 transition text-gray-700 hover:text-green-700"
-              >
-                <span className="text-xl">📄</span>
-                <span className="font-medium">Pages</span>
-              </Link>
-            </li>
+            {/* Pages - Hidden for now */}
             <li>
               <Link
                 href="/admin/blog"

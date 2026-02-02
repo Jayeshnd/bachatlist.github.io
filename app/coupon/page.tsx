@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 
 interface CouponCode {
   id: string;
@@ -103,11 +104,16 @@ function CouponRevealModal({
         {/* Store Name and Logo */}
         <div className="p-3 text-center">
           {coupon.storeLogo ? (
-            <img 
-              src={coupon.storeLogo} 
-              alt={`${storeName} logo`}
-              className="h-10 w-auto mx-auto mb-1"
-            />
+            <div className="relative w-16 h-10 mx-auto mb-1">
+              <Image 
+                src={coupon.storeLogo} 
+                alt={`${storeName} logo`}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-contain"
+                priority
+              />
+            </div>
           ) : (
             <div className="h-10 w-10 mx-auto mb-1 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
               {storeName.charAt(0)}
@@ -280,11 +286,15 @@ function EnhancedCouponCard({
             data-offer-key="storeImage"
             data-offer-value={coupon.storeLogo}
           >
-            <span className="store-logo-cta inline-block">
-              <img 
+            <span className="store-logo-cta inline-block relative w-12 h-8">
+              <Image 
                 src={coupon.storeLogo} 
                 alt={`${storeName} coupons`}
-                className="h-8 w-auto object-contain"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-contain"
+                loading="lazy"
+                decoding="async"
               />
             </span>
           </div>
@@ -351,7 +361,7 @@ function EnhancedCouponCard({
           className={`offer-get-code-link coupon-btn w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-300 ${
             copiedId === coupon.id
               ? "bg-green-600 text-white"
-              : "bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 hover:shadow-lg"
+              : "bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 hover:shadow-lg transform hover:-translate-y-0.5"
           }`}
           onClick={() => onReveal(coupon)}
           data-offer-key="offerGetCodeBtnText"
@@ -803,16 +813,6 @@ export default function CouponPage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center">
-            <p className="text-gray-400">© 2024 BachatList. All rights reserved.</p>
-            <p className="text-gray-500 text-sm mt-2">Find the best deals and coupons in India</p>
-          </div>
-        </div>
-      </footer>
 
       {/* Coupon Reveal Modal */}
       <CouponRevealModal
