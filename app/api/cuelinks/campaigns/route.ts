@@ -123,12 +123,12 @@ export async function GET(request: Request) {
         title: campaign.title,
         name: campaign.title, // For compatibility
         description: campaign.description,
-        imageUrl: campaign.image_url || "",
+        image_url: campaign.image_url || "", // snake_case for frontend compatibility
         categories: categoriesArray,
         url: campaign.affiliate_url || campaign.url, // Use tracked URL
-        affiliateUrl: campaign.affiliate_url,
-        couponCode: campaign.coupon_code || null,
-        storeName: campaign.campaign,
+        affiliate_url: campaign.affiliate_url,
+        coupon_code: campaign.coupon_code || null,
+        campaign: campaign.campaign,
         merchantName: campaign.campaign,
         endDate: campaign.end_date,
       };

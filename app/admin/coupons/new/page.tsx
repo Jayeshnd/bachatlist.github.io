@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 interface CuelinksCampaign {
-  id: number;
+  id: number | string;
   campaign: string;
   title: string;
   description: string;
   image_url?: string;
   coupon_code?: string;
+  url?: string;
+  affiliate_url?: string;
 }
 
 export default function NewCouponPage() {
@@ -46,25 +48,37 @@ export default function NewCouponPage() {
   // Handle Cuelinks campaign selection
   const handleCampaignSelect = (campaign: CuelinksCampaign) => {
     setSelectedCampaign(campaign);
+    console.log("Selected campaign:", campaign);
     // Auto-fill form fields
     const form = document.querySelector('form') as HTMLFormElement;
     if (form) {
+      console.log("Form found, populating fields...");
       const codeInput = form.elements.namedItem('code') as HTMLInputElement;
       const descInput = form.elements.namedItem('description') as HTMLTextAreaElement;
       const storeNameInput = form.elements.namedItem('storeName') as HTMLInputElement;
       const storeLogoInput = form.elements.namedItem('storeLogo') as HTMLInputElement;
+      const affiliateUrlInput = form.elements.namedItem('affiliateUrl') as HTMLInputElement;
       
       if (codeInput && campaign.coupon_code) {
         codeInput.value = campaign.coupon_code;
+        console.log("Set code:", campaign.coupon_code);
       }
       if (descInput) {
-        descInput.value = campaign.description || "";
+        const descValue = campaign.title || campaign.description || "";
+        descInput.value = descValue;
+        console.log("Set description:", descValue);
       }
       if (storeNameInput) {
         storeNameInput.value = campaign.campaign;
+        console.log("Set storeName:", campaign.campaign);
       }
       if (storeLogoInput && campaign.image_url) {
         storeLogoInput.value = campaign.image_url;
+        console.log("Set storeLogo:", campaign.image_url);
+      }
+      if (affiliateUrlInput && campaign.affiliate_url) {
+        affiliateUrlInput.value = campaign.affiliate_url;
+        console.log("Set affiliateUrl:", campaign.affiliate_url);
       }
     }
   };
@@ -76,6 +90,13 @@ export default function NewCouponPage() {
 
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
+    
+    console.log("Form submission data:", JSON.stringify(data, null, 2));
+    
+    // Debug: Check individual fields
+    console.log("storeName:", data.storeName);
+    console.log("storeLogo:", data.storeLogo);
+    console.log("affiliateUrl:", data.affiliateUrl);
 
     try {
       const response = await fetch("/api/admin/coupons", {
@@ -204,6 +225,22 @@ export default function NewCouponPage() {
                 placeholder="Describe this coupon..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               />
+            </div>
+
+            {/* Affiliate URL */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Affiliate URL
+              </label>
+              <input
+                type="url"
+                name="affiliateUrl"
+                placeholder="https://..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Store name will be auto-extracted from URL if not provided
+              </p>
             </div>
 
             {/* Store Name */}

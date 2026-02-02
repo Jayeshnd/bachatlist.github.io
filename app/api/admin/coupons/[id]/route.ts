@@ -45,6 +45,27 @@ function serializeData(data: any): any {
   return data;
 }
 
+// Helper function to extract store name from affiliate URL
+function extractStoreNameFromUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const decodedUrl = decodeURIComponent(url);
+    const urlMatch = decodedUrl.match(/url=https?:\/\/([^/]+)/i);
+    if (urlMatch) {
+      const hostname = urlMatch[1].split('?')[0].split('/')[0];
+      return hostname.replace('www.', '').split('.').slice(0, -1).join(' ')
+        .split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+    const urlObj = new URL(decodedUrl.startsWith('http') ? decodedUrl : 'https://' + decodedUrl);
+    const hostname = urlObj.hostname.replace('www.', '');
+    const storeName = hostname.split('.').slice(0, -1).join(' ')
+      .split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    return storeName || "Store";
+  } catch {
+    return null;
+  }
+}
+
 // GET a single coupon
 export async function GET(
   request: NextRequest,
@@ -149,6 +170,16 @@ export async function PUT(
     }
     if (data.metaTitle !== undefined) updateData.metaTitle = data.metaTitle;
     if (data.metaDescription !== undefined) updateData.metaDescription = data.metaDescription;
+    
+    // Handle affiliate URL and store info
+    if (data.affiliateUrl !== undefined) updateData.affiliateUrl = data.affiliateUrl;
+    if (data.storeName !== undefined) updateData.storeName = data.storeName;
+    if (data.storeLogo !== undefined) updateData.storeLogo = data.storeLogo;
+    
+    // Auto-extract store name from affiliate URL if storeName is not provided
+    if (data.storeName === undefined && data.affiliateUrl) {
+      updateData.storeName = extractStoreNameFromUrl(data.affiliateUrl);
+    }
 
     const coupon = await prisma.couponCode.update({
       where: { id },

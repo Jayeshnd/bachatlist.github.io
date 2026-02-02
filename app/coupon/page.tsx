@@ -30,6 +30,164 @@ interface Category {
   icon: string;
 }
 
+// Coupon Reveal Modal Component
+function CouponRevealModal({
+  coupon,
+  isOpen,
+  onClose,
+  onCopy,
+  copiedId
+}: {
+  coupon: CouponCode | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onCopy: (code: string, id: string) => void;
+  copiedId: string | null;
+}) {
+  const [isRevealed, setIsRevealed] = useState(false);
+  const [revealedCode, setRevealedCode] = useState("");
+
+  if (!isOpen || !coupon) return null;
+
+  // Extract store name from affiliate URL if storeName is null
+  const getStoreNameFromUrl = (url: string | null | undefined): string => {
+    if (!url) return "Store";
+    try {
+      const decodedUrl = decodeURIComponent(url);
+      const urlMatch = decodedUrl.match(/url=https?:\/\/[^/]+\/([^/?#]+)/i);
+      if (urlMatch) {
+        const domain = urlMatch[1];
+        return domain.charAt(0).toUpperCase() + domain.slice(1).replace(/-/g, " ");
+      }
+      const urlObj = new URL(decodedUrl.startsWith('http') ? decodedUrl : 'https://' + decodedUrl);
+      const hostname = urlObj.hostname.replace('www.', '');
+      return hostname.charAt(0).toUpperCase() + hostname.slice(1).replace(/\.[a-z]+$/i, '').replace(/-/g, ' ');
+    } catch {
+      return "Store";
+    }
+  };
+
+  // Get store name - from coupon or extract from URL
+  const storeName = coupon.storeName || getStoreNameFromUrl(coupon.affiliateUrl);
+
+  const handleReveal = () => {
+    setIsRevealed(true);
+    setRevealedCode(coupon.code);
+  };
+
+  const handleCopy = () => {
+    onCopy(coupon.code, coupon.id);
+  };
+
+  const handleClose = () => {
+    setIsRevealed(false);
+    setRevealedCode("");
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black/60"
+        onClick={handleClose}
+      />
+      
+      {/* Modal Content - couponzguru style */}
+      <div className="relative bg-white rounded-lg shadow-2xl max-w-sm w-full overflow-hidden">
+        {/* Header */}
+        <div className="bg-orange-500 p-3 text-center">
+          <span className="text-white font-bold text-sm">GET THIS COUPON</span>
+        </div>
+
+        {/* Store Name and Logo */}
+        <div className="p-3 text-center">
+          {coupon.storeLogo ? (
+            <img 
+              src={coupon.storeLogo} 
+              alt={`${storeName} logo`}
+              className="h-10 w-auto mx-auto mb-1"
+            />
+          ) : (
+            <div className="h-10 w-10 mx-auto mb-1 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+              {storeName.charAt(0)}
+            </div>
+          )}
+          <p className="font-semibold text-gray-800 text-sm">{storeName}</p>
+        </div>
+
+        {/* Discount & Description - Smaller */}
+        <div className="px-3 pb-2 text-center">
+          <span className="text-xl font-bold text-orange-500">
+            {coupon.discountType === "PERCENTAGE" ? `${coupon.discountValue}% OFF` : `₹${coupon.discountValue} OFF`}
+          </span>
+          {coupon.description && (
+            <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+              {coupon.description.replace(/<[^>]*>/g, " ").trim().substring(0, 80)}...
+            </p>
+          )}
+        </div>
+
+        {/* Coupon Code Section */}
+        <div className="p-4">
+          {!isRevealed ? (
+            <button
+              onClick={handleReveal}
+              className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white rounded font-bold transition-colors"
+            >
+              Show Coupon
+            </button>
+          ) : (
+            <div className="space-y-3">
+              <div className="border-2 border-dashed border-orange-500 rounded p-3 text-center bg-orange-50">
+                <span className="font-mono text-xl font-bold text-gray-800 tracking-wider">
+                  {revealedCode}
+                </span>
+              </div>
+              {coupon.affiliateUrl ? (
+                <a
+                  href={coupon.affiliateUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3 rounded font-bold transition-colors flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white"
+                >
+                  COPY CODE & GET DEAL ↗
+                </a>
+              ) : (
+                <button
+                  onClick={handleCopy}
+                  className={`w-full py-3 rounded font-bold transition-colors flex items-center justify-center gap-2 ${
+                    copiedId === coupon.id
+                      ? "bg-green-500 text-white"
+                      : "bg-orange-500 hover:bg-orange-600 text-white"
+                  }`}
+                >
+                  {copiedId === coupon.id ? "✓ COPIED!" : "COPY CODE & GET DEAL"}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Close button */}
+        <button 
+          onClick={handleClose}
+          className="absolute top-2 right-2 text-white hover:text-gray-200"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Footer */}
+        <div className="bg-gray-100 p-2 text-center">
+          <span className="text-xs text-gray-500">Powered by BachatList</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const CATEGORIES: Category[] = [
   { name: "All", icon: "🏷️" },
   { name: "Amazon", icon: "📦" },
@@ -63,66 +221,81 @@ function CouponSkeleton() {
 function EnhancedCouponCard({ 
   coupon, 
   onCopy, 
-  copiedId 
+  copiedId,
+  onReveal
 }: { 
   coupon: CouponCode; 
   onCopy: (code: string, id: string) => void;
   copiedId: string | null;
+  onReveal: (coupon: CouponCode) => void;
 }) {
   const stripHtml = useCallback((html: string | null): string => {
     if (!html) return "";
     return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
   }, []);
 
-  // Determine if this is a deal or coupon based on affiliate URL
-  const isDeal = !!coupon.affiliateUrl;
-  
-  // Generate cashback info based on store name
-  const getCashbackInfo = () => {
-    const storeLower = (coupon.storeName || "").toLowerCase();
-    if (storeLower.includes("amazon")) return { rate: "3.2%", type: "VOUCHER REWARDS" };
-    if (storeLower.includes("myntra")) return { rate: "6.7%", type: "CASHBACK" };
-    if (storeLower.includes("ajio")) return { rate: "10.2%", type: "CASHBACK" };
-    if (storeLower.includes("flipkart")) return { rate: "4.5%", type: "CASHBACK" };
-    if (storeLower.includes("snapdeal")) return { rate: "8%", type: "CASHBACK" };
-    return { rate: "5%", type: "CASHBACK" };
+  // Extract store name from affiliate URL if storeName is null
+  const getStoreNameFromUrl = (url: string | null | undefined): string => {
+    if (!url) return "Store";
+    try {
+      // Handle URLs that might be wrapped in redirect services
+      const decodedUrl = decodeURIComponent(url);
+      const urlMatch = decodedUrl.match(/url=https?:\/\/[^/]+\/([^/?#]+)/i);
+      if (urlMatch) {
+        const domain = urlMatch[1];
+        // Format the store name
+        return domain.charAt(0).toUpperCase() + domain.slice(1).replace(/-/g, " ");
+      }
+      const urlObj = new URL(decodedUrl.startsWith('http') ? decodedUrl : 'https://' + decodedUrl);
+      const hostname = urlObj.hostname.replace('www.', '');
+      return hostname.charAt(0).toUpperCase() + hostname.slice(1).replace(/\.[a-z]+$/i, '').replace(/-/g, ' ');
+    } catch {
+      return "Store";
+    }
   };
 
-  const cashbackInfo = getCashbackInfo();
-  const cashbackText = `Upto ${cashbackInfo.rate} ${cashbackInfo.type}`;
-
+  // Get store name - from coupon or extract from URL
+  const storeName = coupon.storeName || getStoreNameFromUrl(coupon.affiliateUrl);
+  
   return (
     <div 
       className="offer-card-wrapper bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 min-w-[280px] max-w-[320px] flex-shrink-0"
       data-section="Offers"
       data-tab="coupons-slider"
     >
-      {/* Hidden data attributes for tracking (matching the HTML example) */}
-      <span style={{ display: 'none' }} data-offer-key="couponType" data-offer-value={isDeal ? "deal" : "coupon"}></span>
+      {/* Hidden data attributes for tracking */}
+      <span style={{ display: 'none' }} data-offer-key="couponType" data-offer-value="coupon"></span>
       <span style={{ display: 'none' }} data-offer-key="validationType" data-offer-value=""></span>
-      <span style={{ display: 'none' }} data-offer-key="storeName" data-offer-value={coupon.storeName || ""}></span>
+      <span style={{ display: 'none' }} data-offer-key="storeName" data-offer-value={storeName}></span>
       <span style={{ display: 'none' }} data-offer-key="id" data-offer-value={coupon.id}></span>
-      <span style={{ display: 'none' }} data-offer-key="storeId" data-offer-value={(coupon.storeName || "").toLowerCase()}></span>
-      <span style={{ display: 'none' }} data-offer-key="cashbackType" data-offer-value={cashbackInfo.type}></span>
-      <span style={{ display: 'none' }} data-offer-key="voted" data-offer-value="NULL"></span>
-      <span style={{ display: 'none' }} data-offer-key="isCashback" data-offer-value="1"></span>
+      <span style={{ display: 'none' }} data-offer-key="storeId" data-offer-value={storeName.toLowerCase()}></span>
       <span style={{ display: 'none' }} data-offer-key="offerTitle" data-offer-value={stripHtml(coupon.description) || coupon.code}></span>
 
       <div className="upper-block p-4">
         {/* Store Logo Section */}
-        {coupon.storeLogo && (
+        {coupon.storeLogo ? (
           <div 
             className="img-wrapper offer-store-logo mb-3" 
-            data-store-name={coupon.storeName || ""}
+            data-store-name={storeName}
             data-offer-key="storeImage"
             data-offer-value={coupon.storeLogo}
           >
             <span className="store-logo-cta inline-block">
               <img 
                 src={coupon.storeLogo} 
-                alt={`${coupon.storeName || "Store"} coupons`}
+                alt={`${storeName} coupons`}
                 className="h-8 w-auto object-contain"
               />
+            </span>
+          </div>
+        ) : (
+          <div 
+            className="img-wrapper offer-store-logo mb-3" 
+            data-store-name={storeName}
+            data-offer-key="storeImage"
+          >
+            <span className="store-logo-cta inline-block">
+              <span className="text-2xl">🏷️</span>
             </span>
           </div>
         )}
@@ -139,22 +312,6 @@ function EnhancedCouponCard({
         {/* Discount Badge */}
         <div className="inline-block px-4 py-1.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full text-lg font-bold shadow-lg mb-3">
           {coupon.discountType === "PERCENTAGE" ? `${coupon.discountValue}% OFF` : `₹${coupon.discountValue} OFF`}
-        </div>
-
-        {/* Cashback Details (matching the HTML example structure) */}
-        <div 
-          className="cb-details flex items-center gap-2 mb-3 p-2 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg"
-          data-offer-key="cashbackText"
-          data-offer-value={cashbackText}
-        >
-          <img 
-            className="cd-cb-icon w-6 h-6" 
-            src="https://d3mqyttn50wslf.cloudfront.net/modules/mweb/assets/images/svg/cd-cb-icon-new.svg" 
-            alt="Cashback" 
-          />
-          <div className="cashback-text text-sm text-gray-700">
-            <span className="cashback-rate font-medium">{cashbackText}</span>
-          </div>
         </div>
 
         {/* Terms */}
@@ -183,53 +340,33 @@ function EnhancedCouponCard({
         )}
       </div>
 
-      {/* CTA Button Section (matching HTML example) */}
-      {isDeal ? (
-        <div className="get-deal-btn-container p-4 pt-0">
-          {coupon.affiliateUrl ? (
-            <a
-              href={coupon.affiliateUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="get-cd-deal get-deal-btn block w-full py-3 px-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold text-center hover:from-green-600 hover:to-green-700 transition-all duration-300 hover:shadow-lg"
-              data-id={coupon.id}
-            >
-              Get Deal
-            </a>
-          ) : (
-            <button
-              className="get-cd-deal get-deal-btn w-full py-3 px-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300 hover:shadow-lg"
-              data-id={coupon.id}
-              onClick={() => onCopy(coupon.code, coupon.id)}
-            >
-              Get Deal
-            </button>
-          )}
-        </div>
-      ) : (
-        <div 
-          className="cta-button-wrapper get-offer-code p-4 pt-0"
-          data-offer-key="couponCode"
-          data-offer-value={coupon.code}
-          data-gtm-offer-type="coupon"
+      {/* CTA Button Section */}
+      <div 
+        className="cta-button-wrapper get-offer-code p-4 pt-0"
+        data-offer-key="couponCode"
+        data-offer-value={coupon.code}
+        data-gtm-offer-type="coupon"
+      >
+        <button
+          className={`offer-get-code-link coupon-btn w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-300 ${
+            copiedId === coupon.id
+              ? "bg-green-600 text-white"
+              : "bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 hover:shadow-lg"
+          }`}
+          onClick={() => onReveal(coupon)}
+          data-offer-key="offerGetCodeBtnText"
+          data-offer-value="& GET CODE"
+          data-id={coupon.id}
         >
-          <button
-            className={`offer-get-code-link coupon-btn w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-300 ${
-              copiedId === coupon.id
-                ? "bg-green-600 text-white"
-                : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:shadow-lg"
-            }`}
-            onClick={() => onCopy(coupon.code, coupon.id)}
-            data-offer-key="offerGetCodeBtnText"
-            data-offer-value="& GET CODE"
-            data-id={coupon.id}
-          >
-            <div className="p1-code font-mono inline">{coupon.code}</div>
-            <div className="p1"></div>
-            <span className="ml-2">{copiedId === coupon.id ? "✓ Copied!" : "Show Coupon"}</span>
-          </button>
-        </div>
-      )}
+          <div className="p1-code font-mono inline flex items-center justify-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span>{copiedId === coupon.id ? "✓ Copied!" : "Show Coupon"}</span>
+          </div>
+        </button>
+      </div>
 
       {/* Footer */}
       <div className="px-4 py-2 bg-gray-50 border-t border-gray-100">
@@ -248,6 +385,13 @@ export default function CouponPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"slider" | "grid" | "list">("slider");
+  const [revealModal, setRevealModal] = useState<{
+    isOpen: boolean;
+    coupon: CouponCode | null;
+  }>({
+    isOpen: false,
+    coupon: null,
+  });
 
   // Strip HTML tags from description
   const stripHtml = useCallback((html: string | null): string => {
@@ -285,9 +429,8 @@ export default function CouponPage() {
     return matchesCategory && matchesSearch;
   });
 
-  // Separate coupons and deals
-  const couponCards = filteredCoupons.filter(c => !c.affiliateUrl);
-  const dealCards = filteredCoupons.filter(c => c.affiliateUrl);
+  // Show all coupons together (both with and without affiliate URL)
+  const allCouponCards = filteredCoupons;
 
   useEffect(() => {
     async function fetchCoupons() {
@@ -316,6 +459,14 @@ export default function CouponPage() {
   const handleCategoryClick = (category: string) => {
     setActiveCategory(category);
     setSearchTerm("");
+  };
+
+  const handleRevealCoupon = (coupon: CouponCode) => {
+    setRevealModal({ isOpen: true, coupon });
+  };
+
+  const handleCloseModal = () => {
+    setRevealModal({ isOpen: false, coupon: null });
   };
 
   // Slider navigation
@@ -487,16 +638,16 @@ export default function CouponPage() {
             {/* Slider View */}
             {viewMode === "slider" && (
               <div className="space-y-8">
-                {/* Coupon Cards Slider */}
-                {couponCards.length > 0 && (
+                {/* All Coupons Slider */}
+                {allCouponCards.length > 0 && (
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                        <span>🎫</span> Coupon Codes
+                        <span>🎫</span> All Coupons
                       </h2>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => scrollContainer('left', 'coupon-slider')}
+                          onClick={() => scrollContainer('left', 'all-coupons-slider')}
                           className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -504,7 +655,7 @@ export default function CouponPage() {
                           </svg>
                         </button>
                         <button
-                          onClick={() => scrollContainer('right', 'coupon-slider')}
+                          onClick={() => scrollContainer('right', 'all-coupons-slider')}
                           className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -513,53 +664,14 @@ export default function CouponPage() {
                         </button>
                       </div>
                     </div>
-                    <ul className="generic-cd-slider-ul flex gap-4 overflow-x-auto pb-4 scroll-smooth" id="coupon-slider">
-                      {couponCards.map((coupon) => (
+                    <ul className="generic-cd-slider-ul flex gap-4 overflow-x-auto pb-4 scroll-smooth" id="all-coupons-slider">
+                      {allCouponCards.map((coupon) => (
                         <li key={coupon.id} className="generic-cd-slider-li flex-shrink-0">
                           <EnhancedCouponCard 
                             coupon={coupon} 
                             onCopy={copyToClipboard}
                             copiedId={copiedId}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Deals Slider */}
-                {dealCards.length > 0 && (
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                        <span>🔥</span> Hot Deals
-                      </h2>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => scrollContainer('left', 'deal-slider')}
-                          className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => scrollContainer('right', 'deal-slider')}
-                          className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                    <ul className="generic-cd-slider-ul flex gap-4 overflow-x-auto pb-4 scroll-smooth" id="deal-slider">
-                      {dealCards.map((coupon) => (
-                        <li key={coupon.id} className="generic-cd-slider-li flex-shrink-0">
-                          <EnhancedCouponCard 
-                            coupon={coupon} 
-                            onCopy={copyToClipboard}
-                            copiedId={copiedId}
+                            onReveal={handleRevealCoupon}
                           />
                         </li>
                       ))}
@@ -578,6 +690,7 @@ export default function CouponPage() {
                     coupon={coupon} 
                     onCopy={copyToClipboard}
                     copiedId={copiedId}
+                    onReveal={handleRevealCoupon}
                   />
                 ))}
               </div>
@@ -638,14 +751,14 @@ export default function CouponPage() {
                           <div className="flex items-center gap-3">
                             {!coupon.affiliateUrl ? (
                               <button
-                                onClick={() => copyToClipboard(coupon.code, coupon.id)}
-                                className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
-                                  copiedId === coupon.id
-                                    ? "bg-green-600 text-white"
-                                    : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700"
-                                }`}
+                                onClick={() => handleRevealCoupon(coupon)}
+                                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold text-sm hover:from-blue-600 hover:to-blue-700 transition-all flex items-center gap-2"
                               >
-                                {copiedId === coupon.id ? "✓ Copied!" : coupon.code}
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                Reveal Code
                               </button>
                             ) : (
                               <a
@@ -700,6 +813,15 @@ export default function CouponPage() {
           </div>
         </div>
       </footer>
+
+      {/* Coupon Reveal Modal */}
+      <CouponRevealModal
+        coupon={revealModal.coupon}
+        isOpen={revealModal.isOpen}
+        onClose={handleCloseModal}
+        onCopy={copyToClipboard}
+        copiedId={copiedId}
+      />
     </div>
   );
 }

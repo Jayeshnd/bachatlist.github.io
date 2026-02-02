@@ -9,6 +9,35 @@ export default function EditCouponForm({ coupon }: { coupon: any }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Helper to extract store name from URL
+  const extractStoreNameFromUrl = (url: string): string => {
+    if (!url) return "";
+    try {
+      const decodedUrl = decodeURIComponent(url);
+      const urlMatch = decodedUrl.match(/url=https?:\/\/([^/]+)/i);
+      if (urlMatch) {
+        const hostname = urlMatch[1].split('?')[0].split('/')[0];
+        return hostname.replace('www.', '').split('.').slice(0, -1).join(' ')
+          .split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+      }
+      const urlObj = new URL(decodedUrl.startsWith('http') ? decodedUrl : 'https://' + decodedUrl);
+      const hostname = urlObj.hostname.replace('www.', '');
+      return hostname.split('.').slice(0, -1).join(' ')
+        .split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    } catch {
+      return "";
+    }
+  };
+
+  // Handle auto-extract store name from URL
+  const handleAffiliateUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    const storeNameInput = document.querySelector('input[name="storeName"]') as HTMLInputElement;
+    if (storeNameInput && !storeNameInput.value) {
+      storeNameInput.value = extractStoreNameFromUrl(url);
+    }
+  };
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -78,6 +107,24 @@ export default function EditCouponForm({ coupon }: { coupon: any }) {
             placeholder="Describe this coupon..."
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
           />
+        </div>
+
+        {/* Affiliate URL */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Affiliate URL
+          </label>
+          <input
+            type="url"
+            name="affiliateUrl"
+            defaultValue={coupon.affiliateUrl || ""}
+            placeholder="https://..."
+            onChange={handleAffiliateUrlChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Store name will be auto-extracted from URL if not provided
+          </p>
         </div>
 
         {/* Store Name */}
