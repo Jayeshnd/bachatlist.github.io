@@ -93,6 +93,13 @@ export default function RootLayout({
             }),
           }}
         />
+      </head>
+      <body>
+        <Providers>
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
+        </Providers>
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -102,18 +109,11 @@ export default function RootLayout({
                 s.type = "text/javascript";
                 s.async = true;
                 s.src = (document.location.protocol == "https:" ? "https://cdn0.cuelinks.com/js/" : "http://cdn0.cuelinks.com/js/") + "cuelinksv2.js";
-                document.getElementsByTagName("body")[0].appendChild(s);
+                document.body.appendChild(s);
               }());
             `,
           }}
         />
-      </head>
-      <body>
-        <Providers>
-          <LayoutWrapper>
-            {children}
-          </LayoutWrapper>
-        </Providers>
       </body>
     </html>
   );
