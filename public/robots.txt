@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://bachatlist.com/sitemap.xml
+Sitemap: https://www.bachatlist.com/sitemap.xml
 
 # Disallow admin paths
 Disallow: /admin/

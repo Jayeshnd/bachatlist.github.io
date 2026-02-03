@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     images: ["/images/og-image.jpg"],
   },
   alternates: {
-    canonical: "https://bachatlist.com",
+    canonical: "https://www.bachatlist.com",
   },
   icons: {
     icon: "/favicon.svg",
@@ -81,7 +81,7 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               name: "BachatList",
-              url: "https://bachatlist.com",
+              url: "https://www.bachatlist.com",
               potentialAction: {
                 "@type": "SearchAction",
                 target: {
