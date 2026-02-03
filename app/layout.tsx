@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     description: "Find the best deals and save more on every purchase. Discover coupons, discounts, and exclusive offers.",
     images: [
       {
-        url: "/images/og-image.jpg",
+        url: "/images/og-image.svg",
         width: 1200,
         height: 630,
         alt: "BachatList - Best Deals & Smart Shopping",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     creator: "@bachatlist",
     title: "BachatList - Best Deals & Smart Shopping",
     description: "Find the best deals and save more on every purchase.",
-    images: ["/images/og-image.jpg"],
+    images: ["/images/og-image.svg"],
   },
   alternates: {
     canonical: "https://www.bachatlist.com",
