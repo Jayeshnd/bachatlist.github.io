@@ -2,15 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import Link from "next/link";
 
 interface Banner {
   id: string;
   imageUrl: string;
   title?: string;
   subtitle?: string;
-  ctaText?: string;
-  ctaLink?: string;
+  linkText?: string;
+  link?: string;
   position: number;
 }
 
@@ -52,53 +51,91 @@ export function BannerSlider({ banners, autoPlay = true, autoPlayInterval = 5000
   if (sortedBanners.length === 0) return null;
 
   return (
-    <div className="relative w-full h-[200px] md:h-[300px] lg:h-[400px] overflow-hidden rounded-2xl bg-gray-100">
+    <div className="relative w-full aspect-[16/9] md:aspect-[21/9] lg:aspect-[16/7] overflow-hidden rounded-2xl bg-gray-100">
       <div
-        className="absolute inset-0 flex transition-transform duration-500 ease-in-out"
+        className="absolute inset-0 flex transition-transform duration-500 ease-in-out h-full"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
         {sortedBanners.map((banner) => (
           <div key={banner.id} className="flex-shrink-0 w-full h-full relative">
-            {banner.imageUrl ? (
-              <Image
-                src={banner.imageUrl}
-                alt={banner.title || "Banner"}
-                fill
-                className="object-cover"
-                priority={currentIndex === sortedBanners.indexOf(banner)}
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-green-400 to-emerald-500" />
-            )}
-            
-            {/* Overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-900/60 via-gray-900/20 to-transparent" />
+            {banner.link ? (
+              <a href={banner.link} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                {banner.imageUrl ? (
+                  <Image
+                    src={banner.imageUrl}
+                    alt={banner.title || "Banner"}
+                    fill
+                    className="object-contain bg-gray-50"
+                    priority={currentIndex === sortedBanners.indexOf(banner)}
+                    sizes="100vw"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-green-400 to-emerald-500" />
+                )}
+                
+                {/* Overlay gradient */}
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-900/60 via-gray-900/20 to-transparent" />
 
-            {/* Content */}
-            <div className="absolute inset-0 flex items-center">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                <div className="max-w-xl">
-                  {banner.title && (
-                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">
-                      {banner.title}
-                    </h2>
-                  )}
-                  {banner.subtitle && (
-                    <p className="text-gray-200 text-sm md:text-base mb-4">
-                      {banner.subtitle}
-                    </p>
-                  )}
-                  {banner.ctaText && banner.ctaLink && (
-                    <Link
-                      href={banner.ctaLink}
-                      className="inline-block bg-white text-gray-900 px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-100 transition shadow-lg"
-                    >
-                      {banner.ctaText}
-                    </Link>
-                  )}
+                {/* Content */}
+                <div className="absolute inset-0 flex items-center">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                    <div className="max-w-xl">
+                      {banner.title && (
+                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">
+                          {banner.title}
+                        </h2>
+                      )}
+                      {banner.subtitle && (
+                        <p className="text-gray-200 text-sm md:text-base mb-4">
+                          {banner.subtitle}
+                        </p>
+                      )}
+                      {banner.linkText && (
+                        <span className="inline-block bg-white text-gray-900 px-6 py-2.5 rounded-lg font-semibold text-sm shadow-lg">
+                          {banner.linkText}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </a>
+            ) : (
+              <>
+                {banner.imageUrl ? (
+                  <Image
+                    src={banner.imageUrl}
+                    alt={banner.title || "Banner"}
+                    fill
+                    className="object-contain bg-gray-50"
+                    priority={currentIndex === sortedBanners.indexOf(banner)}
+                    sizes="100vw"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-green-400 to-emerald-500" />
+                )}
+                
+                {/* Overlay gradient */}
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-900/60 via-gray-900/20 to-transparent" />
+
+                {/* Content */}
+                <div className="absolute inset-0 flex items-center">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                    <div className="max-w-xl">
+                      {banner.title && (
+                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">
+                          {banner.title}
+                        </h2>
+                      )}
+                      {banner.subtitle && (
+                        <p className="text-gray-200 text-sm md:text-base mb-4">
+                          {banner.subtitle}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         ))}
       </div>
@@ -108,7 +145,7 @@ export function BannerSlider({ banners, autoPlay = true, autoPlayInterval = 5000
         <>
           <button
             onClick={goToPrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-900 hover:bg-white transition shadow-lg"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-900 hover:bg-white transition shadow-lg z-10"
             aria-label="Previous slide"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,7 +154,7 @@ export function BannerSlider({ banners, autoPlay = true, autoPlayInterval = 5000
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-900 hover:bg-white transition shadow-lg"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-900 hover:bg-white transition shadow-lg z-10"
             aria-label="Next slide"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,7 +166,7 @@ export function BannerSlider({ banners, autoPlay = true, autoPlayInterval = 5000
 
       {/* Dots indicator */}
       {sortedBanners.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
           {sortedBanners.map((_, index) => (
             <button
               key={index}

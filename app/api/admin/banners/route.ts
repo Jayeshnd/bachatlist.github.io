@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 // GET all banners
 export async function GET(request: NextRequest) {
@@ -67,6 +68,9 @@ export async function POST(request: NextRequest) {
         bannerType: data.bannerType || "slider",
       },
     });
+
+    // Revalidate the home page to reflect new banner
+    revalidatePath("/");
 
     return NextResponse.json(banner, { status: 201 });
   } catch (error) {

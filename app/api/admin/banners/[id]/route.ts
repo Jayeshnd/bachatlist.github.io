@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 // GET a single banner
 export async function GET(
@@ -77,6 +78,9 @@ export async function PUT(
       data: updateData,
     });
 
+    // Revalidate the home page to reflect banner changes
+    revalidatePath("/");
+
     return NextResponse.json(banner);
   } catch (error) {
     console.error("Failed to update banner:", error);
@@ -103,6 +107,9 @@ export async function DELETE(
     await prisma.banner.delete({
       where: { id },
     });
+
+    // Revalidate the home page to reflect banner deletion
+    revalidatePath("/");
 
     return NextResponse.json({ success: true });
   } catch (error) {
