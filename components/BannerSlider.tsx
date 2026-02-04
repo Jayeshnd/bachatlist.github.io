@@ -51,7 +51,7 @@ export function BannerSlider({ banners, autoPlay = true, autoPlayInterval = 5000
   if (sortedBanners.length === 0) return null;
 
   return (
-    <div className="relative w-full aspect-[16/9] md:aspect-[21/9] lg:aspect-[16/7] overflow-hidden rounded-2xl bg-gray-100">
+    <div className="relative w-full aspect-[16/6] md:aspect-[16/5] lg:aspect-[16/4] overflow-hidden rounded-xl bg-gray-100">
       <div
         className="absolute inset-0 flex transition-transform duration-500 ease-in-out h-full"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
