@@ -34,13 +34,13 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-gray-800 text-white py-8" role="contentinfo" suppressHydrationWarning>
+    <footer className="bg-gray-900 text-white py-8" role="contentinfo" suppressHydrationWarning>
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div>
             <Link href="/" aria-label="BachatList Home">
-              <Logo size="md" className="dark:text-white" />
+              <Logo size="lg" />
             </Link>
             <p className="text-gray-400 mt-4">Your one-stop destination for coupons and discounts.</p>
             <div className="flex space-x-4 mt-4">

@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Disable Turbopack due to internal errors
+  turbopack: false,
+  
   // Configure your domain for production
   assetPrefix: process.env.NODE_ENV === 'production' ? 'https://www.bachatlist.com' : undefined,
   
