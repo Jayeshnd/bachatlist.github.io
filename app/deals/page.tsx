@@ -1,6 +1,26 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatPrice, toNumber } from "@/lib/utils";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: {
+    default: "Deals & Discounts | BachatList",
+    template: "%s | BachatList Deals",
+  },
+  description: "Find the best deals and discounts on products across various categories. Save money on every purchase with BachatList.",
+  keywords: ["deals", "discounts", "coupons", "offers", "savings", "best prices"],
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: "Deals & Discounts | BachatList",
+    description: "Find the best deals and discounts on products across various categories. Save money on every purchase.",
+    type: "website",
+    siteName: "BachatList",
+  },
+};
 
 async function getDealsData(search: string, category: string) {
   try {

@@ -91,7 +91,7 @@ export function BannerSlider({ banners, autoPlay = true, autoPlayInterval = 5000
                         </p>
                       )}
                       {banner.linkText && (
-                        <span className="inline-block bg-white text-gray-900 px-6 py-2.5 rounded-lg font-semibold text-sm shadow-lg">
+                        <span className="inline-block bg-white text-gray-900 px-6 py-2.5 rounded-lg font-semibold text-sm">
                           {banner.linkText}
                         </span>
                       )}
@@ -145,7 +145,7 @@ export function BannerSlider({ banners, autoPlay = true, autoPlayInterval = 5000
         <>
           <button
             onClick={goToPrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-900 hover:bg-white transition shadow-lg z-10"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-900 hover:bg-white transition z-10"
             aria-label="Previous slide"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,7 +154,7 @@ export function BannerSlider({ banners, autoPlay = true, autoPlayInterval = 5000
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-900 hover:bg-white transition shadow-lg z-10"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-900 hover:bg-white transition z-10"
             aria-label="Next slide"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

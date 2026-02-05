@@ -2,6 +2,38 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { formatPrice, toNumber } from "@/lib/utils";
+import { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const category = await prisma.category.findUnique({
+    where: { slug },
+    include: { _count: { select: { deals: true } } },
+  });
+
+  if (!category) {
+    return {
+      title: "Category Not Found",
+      robots: { index: false },
+    };
+  }
+
+  return {
+    title: `${category.name} Deals & Discounts | BachatList`,
+    description: category.description || `Find the best ${category.name.toLowerCase()} deals and discounts. Save money on every purchase.`,
+    keywords: [category.name, "deals", "discounts", "coupons", "offers", "savings"],
+    robots: {
+      index: true,
+      follow: true,
+    },
+    openGraph: {
+      title: `${category.name} Deals & Discounts | BachatList`,
+      description: category.description || `Find the best ${category.name.toLowerCase()} deals and discounts.`,
+      type: "website",
+      siteName: "BachatList",
+    },
+  };
+}
 
 async function getCategoryData(slug: string) {
   try {

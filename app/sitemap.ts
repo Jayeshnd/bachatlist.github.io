@@ -1,74 +1,93 @@
 import { MetadataRoute } from "next";
+import { prisma } from "@/lib/prisma";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.bachatlist.com";
-  
-  return [
+  const currentDate = new Date();
+
+  // Fetch all active categories for dynamic sitemap entries
+  const categories = await prisma.category.findMany({
+    where: { isActive: true },
+    select: { slug: true, updatedAt: true },
+  });
+
+  // Static pages
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: "daily",
       priority: 1,
     },
     {
       url: `${baseUrl}/deals`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: "hourly",
       priority: 0.9,
     },
     {
       url: `${baseUrl}/categories`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: "daily",
       priority: 0.8,
     },
     {
       url: `${baseUrl}/coupon`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: "daily",
       priority: 0.7,
     },
     {
       url: `${baseUrl}/blog`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: "daily",
       priority: 0.6,
     },
     {
       url: `${baseUrl}/features`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: "weekly",
       priority: 0.5,
     },
     {
       url: `${baseUrl}/about`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: "weekly",
       priority: 0.5,
     },
     {
       url: `${baseUrl}/contact`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: "weekly",
       priority: 0.5,
     },
     {
       url: `${baseUrl}/privacy`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: "monthly",
       priority: 0.3,
     },
     {
       url: `${baseUrl}/terms`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: "monthly",
       priority: 0.3,
     },
     {
       url: `${baseUrl}/telegram`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: "weekly",
       priority: 0.5,
     },
   ];
+
+  // Dynamic category pages
+  const categoryPages: MetadataRoute.Sitemap = categories.map((category) => ({
+    url: `${baseUrl}/category/${category.slug}`,
+    lastModified: category.updatedAt || currentDate,
+    changeFrequency: "daily",
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...categoryPages];
 }

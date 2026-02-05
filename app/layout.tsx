@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://bachatlist.com",
+    url: "https://www.bachatlist.com",
     siteName: "BachatList",
     title: "BachatList - Best Deals & Smart Shopping",
     description: "Find the best deals and save more on every purchase. Discover coupons, discounts, and exclusive offers.",
