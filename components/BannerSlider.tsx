@@ -51,7 +51,7 @@ export function BannerSlider({ banners, autoPlay = true, autoPlayInterval = 5000
   if (sortedBanners.length === 0) return null;
 
   return (
-    <div className="relative w-full aspect-[16/6] md:aspect-[16/5] lg:aspect-[16/4] overflow-hidden rounded-xl bg-gray-100">
+    <div className="relative w-full aspect-[16/9] md:aspect-[16/7] lg:aspect-[16/5] max-h-[300px] md:max-h-[400px] lg:max-h-[450px] overflow-hidden rounded-xl bg-gray-100">
       <div
         className="absolute inset-0 flex transition-transform duration-500 ease-in-out h-full"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -59,13 +59,13 @@ export function BannerSlider({ banners, autoPlay = true, autoPlayInterval = 5000
         {sortedBanners.map((banner) => (
           <div key={banner.id} className="flex-shrink-0 w-full h-full relative">
             {banner.link ? (
-              <a href={banner.link} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+              <a href={banner.link} target="_blank" rel="noopener noreferrer" className="block w-full h-full cursor-pointer">
                 {banner.imageUrl ? (
                   <Image
                     src={banner.imageUrl}
                     alt={banner.title || "Banner"}
                     fill
-                    className="object-contain bg-gray-50"
+                    className="object-cover"
                     priority={currentIndex === sortedBanners.indexOf(banner)}
                     sizes="100vw"
                   />
@@ -106,7 +106,7 @@ export function BannerSlider({ banners, autoPlay = true, autoPlayInterval = 5000
                     src={banner.imageUrl}
                     alt={banner.title || "Banner"}
                     fill
-                    className="object-contain bg-gray-50"
+                    className="object-cover"
                     priority={currentIndex === sortedBanners.indexOf(banner)}
                     sizes="100vw"
                   />

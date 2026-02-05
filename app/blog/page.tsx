@@ -3,23 +3,23 @@ import { prisma } from "@/lib/prisma";
 
 // Default fallback categories
 const defaultCategories = [
-  { name: "All Posts", count: 24, active: true },
-  { name: "Amazon Deals", count: 8, active: false },
-  { name: "Flipkart Deals", count: 6, active: false },
-  { name: "Shopping Guide", count: 5, active: false },
-  { name: "Tech Reviews", count: 3, active: false },
-  { name: "Money Saving", count: 2, active: false },
+  { name: "All Posts", slug: "all", count: 24, active: true },
+  { name: "Amazon Deals", slug: "amazon-deals", count: 8, active: false },
+  { name: "Flipkart Deals", slug: "flipkart-deals", count: 6, active: false },
+  { name: "Shopping Guide", slug: "shopping-guide", count: 5, active: false },
+  { name: "Tech Reviews", slug: "tech-reviews", count: 3, active: false },
+  { name: "Money Saving", slug: "money-saving", count: 2, active: false },
 ];
 
-// Default fallback blog posts
+// Default fallback blog posts with ISO dates
 const defaultPosts = [
   {
     id: "1",
     title: "Top 10 Amazon Deals Under ₹500 You Can't Miss",
     excerpt: "Discover amazing budget-friendly deals on Amazon that won't break the bank. From gadgets to essentials, we've curated the best picks for you.",
     authorName: "Rahul Sharma",
-    publishedAt: new Date("2024-01-15").toISOString(),
-    readTime: "5 min read",
+    publishedAt: "2024-01-15T00:00:00.000Z",
+    readTime: "5",
     categoryName: "Amazon Deals",
     featuredImage: "https://m.media-amazon.com/images/I/81Qq3V3E3JL._AC_UY327_FMwebp_QL65_.jpg",
     isFeatured: true,
@@ -30,8 +30,8 @@ const defaultPosts = [
     title: "Flipkart Big Billion Days: Complete Shopping Guide",
     excerpt: "Everything you need to know about Flipkart's biggest sale event. Tips, tricks, and the best categories to shop from.",
     authorName: "Priya Singh",
-    publishedAt: new Date("2024-01-12").toISOString(),
-    readTime: "8 min read",
+    publishedAt: "2024-01-12T00:00:00.000Z",
+    readTime: "8",
     categoryName: "Shopping Guide",
     featuredImage: "https://m.media-amazon.com/images/I/61Nr0k0jvOL._AC_UY327_FMwebp_QL65_.jpg",
     isFeatured: true,
@@ -91,9 +91,10 @@ async function getCategories() {
     });
 
     return [
-      { name: "All Posts", count: totalCount, active: true },
+      { name: "All Posts", slug: "all", count: totalCount, active: true },
       ...categories.map((cat) => ({
         name: cat.name,
+        slug: cat.slug,
         count: cat._count.posts,
         active: false,
       })),

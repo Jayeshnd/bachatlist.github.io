@@ -5,10 +5,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://www.bachatlist.com";
   const currentDate = new Date();
 
-  // Fetch all active categories for dynamic sitemap entries
+  // Fetch all active categories
   const categories = await prisma.category.findMany({
     where: { isActive: true },
     select: { slug: true, updatedAt: true },
+  });
+
+  // Fetch all published blog posts
+  const blogPosts = await prisma.blogPost.findMany({
+    where: { status: "PUBLISHED" },
+    select: { slug: true, updatedAt: true, publishedAt: true },
   });
 
   // Static pages
@@ -41,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/blog`,
       lastModified: currentDate,
       changeFrequency: "daily",
-      priority: 0.6,
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/features`,
@@ -89,5 +95,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...categoryPages];
+  // Dynamic blog post pages
+  const blogPostPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: post.updatedAt || post.publishedAt || currentDate,
+    changeFrequency: "weekly",
+    priority: 0.6,
+  }));
+
+  return [...staticPages, ...categoryPages, ...blogPostPages];
 }

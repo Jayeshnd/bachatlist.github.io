@@ -10,13 +10,13 @@ const navItems = [
   { name: "Categories", href: "/categories" },
   { name: "Coupon", href: "/coupon" },
   { name: "Blog", href: "/blog" },
-  { name: "Features", href: "/features" },
   { name: "Telegram", href: "/telegram" },
 ];
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const mounted = status !== "loading";
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50" role="banner">
@@ -41,9 +41,9 @@ export default function Header() {
           </nav>
           
           <div className="hidden md:flex items-center gap-4">
-            {session ? (
+            {mounted && session ? (
               <>
-                <span className="text-gray-600 font-medium">
+                <span suppressHydrationWarning className="text-gray-600 font-medium">
                   {session.user?.name || session.user?.email}
                 </span>
                 <button
@@ -111,7 +111,7 @@ export default function Header() {
                 {item.name}
               </Link>
             ))}
-            {session ? (
+            {mounted && session ? (
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
                 className="block w-full text-left py-2 text-gray-600 hover:text-primary font-medium transition duration-200"
