@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import HomeClient from "./HomeClient";
 
+// Disable caching for real-time data
+export const revalidate = 0;
+
 // Helper function to convert Decimal fields to numbers for serialization
 function serializeDeal(deal: any) {
   return {
