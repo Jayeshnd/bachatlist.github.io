@@ -240,7 +240,7 @@ function CategoryCard({ category }: { category: any }) {
   );
 }
 
-export default function HomeClient({ featuredDeals, categories, latestDeals, banners, hotDeals }: any) {
+export default function HomeClient({ featuredDeals, categories, latestDeals, banners, hotDeals, lootDeals }: any) {
   // Flipshope-style stores list - now fetched from API
   const [stores, setStores] = useState<{ name: string; icon: string; logo?: string }[]>([]);
   const [storesLoading, setStoresLoading] = useState(true);
@@ -331,6 +331,25 @@ export default function HomeClient({ featuredDeals, categories, latestDeals, ban
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
             {hotDeals.slice(0, 5).map((hotDeal: any) => (
               <DealCard key={hotDeal.id} deal={{ ...hotDeal.deal, customBadge: hotDeal.customBadge }} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Loot Deals Section (if available) */}
+      {lootDeals && lootDeals.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <span className="text-purple-500">💎</span> Loot Deals
+            </h2>
+            <Link href="/deals?type=loot" className="text-primary-600 font-medium hover:underline text-sm flex items-center gap-1">
+              View All <span>→</span>
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+            {lootDeals.map((deal: any) => (
+              <DealCard key={deal.id} deal={{ ...deal, badge: "Loot" }} />
             ))}
           </div>
         </section>

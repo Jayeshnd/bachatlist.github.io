@@ -61,3 +61,4 @@ export default function Logo({ size = "lg", showTagline = false, className = "",
 
   return logoContent;
 }
+

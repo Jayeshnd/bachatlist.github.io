@@ -58,7 +58,7 @@ async function getHomePageData() {
       orderBy: { order: "asc" },
     });
 
-    const [categories, featuredDeals, latestDeals, stores] = await Promise.all([
+    const [categories, featuredDeals, latestDeals, stores, lootDeals] = await Promise.all([
       prisma.category.findMany({
         take: 6,
         where: { isActive: true },
@@ -80,6 +80,12 @@ async function getHomePageData() {
         where: { isActive: true },
         orderBy: { order: "asc" },
       }),
+      prisma.deal.findMany({
+        take: 6,
+        where: { status: "PUBLISHED", isLoot: true },
+        orderBy: { createdAt: "desc" },
+        include: { category: true },
+      }),
     ]);
     
     // Serialize Decimal fields in deals
@@ -89,17 +95,19 @@ async function getHomePageData() {
       ...hotDeal,
       deal: serializeDeal(hotDeal.deal),
     }));
+    const serializedLootDeals = lootDeals.map(serializeDeal);
     
     return { 
       categories, 
       featuredDeals: serializedFeaturedDeals, 
       latestDeals: serializedLatestDeals, 
       banners, 
-      hotDeals: serializedHotDeals 
+      hotDeals: serializedHotDeals,
+      lootDeals: serializedLootDeals
     };
   } catch (error) {
     console.error("Failed to fetch home page data:", error);
-    return { categories: [], featuredDeals: [], latestDeals: [], banners: [], hotDeals: [] };
+    return { categories: [], featuredDeals: [], latestDeals: [], banners: [], hotDeals: [], lootDeals: [] };
   }
 }
 
