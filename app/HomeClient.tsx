@@ -336,25 +336,6 @@ export default function HomeClient({ featuredDeals, categories, latestDeals, ban
         </section>
       )}
 
-      {/* Loot Deals Section (if available) */}
-      {lootDeals && lootDeals.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-              <span className="text-purple-500">💎</span> Loot Deals
-            </h2>
-            <Link href="/deals?type=loot" className="text-primary-600 font-medium hover:underline text-sm flex items-center gap-1">
-              View All <span>→</span>
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
-            {lootDeals.map((deal: any) => (
-              <DealCard key={deal.id} deal={{ ...deal, badge: "Loot" }} />
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* Hero Slider */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <FeaturedDealsSlider deals={featuredDeals} />
@@ -386,7 +367,8 @@ export default function HomeClient({ featuredDeals, categories, latestDeals, ban
           </Link>
         </div>
 
-        {latestDeals.length === 0 ? (
+        {/* Combine latest deals with loot deals */}
+        {(latestDeals.length === 0 && lootDeals.length === 0) ? (
           <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-slate-200">
             <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-4xl">🎁</span>
@@ -396,6 +378,10 @@ export default function HomeClient({ featuredDeals, categories, latestDeals, ban
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+            {/* Show loot deals first, then latest deals */}
+            {lootDeals.map((deal: any) => (
+              <DealCard key={deal.id} deal={{ ...deal, badge: "Loot" }} />
+            ))}
             {latestDeals.map((deal: any) => (
               <DealCard key={deal.id} deal={deal} />
             ))}
