@@ -26,7 +26,7 @@ export default async function DealsPage() {
     originalPrice: toNumber(deal.originalPrice),
     discount: deal.discount,
     currency: deal.currency,
-    rating: deal.rating,
+    rating: toNumber(deal.rating),
     reviewCount: deal.reviewCount,
     features: deal.features,
     images: deal.images,
