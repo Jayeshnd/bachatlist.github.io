@@ -11,7 +11,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://bachatlist.com"),
+  metadataBase: new URL("https://www.bachatlist.com"),
   title: {
     default: "BachatList - Best Deals & Smart Shopping",
     template: "%s | BachatList",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://bachatlist.com",
+    url: "https://www.bachatlist.com",
     siteName: "BachatList",
     title: "BachatList - Best Deals & Smart Shopping",
     description: "Find the best deals and save more on every purchase. Discover coupons, discounts, and exclusive offers.",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     images: ["/images/og-image.svg"],
   },
   alternates: {
-    canonical: "https://bachatlist.com",
+    canonical: "https://www.bachatlist.com",
   },
   icons: {
     icon: "/favicon.svg?v=2",
@@ -82,12 +82,12 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               name: "BachatList",
-              url: "https://bachatlist.com",
+              url: "https://www.bachatlist.com",
               potentialAction: {
                 "@type": "SearchAction",
                 target: {
                   "@type": "EntryPoint",
-                  urlTemplate: "https://bachatlist.com/deals?search={search_term_string}",
+                  urlTemplate: "https://www.bachatlist.com/deals?search={search_term_string}",
                 },
                 "query-input": "required name=search_term_string",
               },

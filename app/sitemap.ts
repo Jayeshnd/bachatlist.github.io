@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://bachatlist.com";
+  const baseUrl = "https://www.bachatlist.com";
   const currentDate = new Date();
 
   // Fetch all active categories
