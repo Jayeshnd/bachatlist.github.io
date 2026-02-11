@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { runScheduledPriceSync, runScheduledNotifications } from '@/lib/automation';
+import { runScheduledPriceSync, runScheduledNotifications, runScheduledCuelinksSync } from '@/lib/automation';
 import { prisma } from '@/lib/prisma';
 
 // Cron secret from environment variables
@@ -53,16 +53,26 @@ export async function GET(request: NextRequest) {
           result: notificationResult,
         });
 
+      case 'cuelinks':
+        // Test Cuelinks sync
+        const cuelinksResult = await runScheduledCuelinksSync();
+        return NextResponse.json({
+          action: 'cuelinks',
+          result: cuelinksResult,
+        });
+
       case 'full':
-        // Run both
-        const [fullSyncResult, fullNotificationResult] = await Promise.all([
+        // Run all sync tasks
+        const [fullSyncResult, fullNotificationResult, fullCuelinksResult] = await Promise.all([
           runScheduledPriceSync(),
           runScheduledNotifications(),
+          runScheduledCuelinksSync(),
         ]);
         return NextResponse.json({
           action: 'full',
           priceSync: fullSyncResult,
           notifications: fullNotificationResult,
+          cuelinks: fullCuelinksResult,
         });
 
       default:
@@ -97,12 +107,17 @@ export async function POST(request: NextRequest) {
         const notificationResult = await runScheduledNotifications();
         return NextResponse.json({ result: notificationResult });
 
+      case 'cuelinks':
+        const cuelinksResult = await runScheduledCuelinksSync();
+        return NextResponse.json({ result: cuelinksResult });
+
       case 'full':
-        const [sync, notif] = await Promise.all([
+        const [sync, notif, cuelinks] = await Promise.all([
           runScheduledPriceSync(),
           runScheduledNotifications(),
+          runScheduledCuelinksSync(),
         ]);
-        return NextResponse.json({ priceSync: sync, notifications: notif });
+        return NextResponse.json({ priceSync: sync, notifications: notif, cuelinks });
 
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

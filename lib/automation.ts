@@ -2,6 +2,186 @@ import { prisma } from './prisma';
 import { syncAllAmazonPrices } from './amazon';
 import { sendTelegramMessage } from './telegram';
 
+const CUELINKS_API_BASE = "https://www.cuelinks.com/api/v2";
+const CUELINKS_API_KEY = process.env.CUELINKS_API_KEY;
+
+// Cuelinks sync function
+export async function runScheduledCuelinksSync() {
+  if (!CUELINKS_API_KEY) {
+    return { success: false, message: 'Cuelinks API key not configured' };
+  }
+
+  try {
+    const result = await syncCuelinksCampaigns();
+    return {
+      success: true,
+      ...result
+    };
+  } catch (error) {
+    console.error('Cuelinks sync failed:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+}
+
+async function syncCuelinksCampaigns() {
+  const result = {
+    fetched: 0,
+    imported: 0,
+    updated: 0,
+    expired: 0,
+    failed: 0
+  };
+
+  // Get or create a system user for auto-imported deals
+  let systemUser = await prisma.user.findFirst({
+    where: { role: 'ADMIN' }
+  });
+  
+  if (!systemUser) {
+    systemUser = await prisma.user.findFirst();
+  }
+  
+  if (!systemUser) {
+    throw new Error('No system user found for auto-imported deals');
+  }
+
+  try {
+    // Fetch all campaigns from Cuelinks
+    const url = `${CUELINKS_API_BASE}/campaigns.json?per_page=100&country_id=252`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token token=${CUELINKS_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Cuelinks API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const campaigns = data.campaigns || [];
+    result.fetched = campaigns.length;
+
+    // Process each campaign
+    for (const campaign of campaigns) {
+      try {
+        // Use fallback title
+        const campaignTitle = campaign.title || campaign.campaign || `deal-${campaign.id}`;
+        const campaignDesc = campaign.description || '';
+        
+        // Check if deal already exists by title or URL
+        const existingDeal = await prisma.deal.findFirst({
+          where: {
+            OR: [
+              { title: campaignTitle },
+              { affiliateUrl: campaign.affiliate_url || campaign.url },
+            ]
+          }
+        });
+
+        const campaignEndDate = campaign.end_date 
+          ? new Date(campaign.end_date) 
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Default 30 days
+
+        const isExpired = new Date() > campaignEndDate;
+
+        if (existingDeal) {
+          // Update existing deal
+          await prisma.deal.update({
+            where: { id: existingDeal.id },
+            data: {
+              description: campaignDesc,
+              shortDesc: campaignDesc.substring(0, 200),
+              productUrl: campaign.url,
+              affiliateUrl: campaign.affiliate_url,
+              coupon: campaign.coupon_code || null,
+              isExpired: isExpired,
+              status: isExpired ? 'ARCHIVED' : existingDeal.status,
+            }
+          });
+          result.updated++;
+        } else if (!isExpired) {
+          // Import new deal (skip expired ones)
+          // Get or create default category
+          let defaultCategory = await prisma.category.findFirst({
+            where: { slug: 'cuelinks' }
+          });
+
+          if (!defaultCategory) {
+            defaultCategory = await prisma.category.create({
+              data: {
+                name: 'Cuelinks',
+                slug: 'cuelinks',
+                icon: '🔗',
+              }
+            });
+          }
+
+          // Skip campaigns without title
+          const campaignTitle = campaign.title || campaign.campaign || `deal-${campaign.id}`;
+          const campaignDesc = campaign.description || '';
+          const slug = campaignTitle.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+          await prisma.deal.create({
+            data: {
+              title: campaignTitle,
+              slug: slug,
+              description: campaignDesc,
+              shortDesc: campaignDesc.substring(0, 200),
+              currentPrice: 0,
+              originalPrice: 0,
+              productUrl: campaign.url,
+              affiliateUrl: campaign.affiliate_url,
+              coupon: campaign.coupon_code || null,
+              status: 'PUBLISHED',
+              categoryId: defaultCategory.id,
+              isLoot: false,
+              images: JSON.stringify(campaign.image_url ? [campaign.image_url] : []),
+              authorId: systemUser.id,
+            }
+          });
+          result.imported++;
+        } else {
+          result.expired++;
+        }
+      } catch (campaignError) {
+        console.error(`Failed to process campaign: ${campaign.title}`, campaignError);
+        result.failed++;
+      }
+    }
+
+    // Log the sync
+    await prisma.apiConnectionLog.create({
+      data: {
+        networkId: 'cuelinks',
+        type: 'CUELINKS',
+        action: 'SYNC',
+        status: result.failed === 0 ? 'SUCCESS' : 'PARTIAL',
+        message: `Fetched: ${result.fetched}, Imported: ${result.imported}, Updated: ${result.updated}, Expired: ${result.expired}, Failed: ${result.failed}`,
+      }
+    });
+
+    return result;
+  } catch (error) {
+    await prisma.apiConnectionLog.create({
+      data: {
+        networkId: 'cuelinks',
+        type: 'CUELINKS',
+        action: 'SYNC',
+        status: 'FAILED',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      }
+    });
+    throw error;
+  }
+}
+
 export async function runScheduledPriceSync() {
   const config = await prisma.amazonConfig.findFirst({ where: { isActive: true } });
   if (!config) {

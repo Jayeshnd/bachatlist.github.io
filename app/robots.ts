@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/admin/", "/api/", "/login", "/auth"],
     },
-    sitemap: "https://www.bachatlist.com/sitemap.xml",
+    sitemap: "https://bachatlist.com/sitemap.xml",
   };
 }

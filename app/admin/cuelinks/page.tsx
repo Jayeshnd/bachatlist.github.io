@@ -90,7 +90,6 @@ export default function CuelinksAdminPage() {
           url: campaign.url,
           currentPrice: 0,
           originalPrice: 0,
-          // No categoryId - will use "uncategorized" automatically
           status: "DRAFT",
           coupon: campaign.couponCode,
         }),
@@ -110,6 +109,46 @@ export default function CuelinksAdminPage() {
     }
   }
 
+  async function handleBulkImport() {
+    if (!confirm("Import all current campaigns as deals? This may take a moment.")) {
+      return;
+    }
+
+    setImporting("bulk");
+    let imported = 0;
+    let failed = 0;
+
+    for (const campaign of campaigns) {
+      try {
+        const response = await fetch("/api/admin/deals", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: campaign.title,
+            description: campaign.description,
+            shortDesc: campaign.description?.substring(0, 150),
+            url: campaign.url,
+            currentPrice: 0,
+            originalPrice: 0,
+            status: "PUBLISHED",
+            coupon: campaign.couponCode,
+          }),
+        });
+
+        if (response.ok) {
+          imported++;
+        } else {
+          failed++;
+        }
+      } catch (err) {
+        failed++;
+      }
+    }
+
+    setImporting(null);
+    alert(`Bulk import completed!\nImported: ${imported}\nFailed: ${failed}`);
+  }
+
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-8">
@@ -119,6 +158,12 @@ export default function CuelinksAdminPage() {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500">{campaigns.length} offers</span>
+          <a
+            href="/admin/deals"
+            className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200"
+          >
+            Go to Deals
+          </a>
         </div>
       </div>
 
@@ -163,6 +208,15 @@ export default function CuelinksAdminPage() {
           >
             {loading ? "Loading..." : "Refresh"}
           </button>
+
+          {/* Bulk Import */}
+          <button
+            onClick={handleBulkImport}
+            disabled={importing === "bulk" || campaigns.length === 0}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+          >
+            {importing === "bulk" ? "Importing..." : "Import All"}
+          </button>
         </div>
       </div>
 
@@ -173,7 +227,7 @@ export default function CuelinksAdminPage() {
         </div>
       )}
 
-      {/* Table View - Cuelinks Style */}
+      {/* Table View */}
       <div className="bg-white rounded-xl shadow-md overflow-hidden">
         {loading ? (
           <div className="p-8 text-center">
