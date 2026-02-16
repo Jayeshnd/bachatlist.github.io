@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { Providers } from "./providers";
 import LayoutWrapper from "@/app/components/LayoutWrapper";
@@ -75,6 +76,20 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Google tag (gtag.js) */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-HLD6FKKWBN"
+        />
+        <Script id="google-analytics" dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-HLD6FKKWBN');
+          `,
+        }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
