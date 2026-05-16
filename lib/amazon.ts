@@ -34,7 +34,7 @@ interface CreatorsConfig {
 // Token cache
 let cachedToken: { token: string; expiresAt: number } | null = null;
 
-// Get Creators API config
+// Get Creators API config from environment
 export async function getCreatorsConfig(): Promise<CreatorsConfig> {
   const clientId = process.env.AMAZON_CLIENT_ID;
   const clientSecret = process.env.AMAZON_CLIENT_SECRET;
@@ -44,7 +44,7 @@ export async function getCreatorsConfig(): Promise<CreatorsConfig> {
   const marketplace = process.env.AMAZON_MARKETPLACE || 'IN';
 
   if (!clientId || !clientSecret || !associateTag) {
-    throw new Error('Amazon Creators API not configured. Set AMAZON_CLIENT_ID, AMAZON_CLIENT_SECRET, AMAZON_ASSOCIATE_TAG');
+    throw new Error('Amazon Creators API credentials not configured');
   }
 
   return {
@@ -59,12 +59,12 @@ export async function getCreatorsConfig(): Promise<CreatorsConfig> {
 
 // Fetch OAuth access token (exactly as per Amazon documentation)
 async function getAccessToken(config: CreatorsConfig): Promise<string> {
-  // Return cached token if valid
+  // Return cached token if still valid
   if (cachedToken && Date.now() < cachedToken.expiresAt) {
     return cachedToken.token;
   }
 
-  // EU region token endpoint for India (v2.2)
+  // EU region token endpoint for India (v2.2) - from documentation
   const tokenEndpoint = 'https://creatorsapi.auth.eu-south-2.amazoncognito.com/oauth2/token';
 
   const body = new URLSearchParams({
@@ -84,15 +84,15 @@ async function getAccessToken(config: CreatorsConfig): Promise<string> {
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('Token fetch failed:', errorText);
-    throw new Error(`Token fetch failed: ${response.status}`);
+    console.error('Creators API token error:', errorText);
+    throw new Error(`Failed to get access token: ${response.status}`);
   }
 
   const data = await response.json();
   const token = data.access_token;
   const expiresIn = data.expires_in || 3600;
 
-  // Cache token (expire 5 min early)
+  // Cache token (expire 5 minutes early)
   cachedToken = {
     token,
     expiresAt: Date.now() + (expiresIn - 300) * 1000,
@@ -101,7 +101,7 @@ async function getAccessToken(config: CreatorsConfig): Promise<string> {
   return token;
 }
 
-// Get active config (backward compatible)
+// Get active Amazon config (backward compatible)
 export async function getActiveAmazonConfig() {
   const config = await getCreatorsConfig();
   return {
@@ -121,7 +121,7 @@ export function generateAffiliateUrl(asin: string, associateTag: string, region:
   return `${baseUrl}/${asin}?tag=${associateTag}`;
 }
 
-// Search Items using Creators API (cURL format)
+// Search Items using Creators API (exactly as per documentation)
 export async function searchProducts(params: {
   keywords: string;
   region: string;
@@ -140,6 +140,7 @@ export async function searchProducts(params: {
 
     const marketplace = config.region === 'in' ? 'www.amazon.in' : 'www.amazon.com';
 
+    // Request body as per documentation
     const requestBody: any = {
       keywords: params.keywords,
       marketplace,
@@ -164,6 +165,7 @@ export async function searchProducts(params: {
       if (params.maxPrice) requestBody.priceRange.maxPrice = params.maxPrice;
     }
 
+    // API call as per documentation
     const response = await fetch('https://creatorsapi.amazon/catalog/v1/searchItems', {
       method: 'POST',
       headers: {
@@ -188,7 +190,7 @@ export async function searchProducts(params: {
   }
 }
 
-// Get Items using Creators API (cURL format)
+// Get Items using Creators API (exactly as per documentation)
 export async function getProductDetails(params: {
   asin: string;
   region: string;
@@ -202,6 +204,7 @@ export async function getProductDetails(params: {
 
     const marketplace = config.region === 'in' ? 'www.amazon.in' : 'www.amazon.com';
 
+    // Request body as per documentation
     const requestBody = {
       itemIds: [params.asin],
       itemIdType: 'ASIN',
@@ -218,6 +221,7 @@ export async function getProductDetails(params: {
       ],
     };
 
+    // API call as per documentation
     const response = await fetch('https://creatorsapi.amazon/catalog/v1/getItems', {
       method: 'POST',
       headers: {
@@ -261,12 +265,14 @@ export async function getMultipleProducts(params: {
 // Parse SearchItems response
 function parseSearchResponse(data: any, region: string): AmazonSearchResult {
   const items: AmazonProduct[] = [];
+
   if (data.searchResult?.items) {
     for (const item of data.searchResult.items) {
       const product = parseItem(item, region);
       if (product) items.push(product);
     }
   }
+
   return {
     items,
     totalResults: data.searchResult?.totalResultCount,
@@ -282,12 +288,12 @@ function parseGetItemsResponse(data: any, region: string): AmazonProduct | null 
   return null;
 }
 
-// Parse individual item (with media/images)
+// Parse individual item (with media/images as per docs)
 function parseItem(item: any, region: string): AmazonProduct | null {
   if (!item.asin) return null;
 
   const currency = region === 'in' ? 'INR' : 'USD';
-  
+
   let currentPrice: number | undefined;
   let originalPrice: number | undefined;
 
@@ -299,7 +305,7 @@ function parseItem(item: any, region: string): AmazonProduct | null {
     originalPrice = item.offersV2.listings[0].savingBasis.amount;
   }
 
-  // Fetch media/images
+  // Media/Images (as shown in documentation response)
   let imageUrl: string | undefined;
   if (item.images?.primary?.large?.url) {
     imageUrl = item.images.primary.large.url;
