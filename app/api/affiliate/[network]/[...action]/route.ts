@@ -97,7 +97,31 @@ const API_CONFIGS: Record<string, ApiConfig> = {
       },
     },
   },
-  // Amazon uses dedicated route at /api/affiliate/amazon due to AWS Signature requirements
+  // Amazon - uses dedicated route at /api/affiliate/amazon
+  // The endpoint paths are handled by the dedicated route
+  amazon: {
+    name: "Amazon PA-API",
+    baseUrl: "", // Not used - handled by dedicated route
+    apiKey: "AMAZON_ACCESS_KEY",
+    authType: "bearer",
+    endpoints: {
+      search: {
+        method: "GET",
+        path: "",
+        params: ["keywords", "category", "page", "minPrice", "maxPrice"],
+      },
+      product: {
+        method: "GET",
+        path: "",
+        params: ["asin"],
+      },
+      affiliateUrl: {
+        method: "POST",
+        path: "",
+        bodyParams: ["asin"],
+      },
+    },
+  },
   // ✨ Add more networks like this:
   // impact: {
   //   name: "Impact Radius",
@@ -119,9 +143,32 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ network: string; action: string[] }> }
 ) {
+  const { network, action } = await params;
+  const networkKey = network.toLowerCase();
+  
+  // Special handling for Amazon - proxy to dedicated route
+  if (networkKey === "amazon") {
+    const actionKey = action?.[0] || "search";
+    const url = new URL(`/api/affiliate/amazon?action=${actionKey}`, request.url);
+    const { searchParams } = new URL(request.url);
+    
+    // Pass through relevant params based on action
+    if (actionKey === "search") {
+      ["keywords", "category", "page", "minPrice", "maxPrice"].forEach(param => {
+        const value = searchParams.get(param);
+        if (value) url.searchParams.set(param, value);
+      });
+    } else if (actionKey === "product") {
+      const asin = searchParams.get("asin");
+      if (asin) url.searchParams.set("asin", asin);
+    }
+    
+    const response = await fetch(url.toString());
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
+  }
+
   try {
-    const { network, action } = await params;
-    const networkKey = network.toLowerCase();
     const actionKey = action?.[0] || "";
 
     // Check if network is configured
@@ -220,11 +267,25 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ network: string; action: string[] }> }
 ) {
-  try {
-    const { network, action } = await params;
-    const networkKey = network.toLowerCase();
-    const actionKey = action?.[0] || "";
+  const { network, action } = await params;
+  const networkKey = network.toLowerCase();
+  const actionKey = action?.[0] || "";
 
+  // Special handling for Amazon - proxy to dedicated route
+  if (networkKey === "amazon") {
+    const body = await request.json();
+    const url = new URL("/api/affiliate/amazon", request.url);
+    
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: actionKey, ...body }),
+    });
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
+  }
+
+  try {
     // Check if network is configured
     const config = API_CONFIGS[networkKey];
     if (!config) {
