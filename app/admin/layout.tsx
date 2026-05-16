@@ -116,6 +116,15 @@ export default function AdminLayout({
             </li>
             <li>
               <Link
+                href="/admin/amazon-config"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 transition text-gray-700 hover:text-green-700"
+              >
+                <span className="text-xl">🛒</span>
+                <span className="font-medium">Amazon PA-API</span>
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/admin/cuelinks"
                 className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-green-50 transition text-gray-700 hover:text-green-700"
               >

@@ -503,17 +503,34 @@ export function generateAffiliateUrl(asin: string, associateTag: string, region:
   return `${baseUrl}/${asin}?tag=${associateTag}`;
 }
 
-// Get active Amazon config from database
+// Get active Amazon config from database (with env fallback)
 export async function getActiveAmazonConfig() {
   const config = await prisma.amazonConfig.findFirst({
     where: { isActive: true },
   });
 
-  if (!config) {
+  if (config) {
+    return config;
+  }
+
+  // Fallback to environment variables
+  const associateTag = process.env.AMAZON_ASSOCIATE_TAG;
+  const accessKey = process.env.AMAZON_ACCESS_KEY;
+  const secretKey = process.env.AMAZON_SECRET_KEY;
+
+  if (!associateTag || !accessKey || !secretKey) {
     throw new Error('No active Amazon configuration found');
   }
 
-  return config;
+  return {
+    id: 'env',
+    associateTag,
+    accessKey,
+    secretKey,
+    region: process.env.AMAZON_REGION || 'in',
+    marketplace: process.env.AMAZON_MARKETPLACE || 'IN',
+    isActive: true,
+  };
 }
 
 // Cache product in database
