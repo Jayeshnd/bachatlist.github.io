@@ -283,6 +283,7 @@ export default function DealsPageClient({ initialDeals }: { initialDeals: Deal[]
                 <thead className="bg-orange-100">
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-orange-900">Product</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-orange-900">ASIN</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-orange-900">Price</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold text-orange-900">Action</th>
                   </tr>
@@ -297,6 +298,11 @@ export default function DealsPageClient({ initialDeals }: { initialDeals: Deal[]
                           )}
                           <p className="font-medium text-gray-900 line-clamp-2">{product.title}</p>
                         </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <code className="bg-orange-100 text-orange-800 px-2 py-1 rounded text-sm font-mono">
+                          {product.asin}
+                        </code>
                       </td>
                       <td className="px-4 py-3">
                         <span className="font-bold text-green-600">₹{product.currentPrice}</span>
