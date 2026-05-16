@@ -97,6 +97,7 @@ const API_CONFIGS: Record<string, ApiConfig> = {
       },
     },
   },
+  // Amazon uses dedicated route at /api/affiliate/amazon due to AWS Signature requirements
   // ✨ Add more networks like this:
   // impact: {
   //   name: "Impact Radius",

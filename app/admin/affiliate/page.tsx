@@ -11,7 +11,7 @@ interface NetworkConfig {
   name: string;
   baseUrl: string;
   apiKeyName: string;
-  authType: "token" | "bearer";
+  authType: "token" | "bearer" | "aws";
   enabled: boolean;
   endpoints: EndpointConfig[];
 }
@@ -22,6 +22,7 @@ interface EndpointConfig {
   method: "GET" | "POST";
   path: string;
   params: string[];
+  bodyParams?: string[];
 }
 
 // ============================================
@@ -53,6 +54,19 @@ const DEFAULT_NETWORKS: NetworkConfig[] = [
       { id: "campaigns", name: "Campaigns", method: "GET", path: "/offers/campaigns", params: ["page", "limit", "category"] },
       { id: "reports", name: "Reports", method: "GET", path: "/reports", params: ["from_date", "to_date", "offer_id"] },
       { id: "clicks", name: "Clicks", method: "GET", path: "/reports/clicks", params: ["from_date", "to_date", "offer_id"] },
+    ],
+  },
+  {
+    id: "amazon",
+    name: "Amazon PA-API",
+    baseUrl: "https://bachatlist.com/api/affiliate/amazon",
+    apiKeyName: "AMAZON_ACCESS_KEY",
+    authType: "bearer",
+    enabled: true,
+    endpoints: [
+      { id: "search", name: "Search Products", method: "GET", path: "?action=search", params: ["keywords", "category", "page", "minPrice", "maxPrice"] },
+      { id: "product", name: "Get Product", method: "GET", path: "?action=product", params: ["asin"] },
+      { id: "affiliateUrl", name: "Affiliate URL", method: "POST", path: "", params: [], bodyParams: ["asin"] },
     ],
   },
 ];
@@ -160,7 +174,7 @@ function AddNetworkForm({ onAdd }: { onAdd: (network: NetworkConfig) => void }) 
     name: "",
     baseUrl: "",
     apiKeyName: "",
-    authType: "bearer" as "token" | "bearer",
+    authType: "bearer" as "token" | "bearer" | "aws",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -228,11 +242,12 @@ function AddNetworkForm({ onAdd }: { onAdd: (network: NetworkConfig) => void }) 
           <label className="block text-sm text-gray-600 mb-1">Auth Type</label>
           <select
             value={form.authType}
-            onChange={(e) => setForm({ ...form, authType: e.target.value as "token" | "bearer" })}
+            onChange={(e) => setForm({ ...form, authType: e.target.value as "token" | "bearer" | "aws" })}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
           >
             <option value="bearer">Bearer Token (most APIs)</option>
             <option value="token">Token token=xxx (Cuelinks)</option>
+            <option value="aws">AWS Signature (Amazon PA-API)</option>
           </select>
         </div>
       </div>
