@@ -503,24 +503,35 @@ export function generateAffiliateUrl(asin: string, associateTag: string, region:
   return `${baseUrl}/${asin}?tag=${associateTag}`;
 }
 
-// Get active Amazon config from database (with env fallback)
+// Get active Amazon config - prefers environment variables (Vercel) over database
 export async function getActiveAmazonConfig() {
-  const config = await prisma.amazonConfig.findFirst({
-    where: { isActive: true },
-  });
-
-  if (config) {
-    return config;
-  }
-
-  // Fallback to environment variables
   const associateTag = process.env.AMAZON_ASSOCIATE_TAG;
   const accessKey = process.env.AMAZON_ACCESS_KEY;
   const secretKey = process.env.AMAZON_SECRET_KEY;
 
-  if (!associateTag || !accessKey || !secretKey) {
+  // Prefer environment variables (set in Vercel)
+  if (associateTag && accessKey && secretKey) {
+    return {
+      id: 'env',
+      associateTag,
+      accessKey,
+      secretKey,
+      region: process.env.AMAZON_REGION || 'in',
+      marketplace: process.env.AMAZON_MARKETPLACE || 'IN',
+      isActive: true,
+    };
+  }
+
+  // Fallback to database
+  const config = await prisma.amazonConfig.findFirst({
+    where: { isActive: true },
+  });
+
+  if (!config) {
     throw new Error('No active Amazon configuration found');
   }
+
+  return config;
 
   return {
     id: 'env',
@@ -591,9 +602,9 @@ export async function syncAllAmazonPrices() {
       const freshProduct = await getProductDetails({
         asin: product.asin,
         region: config.region,
-        accessKey: config.accessKey ?? '',
-        secretKey: config.secretKey ?? '',
-        associateTag: config.associateTag,
+        accessKey: config.accessKey || '',
+        secretKey: config.secretKey || '',
+        associateTag: config.associateTag || '',
       });
 
       if (freshProduct && freshProduct.currentPrice) {

@@ -16,9 +16,9 @@ export async function POST(request: NextRequest) {
     const product = await getProductDetails({
       asin,
       region: config.region,
-      accessKey: config.accessKey ?? "",
-      secretKey: config.secretKey ?? "",
-      associateTag: config.associateTag,
+      accessKey: config.accessKey || "",
+      secretKey: config.secretKey || "",
+      associateTag: config.associateTag || "",
     });
 
     if (!product) {
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const affiliateUrl = generateAffiliateUrl(asin, config.associateTag, config.region);
+    const affiliateUrl = generateAffiliateUrl(asin, config.associateTag || "", config.region);
 
     // Get a system user for the deal
     let author = await prisma.user.findFirst({ where: { role: "ADMIN" } });

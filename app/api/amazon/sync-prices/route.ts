@@ -59,9 +59,9 @@ export async function POST(request: NextRequest) {
         const freshProduct = await getProductDetails({
           asin: product.asin,
           region: config.region,
-          accessKey: config.accessKey ?? '',
-          secretKey: config.secretKey ?? '',
-          associateTag: config.associateTag,
+          accessKey: config.accessKey || '',
+          secretKey: config.secretKey || '',
+          associateTag: config.associateTag || '',
         });
 
         if (freshProduct && freshProduct.currentPrice) {

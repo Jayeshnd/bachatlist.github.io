@@ -19,9 +19,9 @@ export async function POST(request: NextRequest) {
     const result = await searchProducts({
       keywords: "deals",
       region: config.region,
-      accessKey: config.accessKey ?? "",
-      secretKey: config.secretKey ?? "",
-      associateTag: config.associateTag,
+      accessKey: config.accessKey || "",
+      secretKey: config.secretKey || "",
+      associateTag: config.associateTag || "",
       sortBy: "PriceLowToHigh",
       maxPrice: 500,
       page: 1,
