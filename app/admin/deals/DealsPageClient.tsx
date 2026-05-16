@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { DealsTable } from "./DealsTable";
 import { CuelinksImportButton } from "./CuelinksImportButton";
+import { AmazonImportButton } from "./AmazonImportButton";
 
 interface Deal {
   id: string;
@@ -149,6 +150,7 @@ export default function DealsPageClient({ initialDeals }: { initialDeals: Deal[]
           <p className="text-gray-600 mt-1">Manage all deals and offers</p>
         </div>
         <div className="flex gap-3">
+          <AmazonImportButton />
           <button
             onClick={() => {
               setShowCuelinks(!showCuelinks);
