@@ -6,6 +6,14 @@ import { DealsTable } from "./DealsTable";
 import { CuelinksImportButton } from "./CuelinksImportButton";
 import { AmazonImportButton } from "./AmazonImportButton";
 
+interface AmazonProduct {
+  asin: string;
+  title: string;
+  currentPrice?: number;
+  imageUrl?: string;
+  productUrl: string;
+}
+
 interface Deal {
   id: string;
   title: string;
@@ -75,6 +83,12 @@ export default function DealsPageClient({ initialDeals }: { initialDeals: Deal[]
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Amazon states
+  const [amazonLoading, setAmazonLoading] = useState(false);
+  const [amazonProducts, setAmazonProducts] = useState<AmazonProduct[]>([]);
+  const [showAmazon, setShowAmazon] = useState(false);
+  const [amazonSearchTerm, setAmazonSearchTerm] = useState("");
+
   async function fetchCuelinksDeals() {
     setCuelinksLoading(true);
     try {
@@ -96,6 +110,54 @@ export default function DealsPageClient({ initialDeals }: { initialDeals: Deal[]
       alert("Error connecting to Cuelinks API");
     } finally {
       setCuelinksLoading(false);
+    }
+  }
+
+  async function fetchAmazonDeals() {
+    if (!amazonSearchTerm.trim()) return;
+    
+    setAmazonLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.append("keywords", amazonSearchTerm);
+      params.append("sortBy", "PriceLowToHigh");
+
+      const response = await fetch(`/api/affiliate/amazon?action=search&${params.toString()}`);
+      const data = await response.json();
+
+      if (response.ok && data.items) {
+        setAmazonProducts(data.items);
+        setShowAmazon(true);
+      } else {
+        alert("Failed to fetch Amazon products");
+      }
+    } catch (error) {
+      console.error("Error fetching Amazon:", error);
+      alert("Error connecting to Amazon API");
+    } finally {
+      setAmazonLoading(false);
+    }
+  }
+
+  async function importAmazonDeal(product: AmazonProduct) {
+    try {
+      const response = await fetch("/api/admin/deals/amazon-import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ asin: product.asin, notify: true }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setDeals([data.deal, ...deals]);
+        alert(`Successfully imported: ${product.title}`);
+      } else {
+        const data = await response.json();
+        alert(`Failed to import: ${data.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Amazon import error:", error);
+      alert("Failed to import deal");
     }
   }
 
@@ -150,7 +212,17 @@ export default function DealsPageClient({ initialDeals }: { initialDeals: Deal[]
           <p className="text-gray-600 mt-1">Manage all deals and offers</p>
         </div>
         <div className="flex gap-3">
-          <AmazonImportButton />
+          <button
+            onClick={() => {
+              setShowAmazon(!showAmazon);
+              if (!showAmazon) {
+                // open search panel
+              }
+            }}
+            className="bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-700 transition shadow-lg shadow-orange-500/25"
+          >
+            🛒 Import from Amazon
+          </button>
           <button
             onClick={() => {
               setShowCuelinks(!showCuelinks);
@@ -171,6 +243,80 @@ export default function DealsPageClient({ initialDeals }: { initialDeals: Deal[]
           </Link>
         </div>
       </div>
+
+      {/* Amazon Import Section */}
+      {showAmazon && (
+        <div className="mb-8 bg-orange-50 rounded-xl border border-orange-200 p-6">
+          <div className="flex flex-wrap items-center gap-4 mb-6">
+            <h2 className="text-lg font-semibold text-orange-900">Search & Import from Amazon</h2>
+            <button
+              onClick={() => setShowAmazon(false)}
+              className="ml-auto text-orange-600 hover:text-orange-800"
+            >
+              ✕ Close
+            </button>
+          </div>
+
+          <div className="flex gap-2 mb-6">
+            <input
+              type="text"
+              placeholder="Search products (e.g. laptop, earbuds)"
+              value={amazonSearchTerm}
+              onChange={(e) => setAmazonSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") fetchAmazonDeals();
+              }}
+              className="flex-1 px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+            />
+            <button
+              onClick={fetchAmazonDeals}
+              disabled={amazonLoading || !amazonSearchTerm.trim()}
+              className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
+            >
+              {amazonLoading ? "Searching..." : "🔍 Search"}
+            </button>
+          </div>
+
+          {amazonProducts.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full bg-white rounded-lg">
+                <thead className="bg-orange-100">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-orange-900">Product</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-orange-900">Price</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold text-orange-900">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-orange-100">
+                  {amazonProducts.map((product) => (
+                    <tr key={product.asin} className="hover:bg-orange-50">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          {product.imageUrl && (
+                            <img src={product.imageUrl} alt="" className="w-12 h-12 object-cover rounded" />
+                          )}
+                          <p className="font-medium text-gray-900 line-clamp-2">{product.title}</p>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="font-bold text-green-600">₹{product.currentPrice}</span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => importAmazonDeal(product)}
+                          className="px-4 py-2 bg-orange-600 text-white text-sm rounded-lg hover:bg-orange-700"
+                        >
+                          Import
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Cuelinks Import Section */}
       {showCuelinks && (
