@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
-    const { asin, categorySlug = "amazon", notify = true } = await request.json();
+    const body = await request.json();
+    const { asin, categorySlug = "amazon", notify = true, status } = body;
 
     if (!asin) {
       return NextResponse.json({ error: "ASIN is required" }, { status: 400 });
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
         productUrl,
         affiliateUrl,
         images: "[]",
-        status: "PUBLISHED",
+        status: status === "DRAFT" ? "DRAFT" : "PUBLISHED",
         categoryId: category.id,
         isLoot: false,
         authorId: author.id,

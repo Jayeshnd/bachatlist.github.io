@@ -75,9 +75,12 @@ export default function DealsPageClient({ initialDeals }: { initialDeals: Deal[]
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Amazon states (simple ASIN import)
+  // Amazon states (Search + Bulk Import as Draft)
   const [showAmazon, setShowAmazon] = useState(false);
-  const [amazonAsin, setAmazonAsin] = useState("");
+  const [amazonSearchTerm, setAmazonSearchTerm] = useState("");
+  const [amazonProducts, setAmazonProducts] = useState<any[]>([]);
+  const [amazonLoading, setAmazonLoading] = useState(false);
+  const [selectedAmazonProducts, setSelectedAmazonProducts] = useState<string[]>([]);
   const [amazonImporting, setAmazonImporting] = useState(false);
 
   async function fetchCuelinksDeals() {
@@ -104,37 +107,73 @@ export default function DealsPageClient({ initialDeals }: { initialDeals: Deal[]
     }
   }
 
-  // Direct Amazon ASIN import
-  async function importAmazonAsin() {
-    if (!amazonAsin.trim()) {
-      alert("Please enter an ASIN");
+  // Search Amazon using Creators API
+  async function searchAmazonProducts() {
+    if (!amazonSearchTerm.trim()) return;
+
+    setAmazonLoading(true);
+    try {
+      const params = new URLSearchParams({
+        keywords: amazonSearchTerm,
+        sortBy: "Relevance",
+      });
+
+      const response = await fetch(`/api/affiliate/amazon?action=search&${params.toString()}`);
+      const data = await response.json();
+
+      if (response.ok && data.items) {
+        setAmazonProducts(data.items);
+      } else {
+        alert("No products found or API error");
+      }
+    } catch (error) {
+      console.error("Amazon search error:", error);
+      alert("Failed to search Amazon");
+    } finally {
+      setAmazonLoading(false);
+    }
+  }
+
+  // Toggle product selection
+  function toggleAmazonProduct(asin: string) {
+    if (selectedAmazonProducts.includes(asin)) {
+      setSelectedAmazonProducts(selectedAmazonProducts.filter(a => a !== asin));
+    } else {
+      setSelectedAmazonProducts([...selectedAmazonProducts, asin]);
+    }
+  }
+
+  // Bulk import selected products as DRAFT
+  async function importSelectedAmazonProducts() {
+    if (selectedAmazonProducts.length === 0) {
+      alert("Please select at least one product");
       return;
     }
 
     setAmazonImporting(true);
-    try {
-      const response = await fetch("/api/admin/deals/amazon-import", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ asin: amazonAsin.trim(), notify: true }),
-      });
+    let successCount = 0;
 
-      const data = await response.json();
+    for (const asin of selectedAmazonProducts) {
+      try {
+        const response = await fetch("/api/admin/deals/amazon-import", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ asin, status: "DRAFT", notify: false }),
+        });
 
-      if (response.ok) {
-        setDeals([data.deal, ...deals]);
-        alert(`Successfully imported deal from Amazon!`);
-        setAmazonAsin("");
-        setShowAmazon(false);
-      } else {
-        alert(`Failed to import: ${data.error || "Unknown error"}`);
+        if (response.ok) {
+          const data = await response.json();
+          setDeals(prev => [data.deal, ...prev]);
+          successCount++;
+        }
+      } catch (error) {
+        console.error(`Failed to import ${asin}:`, error);
       }
-    } catch (error) {
-      console.error("Amazon import error:", error);
-      alert("Failed to import deal");
-    } finally {
-      setAmazonImporting(false);
     }
+
+    setAmazonImporting(false);
+    setSelectedAmazonProducts([]);
+    alert(`Successfully imported ${successCount} products as DRAFT!`);
   }
 
   async function importCuelinksDeal(campaign: Campaign) {
@@ -220,40 +259,101 @@ export default function DealsPageClient({ initialDeals }: { initialDeals: Deal[]
         </div>
       </div>
 
-      {/* Amazon Import Section - Direct ASIN */}
+      {/* Amazon Import Section - Search + Bulk Import as DRAFT */}
       {showAmazon && (
         <div className="mb-8 bg-orange-50 rounded-xl border border-orange-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-orange-900">Import from Amazon (Direct ASIN)</h2>
+            <h2 className="text-lg font-semibold text-orange-900">Search Amazon & Import as Draft</h2>
             <button onClick={() => setShowAmazon(false)} className="text-orange-600 hover:text-orange-800">
               ✕ Close
             </button>
           </div>
 
-          <div className="flex gap-3">
+          {/* Search Bar */}
+          <div className="flex gap-3 mb-6">
             <input
               type="text"
-              placeholder="Enter ASIN (e.g. B08N5WRWNW)"
-              value={amazonAsin}
-              onChange={(e) => setAmazonAsin(e.target.value)}
+              placeholder="Search products (e.g. laptop, wireless earbuds)"
+              value={amazonSearchTerm}
+              onChange={(e) => setAmazonSearchTerm(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") importAmazonAsin();
+                if (e.key === "Enter") searchAmazonProducts();
               }}
               className="flex-1 px-4 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500"
-              disabled={amazonImporting}
             />
             <button
-              onClick={importAmazonAsin}
-              disabled={amazonImporting || !amazonAsin.trim()}
+              onClick={searchAmazonProducts}
+              disabled={amazonLoading || !amazonSearchTerm.trim()}
               className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
             >
-              {amazonImporting ? "Importing..." : "Import"}
+              {amazonLoading ? "Searching..." : "🔍 Search"}
             </button>
           </div>
 
-          <p className="text-sm text-orange-600 mt-2">
-            Paste any Amazon ASIN here and click Import. The deal will be created and sent to Telegram.
-          </p>
+          {/* Results */}
+          {amazonProducts.length > 0 && (
+            <>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-orange-700 font-medium">
+                  Found {amazonProducts.length} products • {selectedAmazonProducts.length} selected
+                </p>
+                <button
+                  onClick={importSelectedAmazonProducts}
+                  disabled={amazonImporting || selectedAmazonProducts.length === 0}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                >
+                  {amazonImporting ? "Importing..." : `Import ${selectedAmazonProducts.length} as DRAFT`}
+                </button>
+              </div>
+
+              <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+                <table className="w-full bg-white rounded-lg">
+                  <thead className="bg-orange-100 sticky top-0">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-orange-900 w-12"></th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-orange-900">Product</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-orange-900">ASIN</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-orange-900">Price</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-orange-100">
+                    {amazonProducts.map((product) => (
+                      <tr key={product.asin} className="hover:bg-orange-50">
+                        <td className="px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedAmazonProducts.includes(product.asin)}
+                            onChange={() => toggleAmazonProduct(product.asin)}
+                            className="w-4 h-4 text-orange-600 border-orange-300 rounded focus:ring-orange-500"
+                          />
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            {product.imageUrl && (
+                              <img src={product.imageUrl} alt="" className="w-12 h-12 object-cover rounded" />
+                            )}
+                            <p className="font-medium text-gray-900 line-clamp-2">{product.title}</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <code className="bg-orange-100 text-orange-800 px-2 py-1 rounded text-sm font-mono">
+                            {product.asin}
+                          </code>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="font-bold text-green-600">₹{product.currentPrice}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {amazonProducts.length === 0 && !amazonLoading && (
+            <p className="text-orange-600 text-sm">Search for products above. Results will appear here.</p>
+          )}
         </div>
       )}
 
