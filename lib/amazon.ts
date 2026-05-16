@@ -1,6 +1,6 @@
 import { prisma } from './prisma';
 
-// Amazon Creators API Configuration
+// Amazon Creators API Types
 interface AmazonProduct {
   asin: string;
   title: string;
@@ -31,10 +31,10 @@ interface CreatorsConfig {
   marketplace: string;
 }
 
-// Cache for access token
+// Token cache
 let cachedToken: { token: string; expiresAt: number } | null = null;
 
-// Get Creators API config from environment variables
+// Get Creators API config
 export async function getCreatorsConfig(): Promise<CreatorsConfig> {
   const clientId = process.env.AMAZON_CLIENT_ID;
   const clientSecret = process.env.AMAZON_CLIENT_SECRET;
@@ -44,7 +44,7 @@ export async function getCreatorsConfig(): Promise<CreatorsConfig> {
   const marketplace = process.env.AMAZON_MARKETPLACE || 'IN';
 
   if (!clientId || !clientSecret || !associateTag) {
-    throw new Error('Amazon Creators API credentials not configured. Please set AMAZON_CLIENT_ID, AMAZON_CLIENT_SECRET, and AMAZON_ASSOCIATE_TAG in environment variables.');
+    throw new Error('Amazon Creators API not configured. Set AMAZON_CLIENT_ID, AMAZON_CLIENT_SECRET, AMAZON_ASSOCIATE_TAG');
   }
 
   return {
@@ -57,22 +57,15 @@ export async function getCreatorsConfig(): Promise<CreatorsConfig> {
   };
 }
 
-// Get OAuth access token from Amazon Cognito
+// Fetch OAuth access token (exactly as per Amazon documentation)
 async function getAccessToken(config: CreatorsConfig): Promise<string> {
-  // Return cached token if still valid
+  // Return cached token if valid
   if (cachedToken && Date.now() < cachedToken.expiresAt) {
     return cachedToken.token;
   }
 
-  // Determine token endpoint based on version
-  let tokenEndpoint: string;
-  if (config.version.startsWith('3.')) {
-    // v3.x uses Login with Amazon
-    tokenEndpoint = 'https://api.amazon.com/auth/o2/token';
-  } else {
-    // v2.x uses Cognito (EU region for India)
-    tokenEndpoint = 'https://creatorsapi.auth.eu-south-2.amazoncognito.com/oauth2/token';
-  }
+  // EU region token endpoint for India (v2.2)
+  const tokenEndpoint = 'https://creatorsapi.auth.eu-south-2.amazoncognito.com/oauth2/token';
 
   const body = new URLSearchParams({
     grant_type: 'client_credentials',
@@ -81,38 +74,34 @@ async function getAccessToken(config: CreatorsConfig): Promise<string> {
     scope: 'creatorsapi/default',
   });
 
-  try {
-    const response = await fetch(tokenEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: body.toString(),
-    });
+  const response = await fetch(tokenEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: body.toString(),
+  });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to get access token: ${response.status} - ${errorText}`);
-    }
-
-    const data = await response.json();
-    const token = data.access_token;
-    const expiresIn = data.expires_in || 3600;
-
-    // Cache token (expire 5 minutes before actual expiry)
-    cachedToken = {
-      token,
-      expiresAt: Date.now() + (expiresIn - 300) * 1000,
-    };
-
-    return token;
-  } catch (error) {
-    console.error('Creators API token fetch error:', error);
-    throw new Error('Failed to authenticate with Amazon Creators API');
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Token fetch failed:', errorText);
+    throw new Error(`Token fetch failed: ${response.status}`);
   }
+
+  const data = await response.json();
+  const token = data.access_token;
+  const expiresIn = data.expires_in || 3600;
+
+  // Cache token (expire 5 min early)
+  cachedToken = {
+    token,
+    expiresAt: Date.now() + (expiresIn - 300) * 1000,
+  };
+
+  return token;
 }
 
-// Get active Amazon config (for backward compatibility)
+// Get active config (backward compatible)
 export async function getActiveAmazonConfig() {
   const config = await getCreatorsConfig();
   return {
@@ -132,7 +121,7 @@ export function generateAffiliateUrl(asin: string, associateTag: string, region:
   return `${baseUrl}/${asin}?tag=${associateTag}`;
 }
 
-// Search products using Creators API
+// Search Items using Creators API (cURL format)
 export async function searchProducts(params: {
   keywords: string;
   region: string;
@@ -150,12 +139,11 @@ export async function searchProducts(params: {
     const token = await getAccessToken(config);
 
     const marketplace = config.region === 'in' ? 'www.amazon.in' : 'www.amazon.com';
-    const partnerTag = config.associateTag;
 
     const requestBody: any = {
       keywords: params.keywords,
       marketplace,
-      partnerTag,
+      partnerTag: config.associateTag,
       itemCount: 10,
       itemPage: params.page || 1,
       resources: [
@@ -169,10 +157,7 @@ export async function searchProducts(params: {
       ],
     };
 
-    if (params.sortBy) {
-      requestBody.sortBy = params.sortBy;
-    }
-
+    if (params.sortBy) requestBody.sortBy = params.sortBy;
     if (params.minPrice || params.maxPrice) {
       requestBody.priceRange = {};
       if (params.minPrice) requestBody.priceRange.minPrice = params.minPrice;
@@ -182,10 +167,9 @@ export async function searchProducts(params: {
     const response = await fetch('https://creatorsapi.amazon/catalog/v1/searchItems', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${token}, Version ${config.version}`,
         'Content-Type': 'application/json',
         'x-marketplace': marketplace,
-        'Version': config.version,
       },
       body: JSON.stringify(requestBody),
     });
@@ -193,19 +177,18 @@ export async function searchProducts(params: {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Creators API SearchItems error:', errorText);
-      throw new Error(`Creators API error: ${response.status}`);
+      return { items: [], totalResults: 0, page: params.page || 1 };
     }
 
     const data = await response.json();
     return parseSearchResponse(data, config.region);
   } catch (error) {
     console.error('Amazon search error:', error);
-    // Return empty results on error
     return { items: [], totalResults: 0, page: params.page || 1 };
   }
 }
 
-// Get product details by ASIN using Creators API
+// Get Items using Creators API (cURL format)
 export async function getProductDetails(params: {
   asin: string;
   region: string;
@@ -238,10 +221,9 @@ export async function getProductDetails(params: {
     const response = await fetch('https://creatorsapi.amazon/catalog/v1/getItems', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${token}, Version ${config.version}`,
         'Content-Type': 'application/json',
         'x-marketplace': marketplace,
-        'Version': config.version,
       },
       body: JSON.stringify(requestBody),
     });
@@ -249,7 +231,7 @@ export async function getProductDetails(params: {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Creators API GetItems error:', errorText);
-      throw new Error(`Creators API error: ${response.status}`);
+      return null;
     }
 
     const data = await response.json();
@@ -260,7 +242,7 @@ export async function getProductDetails(params: {
   }
 }
 
-// Get multiple products by ASINs
+// Get multiple products
 export async function getMultipleProducts(params: {
   asins: string[];
   region: string;
@@ -269,35 +251,22 @@ export async function getMultipleProducts(params: {
   associateTag: string;
 }): Promise<AmazonProduct[]> {
   const products: AmazonProduct[] = [];
-  
   for (const asin of params.asins) {
-    const product = await getProductDetails({
-      asin,
-      region: params.region,
-      accessKey: params.accessKey,
-      secretKey: params.secretKey,
-      associateTag: params.associateTag,
-    });
-    
-    if (product) {
-      products.push(product);
-    }
+    const product = await getProductDetails({ ...params, asin });
+    if (product) products.push(product);
   }
-  
   return products;
 }
 
 // Parse SearchItems response
 function parseSearchResponse(data: any, region: string): AmazonSearchResult {
   const items: AmazonProduct[] = [];
-
   if (data.searchResult?.items) {
     for (const item of data.searchResult.items) {
       const product = parseItem(item, region);
       if (product) items.push(product);
     }
   }
-
   return {
     items,
     totalResults: data.searchResult?.totalResultCount,
@@ -313,7 +282,7 @@ function parseGetItemsResponse(data: any, region: string): AmazonProduct | null 
   return null;
 }
 
-// Parse individual item
+// Parse individual item (with media/images)
 function parseItem(item: any, region: string): AmazonProduct | null {
   if (!item.asin) return null;
 
@@ -322,19 +291,22 @@ function parseItem(item: any, region: string): AmazonProduct | null {
   let currentPrice: number | undefined;
   let originalPrice: number | undefined;
 
-  if (item.offersV2?.listings?.[0]?.price) {
+  if (item.offersV2?.listings?.[0]?.price?.amount) {
     currentPrice = item.offersV2.listings[0].price.amount;
   }
 
-  if (item.offersV2?.listings?.[0]?.savingBasis) {
+  if (item.offersV2?.listings?.[0]?.savingBasis?.amount) {
     originalPrice = item.offersV2.listings[0].savingBasis.amount;
   }
 
+  // Fetch media/images
   let imageUrl: string | undefined;
   if (item.images?.primary?.large?.url) {
     imageUrl = item.images.primary.large.url;
   } else if (item.images?.primary?.medium?.url) {
     imageUrl = item.images.primary.medium.url;
+  } else if (item.images?.primary?.small?.url) {
+    imageUrl = item.images.primary.small.url;
   }
 
   const title = item.itemInfo?.title?.displayValue || 'Unknown Product';
@@ -359,7 +331,7 @@ export function generateAffiliateUrlLegacy(asin: string, associateTag: string, r
   return generateAffiliateUrl(asin, associateTag, region);
 }
 
-// Cache product in database
+// Cache product
 export async function cacheAmazonProduct(product: AmazonProduct, dealId?: string) {
   return prisma.amazonProduct.upsert({
     where: { asin: product.asin },
@@ -389,7 +361,7 @@ export async function cacheAmazonProduct(product: AmazonProduct, dealId?: string
   });
 }
 
-// Get cached product by ASIN
+// Get cached product
 export async function getCachedProduct(asin: string) {
   return prisma.amazonProduct.findUnique({
     where: { asin },
@@ -397,10 +369,9 @@ export async function getCachedProduct(asin: string) {
   });
 }
 
-// Sync all Amazon product prices
+// Sync prices
 export async function syncAllAmazonPrices() {
   const config = await getActiveAmazonConfig();
-
   const products = await prisma.amazonProduct.findMany({
     where: { dealId: { not: null } },
   });
@@ -430,17 +401,12 @@ export async function syncAllAmazonPrices() {
 
         if (oldPrice !== newPrice) {
           results.priceChanges++;
-          results.products.push({
-            asin: product.asin,
-            oldPrice,
-            newPrice,
-          });
+          results.products.push({ asin: product.asin, oldPrice, newPrice });
         }
-
         results.success++;
       }
     } catch (error) {
-      console.error(`Failed to sync price for ${product.asin}:`, error);
+      console.error(`Failed to sync ${product.asin}:`, error);
       results.failed++;
     }
   }
@@ -451,12 +417,11 @@ export async function syncAllAmazonPrices() {
       type: 'AMAZON',
       action: 'SYNC',
       status: results.failed === 0 ? 'SUCCESS' : 'PARTIAL',
-      message: `Synced ${results.success} products, ${results.failed} failed, ${results.priceChanges} price changes`,
+      message: `Synced ${results.success} products, ${results.failed} failed`,
     },
   });
 
   return results;
 }
 
-// Export types
 export type { AmazonProduct, AmazonSearchResult };
